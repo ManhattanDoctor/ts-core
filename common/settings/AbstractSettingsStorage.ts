@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { ObjectUtil } from '../../common/util/ObjectUtil';
+import { ObjectUtil } from '../util/ObjectUtil';
 
 export abstract class AbstractSettingsStorage {
     // --------------------------------------------------------------------------
@@ -8,9 +8,9 @@ export abstract class AbstractSettingsStorage {
     //
     // --------------------------------------------------------------------------
 
-    private static parseValue<T = any>(value: any, defaultValue: T): T {
-        if (_.isNumber(defaultValue)) {
-            return parseFloat(value) as any;
+    private static parseValue<T>(value: any, defaultValue: T): T {
+        if (!_.isNil(value) && _.isNumber(defaultValue)) {
+            return parseFloat(value.toString()) as any;
         }
         return value;
     }
@@ -30,7 +30,7 @@ export abstract class AbstractSettingsStorage {
     // --------------------------------------------------------------------------
 
     protected constructor(data?: any) {
-        this.data = data;
+        this.data = data || {};
     }
 
     // --------------------------------------------------------------------------
@@ -40,18 +40,13 @@ export abstract class AbstractSettingsStorage {
     // --------------------------------------------------------------------------
 
     protected getValue<T>(name: string, defaultValue?: T): T {
-        let value = process.env[name] as any;
-        if (!_.isNil(value)) {
-            return AbstractSettingsStorage.parseValue(value, defaultValue);
+        let value = this.getPrefferedValue(name);
+        if (_.isNil(value) && ObjectUtil.hasOwnProperty(this.data, name)) {
+            value = this.data[name];
         }
 
-        if (!ObjectUtil.hasOwnProperty(this.data, name)) {
-            return defaultValue;
-        }
-
-        value = this.data[name];
         if (_.isNil(value)) {
-            return defaultValue;
+            value = defaultValue;
         }
 
         return AbstractSettingsStorage.parseValue(value, defaultValue);
@@ -67,19 +62,11 @@ export abstract class AbstractSettingsStorage {
 
     // --------------------------------------------------------------------------
     //
-    //  Public Properties
+    //  Protected Properties
     //
     // --------------------------------------------------------------------------
 
-    public get isTesting(): boolean {
-        return this.getValue('NODE_ENV') === 'testing';
-    }
-
-    public get isProduction(): boolean {
-        return this.getValue('NODE_ENV') === 'production';
-    }
-
-    public get isDevelopment(): boolean {
-        return this.getValue('NODE_ENV') === 'development';
+    protected getPrefferedValue<T>(name: string): T {
+        return null;
     }
 }

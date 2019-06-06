@@ -54,7 +54,7 @@ export class LocalTransport extends Transport {
         }
 
         if (!this.pendingCommands.has(name)) {
-            this.pendingCommands.set(name, new Array());
+            this.pendingCommands.set(name, []);
         }
         this.pendingCommands.get(name).push(command);
     }

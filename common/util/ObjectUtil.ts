@@ -19,4 +19,25 @@ export class ObjectUtil {
         let existProperties = ObjectUtil.getProperties(data);
         return _.every(properties, property => existProperties.includes(property));
     }
+
+    public static sortKeys(data: any): any {
+        if (_.isNil(data)) {
+            return null;
+        }
+        if (!_.isObject(data)) {
+            return data;
+        }
+
+        let keys = Object.keys(data);
+        if (_.isEmpty(keys)) {
+            return data;
+        }
+
+        keys.sort();
+        let item = {};
+        for (let key of keys) {
+            item[key] = data[key];
+        }
+        return item;
+    }
 }

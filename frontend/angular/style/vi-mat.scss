@@ -1,0 +1,334 @@
+@import '~@angular/material/theming';
+
+/*--------------------------------------------------------------------------
+//
+//  Mixins
+//
+//-------------------------------------------------------------------------*/
+
+@mixin vi-mat-core($typography) {
+    p {
+        padding: 0;
+        margin: 0;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    a:focus,
+    div:focus,
+    button:focus {
+        outline: 0;
+    }
+
+    button {
+        .fa {
+            margin-right: 4px;
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+    }
+
+    // Temprorary
+    textarea {
+        &.cdk-textarea-autosize {
+            overflow-y: hidden !important;
+        }
+    }
+
+    mat-dialog-container {
+        padding: 0 !important;
+        display: block !important;
+        max-width: none !important;
+        overflow: visible !important;
+        min-height: inherit !important;
+        max-height: inherit;
+
+        &:hover:not(.minimized) {
+            resize-window-element {
+                display: block !important;
+            }
+        }
+
+        & > :first-child {
+            height: 100%;
+            border-radius: 4px;
+            box-sizing: border-box;
+            max-height: inherit;
+            @include vertical-scroll-only();
+        }
+
+        close-window-element {
+            top: -20px;
+            right: -20px;
+        }
+
+        minimize-window-element {
+            top: -20px;
+            right: 10px;
+        }
+
+        resize-window-element {
+            right: -16px;
+            bottom: -16px;
+            display: none !important;
+        }
+    }
+
+    mat-progress-bar {
+        &.border {
+            height: 1px;
+            border: none !important;
+
+            svg {
+                display: none;
+            }
+        }
+
+        &.transparent {
+            .mat-progress-bar-buffer {
+                background-color: transparent;
+            }
+            svg {
+                display: none;
+            }
+        }
+    }
+
+    mat-tab-group {
+        outline: 0;
+
+        .mat-tab-label-active {
+            opacity: 1;
+        }
+
+        &.no-underline {
+            .mat-tab-header {
+                border-bottom: none;
+            }
+        }
+        &.tabs-stretch {
+            .mat-tab-label {
+                min-width: 0;
+                @include flex-grow();
+            }
+        }
+    }
+
+    mat-select {
+        &.text-title {
+            .mat-select-arrow,
+            .mat-select-value {
+                color: inherit;
+            }
+        }
+    }
+
+    mat-form-field {
+        &.mat-focused {
+            .mat-form-field-label {
+                color: inherit !important;
+            }
+        }
+
+        .mat-form-field-infix {
+            width: inherit;
+        }
+
+        &.no-underline {
+            .mat-form-field-wrapper {
+                padding-bottom: 0.7em;
+            }
+            .mat-form-field-underline {
+                display: none !important;
+            }
+        }
+
+        &.text-center {
+            input {
+                text-align: center;
+            }
+            .mat-input-wrapper {
+                text-align: center;
+            }
+        }
+
+        mat-hint {
+            @include mouse-inactive();
+        }
+    }
+
+    mat-chip:focus {
+        outline: 0;
+    }
+
+    mat-list-item,
+    mat-selection-list {
+        font-weight: inherit;
+    }
+
+    .cdk-overlay-pane {
+        &.window,
+        &.notification {
+            position: absolute !important;
+        }
+        &.draggable,
+        &.resizeable {
+            border-radius: 4px;
+        }
+        &.window {
+            border: 2px solid transparent;
+        }
+        &.minimized {
+            height: auto !important;
+            min-height: 40px !important;
+        }
+
+        .mat-menu-content {
+            padding: 0 !important;
+        }
+        .mat-menu-panel {
+            max-width: none !important;
+            max-height: none !important;
+        }
+    }
+
+    .cdk-overlay-backdrop {
+        background-color: rgba(black, 0.5);
+    }
+
+    .mat-form-field-suffix {
+        button {
+            .fa {
+                font-size: 12px;
+                padding-bottom: 2px;
+            }
+        }
+    }
+
+    .mat-body,
+    .mat-title,
+    .mat-caption,
+    .mat-headline,
+    .mat-body-strong,
+    .mat-display-1,
+    .mat-display-2,
+    .mat-display-3,
+    .mat-display-4 {
+        margin: 0;
+    }
+
+    .text-one-line {
+        @include text-one-line();
+    }
+
+    .mouse-help {
+        @include mouse-help();
+    }
+    .mouse-wait {
+        @include mouse-wait();
+    }
+    .mouse-active {
+        @include mouse-active();
+    }
+    .mouse-enabled {
+        @include mouse-enabled();
+    }
+    .mouse-disabled {
+        @include mouse-disabled();
+    }
+    .mouse-inactive {
+        @include mouse-inactive();
+    }
+    .mouse-disabled {
+        @include mouse-disabled();
+    }
+
+    ::-webkit-scrollbar {
+        width: 14px;
+        height: 14px;
+    }
+    ::-webkit-scrollbar-thumb {
+        height: 6px;
+        min-height: 16px;
+        border: 4px solid;
+        background-clip: padding-box;
+        -webkit-border-radius: 7px;
+    }
+    ::-webkit-scrollbar-thumb {
+        border-color: transparent;
+        -webkit-box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.05), inset 1px 1px 0px rgba(0, 0, 0, 0.05);
+    }
+    ::-webkit-scrollbar-corner {
+        background-color: transparent;
+    }
+    ::-webkit-scrollbar-button {
+        width: 0;
+        height: 0;
+        display: none;
+    }
+    .IIV::-webkit-media-controls-play-button,
+    video::-webkit-media-controls-start-playback-button {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+@mixin vi-mat-theme($theme) {
+    $primary: map-get($theme, primary);
+    $foreground: map-get($theme, foreground);
+    $background: map-get($theme, background);
+
+    mat-tab-header {
+        border-color: map-get($foreground, divider);
+    }
+
+    mat-form-field {
+        .mat-form-field-underline {
+            background-color: map-get($foreground, divider) !important;
+        }
+    }
+
+    mat-progress-bar {
+        &.border {
+            border: none !important;
+            .mat-progress-bar-buffer {
+                background-color: mat-color($foreground, divider);
+            }
+        }
+    }
+
+    .mat-menu-panel {
+        color: mat-color($foreground, text);
+    }
+
+    .mat-row {
+        border-color: map-get($foreground, divider);
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    .cdk-overlay-pane {
+        &.blink {
+            border: 2px solid mat-color($primary);
+        }
+    }
+
+    $thumb-color: rgba(0, 0, 0, 0.15);
+
+    @if map-get($theme, is-dark) {
+        $thumb-color: rgba(255, 255, 255, 0.15);
+
+        .mat-drawer-backdrop.mat-drawer-shown {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: $thumb-color;
+    }
+}

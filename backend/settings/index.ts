@@ -1,4 +1,3 @@
-export * from './AbstractSettingsStorage';
 export * from './EnvSettingsStorage';
 export * from './IAmqpSettings';
 export * from './IDatabaseSettings';
