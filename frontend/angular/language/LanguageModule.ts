@@ -1,3 +1,4 @@
+import { HttpClientModule, HttpHandler } from '@angular/common/http';
 import { Injector, NgModule } from '@angular/core';
 import { TranslateModule, TranslateParser } from '@ngx-translate/core';
 import { CookieModule, CookieOptionsProvider, COOKIE_OPTIONS } from 'ngx-cookie';
@@ -8,6 +9,7 @@ import { LanguageService } from './LanguageService';
 
 @NgModule({
     imports: [
+        HttpClientModule,
         CookieModule.forChild(),
         TranslateModule.forRoot({
             parser: {
@@ -20,8 +22,9 @@ import { LanguageService } from './LanguageService';
         LanguageService,
         LanguageResolver,
         LanguageMatPaginatorIntl,
+        { provide: HttpHandler, useValue: {} },
         { provide: CookieOptionsProvider, useValue: CookieOptionsProvider, deps: [COOKIE_OPTIONS, Injector] }
     ],
-    exports: [TranslateModule]
+    exports: [TranslateModule, CookieModule]
 })
 export class LanguageModule {}

@@ -1,13 +1,15 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { CookieService } from 'ngx-cookie';
 import { Subscription } from 'rxjs';
 import { Loadable, LoadableEvent, LoadableStatus } from '../../../common';
+import { ExtendedError } from '../../../common/error/ExtendedError';
 import { MapCollection } from '../../../common/map';
 import { ObservableData } from '../../../common/observer';
+import { CloneUtil } from '../../util';
 import { Language } from './Language';
 import { LanguageMessageFormatParser } from './LanguageMessageFormatParser';
-import { ExtendedError } from '../../../common/error/ExtendedError';
 
 @Injectable()
 export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
@@ -34,10 +36,9 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     //
     //--------------------------------------------------------------------------
 
-    constructor(private cookies: CookieService, private translation: TranslateService) {
+    constructor(private http: HttpClient, private cookies: CookieService, private translation: TranslateService) {
         super();
         this._languages = new MapCollection<Language>('id');
-
         this.parser = translation.parser as LanguageMessageFormatParser;
         /*
         this.parser.events.subscribe(data => {
@@ -62,7 +63,6 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
             this.subscription.unsubscribe();
         }
 
-        /*
         this.subscription = this.http.get(this.getLanguageUrl(language)).subscribe(
             json => {
                 this.subscription.unsubscribe();
@@ -82,7 +82,6 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
                 this.observer.next(new ObservableData(LoadableEvent.FINISHED, language));
             }
         );
-        */
     }
 
     private setLanguage(language: Language, translation: Object): void {

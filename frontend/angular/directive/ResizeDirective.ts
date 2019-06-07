@@ -1,5 +1,6 @@
 import { Directive, ElementRef, EventEmitter, Input, Output } from '@angular/core';
-import * as _ from 'lodash';
+import { Interactable } from '@interactjs/types/types';
+import * as interact from 'interactjs';
 import { Destroyable } from '../../Destroyable';
 import { ViewUtil } from '../util';
 
@@ -25,7 +26,7 @@ export class ResizeDirective extends Destroyable {
     @Input()
     public isBottom: boolean = false;
 
-    private interactable: any;
+    private interactable: Interactable;
 
     //--------------------------------------------------------------------------
     //
@@ -35,8 +36,9 @@ export class ResizeDirective extends Destroyable {
 
     constructor(element: ElementRef) {
         super();
-        this.interactable = interact(ViewUtil.parseElement(element));
-        this.interactable.styleCursor(false);
+
+        this.interactable = interact.default(ViewUtil.parseElement(element));
+        // this.interactable.styleCursor(false);
 
         let param = {} as any;
         param.top = this.isTop;
@@ -65,13 +67,10 @@ export class ResizeDirective extends Destroyable {
     //
     //--------------------------------------------------------------------------
 
-
     public destroy(): void {
-        if (!_.isNil(this.interactable)) {
+        if (this.interactable) {
             this.interactable.unset();
             this.interactable = null;
         }
     }
 }
-
-declare let interact: any;

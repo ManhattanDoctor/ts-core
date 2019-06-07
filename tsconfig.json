@@ -11,13 +11,11 @@
         "preserveSymlinks": true,
         "target": "esnext",
         "sourceMap": true,
-        "outDir": "./dist",
+        "outDir": "./build",
         "baseUrl": "./src",
-        "paths": {
-        },
+        "paths": {},
         "noUnusedLocals": false,
         "noUnusedParameters": false,
         "newLine": "LF"
     }
 }
-
