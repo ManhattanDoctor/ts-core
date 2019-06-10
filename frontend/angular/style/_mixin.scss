@@ -1,0 +1,108 @@
+/*--------------------------------------------------------------------------
+//
+//  Common
+//
+//-------------------------------------------------------------------------*/
+
+@mixin saturation($value) {
+    filter: none;
+    -o-filter: grayscale($value);
+    -ms-filter: grayscale($value);
+    -moz-filter: grayscale($value);
+    -webkit-filter: grayscale($value);
+}
+
+@mixin scroll-auto() {
+    overflow-y: auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@mixin scroll-no() {
+    overflow-y: hidden;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+@mixin vertical-scroll-only() {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+@mixin horizontal-scroll-only() {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+/*--------------------------------------------------------------------------
+//
+//	Text
+//
+//-------------------------------------------------------------------------*/
+
+@mixin text-one-line() {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/*--------------------------------------------------------------------------
+//
+//	Grid
+//
+//-------------------------------------------------------------------------*/
+
+@mixin grid($padding, $cell-class: 'item-container') {
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: $padding;
+
+    &.one {
+        .#{$cell-class} {
+            width: 100%;
+        }
+    }
+    &.two {
+        .#{$cell-class} {
+            width: 50%;
+        }
+    }
+    &.three {
+        .#{$cell-class} {
+            width: 33.3%;
+        }
+    }
+    &.four {
+        .#{$cell-class} {
+            width: 25%;
+        }
+    }
+    &.five {
+        .#{$cell-class} {
+            width: 20%;
+        }
+    }
+    &.six {
+        .#{$cell-class} {
+            width: 16.6%;
+        }
+    }
+    &.eight {
+        .#{$cell-class} {
+            width: 12.5%;
+        }
+    }
+
+    .#{$cell-class} {
+        padding: $padding;
+        vertical-align: middle;
+        display: inline-block;
+        box-sizing: border-box;
+    }
+}

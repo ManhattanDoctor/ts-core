@@ -1,43 +1,21 @@
 import { ComponentType } from '@angular/cdk/portal';
-import { Inject, Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import * as _ from 'lodash';
 import { CookieService } from 'ngx-cookie';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { ObservableData } from '../../../common/observer';
 import { Destroyable } from '../../Destroyable';
 import { ArrayUtil } from '../../util';
+import { IQuestion, QuestionMode } from '../IQuestion';
 import { LanguageService } from '../language';
-import { Question, QuestionMode } from '../Question';
 import { ViewUtil } from '../util';
-import { IWindow } from './IWindow';
+import { IWindow, WindowEvent } from './IWindow';
 import { IWindowContent } from './IWindowContent';
 import { WindowAlign, WindowConfig } from './WindowConfig';
 import { WindowFactory } from './WindowFactory';
 import { WindowProperties } from './WindowProperties';
 
-@Injectable()
-export class WindowService extends Destroyable {
-    // --------------------------------------------------------------------------
-    //
-    // 	Constants
-    //
-    // --------------------------------------------------------------------------
-
-    public static GAP_X = 25;
-    public static GAP_Y = 25;
-    private static TOP_Z_INDEX = 999;
-
-    public static DEFAULT_MIN_WIDTH = 100;
-    public static DEFAULT_MIN_HEIGHT = 100;
-
-    public static DEFAULT_PADDING_TOP = 25;
-    public static DEFAULT_PADDING_LEFT = 25;
-    public static DEFAULT_PADDING_RIGHT = 25;
-    public static DEFAULT_PADDING_BOTTOM = 25;
-
-    public static DEFAULT_VERTICAL_ALIGN: WindowAlign = WindowAlign.CENTER;
-    public static DEFAULT_HORIZONTAL_ALIGN: WindowAlign = WindowAlign.CENTER;
-
+export class WindowBaseService extends Destroyable {
     // --------------------------------------------------------------------------
     //
     // 	Properties
@@ -46,8 +24,10 @@ export class WindowService extends Destroyable {
 
     public factory: WindowFactory<IWindow>;
     public questionWindow: ComponentType<IWindowContent>;
-
     public isNeedCheckWindowPositionAfterOpen: boolean = true;
+
+    protected dialog: MatDialog;
+    protected language: LanguageService;
 
     private _windows: Map<WindowConfig, IWindowContent>;
     private _windowsArray: Array<IWindow>;
@@ -55,21 +35,44 @@ export class WindowService extends Destroyable {
     private observer: Subject<ObservableData<WindowServiceEvent, IWindow>>;
     private properties: PropertiesManager;
 
+    protected gapX: number;
+    protected gapY: number;
+
+    protected topZIndex: number;
+    protected minWidth: number;
+    protected minHeight: number;
+
+    protected paddingTop: number;
+    protected paddingLeft: number;
+    protected paddingRight: number;
+    protected paddingBottom: number;
+
+    protected verticalAlign: WindowAlign;
+    protected horizontalAlign: WindowAlign;
+
     // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
     // --------------------------------------------------------------------------
 
-    // constructor(private dialog: MatDialog, private language: LanguageService, private cookies: CookieService) {
-    constructor(private dialog: MatDialog, private language: LanguageService, private cookies: CookieService) {
+    constructor(dialog: MatDialog, language: LanguageService, cookies: CookieService) {
         super();
         this._windows = new Map();
         this._windowsArray = [];
 
+        this.dialog = dialog;
+        this.language = language;
         this.observer = new Subject();
         this.properties = new PropertiesManager(cookies);
 
+        this.topZIndex = 999;
+        this.gapX = this.gapY = 25;
+        this.minWidth = this.minHeight = 100;
+        this.paddingTop = this.paddingLeft = this.paddingBottom = this.paddingRight = 25;
+
+        this.verticalAlign = WindowAlign.CENTER;
+        this.horizontalAlign = WindowAlign.CENTER;
         /*
         let service = dialog as any;
         service.getOverlayStateModal = service._getOverlayState;
@@ -88,19 +91,17 @@ export class WindowService extends Destroyable {
     // --------------------------------------------------------------------------
 
     private sortFunction(first: IWindow, second: IWindow): number {
-        let firstIndex: number = first.container ? parseInt(ViewUtil.getStyle(first.container.parentElement, 'zIndex'), 10) : -1;
-        let secondIndex: number = second.container ? parseInt(ViewUtil.getStyle(second.container.parentElement, 'zIndex'), 10) : -1;
-
+        let firstIndex = first.container ? parseInt(ViewUtil.getStyle(first.container.parentElement, 'zIndex'), 10) : -1;
+        let secondIndex = second.container ? parseInt(ViewUtil.getStyle(second.container.parentElement, 'zIndex'), 10) : -1;
         return firstIndex > secondIndex ? -1 : 1;
     }
 
     private setWindowOnTop(topWindow: IWindow): void {
-        let currentIndex = WindowService.TOP_Z_INDEX - 2;
+        let currentIndex = this.topZIndex - 2;
         for (let window of this._windowsArray) {
             if (window.container) {
                 window.isOnTop = window === topWindow;
-
-                let zIndex = window.isOnTop ? WindowService.TOP_Z_INDEX : currentIndex--;
+                let zIndex = window.isOnTop ? this.topZIndex : currentIndex--;
                 ViewUtil.setStyle(window.backdrop, 'zIndex', zIndex);
                 ViewUtil.setStyle(window.wrapper, 'zIndex', zIndex);
             }
@@ -135,8 +136,8 @@ export class WindowService extends Destroyable {
 
     private checkWindowPosition(window: IWindow): void {
         while (this.hasWindowWithSamePosition(window)) {
-            window.setX(window.getX() + WindowService.GAP_X);
-            window.setY(window.getY() + WindowService.GAP_Y);
+            window.setX(window.getX() + this.gapX);
+            window.setY(window.getY() + this.gapY);
         }
     }
 
@@ -172,10 +173,10 @@ export class WindowService extends Destroyable {
     }
 
     private get(id: string): IWindow {
-        let result: IWindow = null;
-        this._windowsArray.forEach(window => {
-            if (window.config.id === id) {
-                result = window;
+        let result = null;
+        this._windowsArray.forEach(item => {
+            if (item.config.id === id) {
+                result = item;
                 return true;
             }
         });
@@ -197,31 +198,31 @@ export class WindowService extends Destroyable {
             }
         }
 
-        if (!config.defaultMinWidth) {
-            config.defaultMinWidth = WindowService.DEFAULT_MIN_WIDTH;
-        }
-        if (!config.defaultMinHeight) {
-            config.defaultMinHeight = WindowService.DEFAULT_MIN_HEIGHT;
-        }
-
         if (!config.verticalAlign) {
-            config.verticalAlign = WindowService.DEFAULT_VERTICAL_ALIGN;
+            config.verticalAlign = this.verticalAlign;
         }
         if (!config.horizontalAlign) {
-            config.horizontalAlign = WindowService.DEFAULT_HORIZONTAL_ALIGN;
+            config.horizontalAlign = this.horizontalAlign;
         }
 
-        if (isNaN(config.paddingTop)) {
-            config.paddingTop = WindowService.DEFAULT_PADDING_TOP;
+        if (_.isNaN(config.defaultMinWidth)) {
+            config.defaultMinWidth = this.minWidth;
         }
-        if (isNaN(config.paddingLeft)) {
-            config.paddingLeft = WindowService.DEFAULT_PADDING_LEFT;
+        if (_.isNaN(config.defaultMinHeight)) {
+            config.defaultMinHeight = this.minHeight;
         }
-        if (isNaN(config.paddingRight)) {
-            config.paddingRight = WindowService.DEFAULT_PADDING_RIGHT;
+
+        if (_.isNaN(config.paddingTop)) {
+            config.paddingTop = this.paddingTop;
         }
-        if (isNaN(config.paddingBottom)) {
-            config.paddingBottom = WindowService.DEFAULT_PADDING_BOTTOM;
+        if (_.isNaN(config.paddingLeft)) {
+            config.paddingLeft = this.paddingLeft;
+        }
+        if (_.isNaN(config.paddingRight)) {
+            config.paddingRight = this.paddingRight;
+        }
+        if (_.isNaN(config.paddingBottom)) {
+            config.paddingBottom = this.paddingBottom;
         }
 
         if (config.propertiesId) {
@@ -241,18 +242,17 @@ export class WindowService extends Destroyable {
 
         window = this.factory.create(properties);
 
-        let subscription: Subscription = window.events.subscribe(event => {
+        let subscription = window.events.subscribe(event => {
             switch (event) {
-                case IWindow.EVENT_OPENED:
+                case WindowEvent.OPENED:
                     this.add(config, reference.componentInstance);
-
                     this.setWindowOnTop(window);
                     if (this.isNeedCheckWindowPositionAfterOpen) {
                         this.checkWindowPosition(window);
                     }
                     break;
 
-                case IWindow.EVENT_CLOSED:
+                case WindowEvent.CLOSED:
                     subscription.unsubscribe();
                     this.remove(config, window);
 
@@ -261,18 +261,17 @@ export class WindowService extends Destroyable {
                     }
                     break;
 
-                case IWindow.EVENT_RESIZED:
+                case WindowEvent.RESIZED:
                     if (config.propertiesId) {
                         this.properties.save(config.propertiesId, window);
                     }
                     break;
 
-                case IWindow.EVENT_SET_ON_TOP:
+                case WindowEvent.SET_ON_TOP:
                     this.setWindowOnTop(window);
                     break;
             }
         });
-
         return window.content;
     }
 
@@ -300,10 +299,19 @@ export class WindowService extends Destroyable {
 
     public destroy(): void {
         this.removeAll();
+
+        if (this.properties) {
+            this.properties.destroy();
+            this.properties = null;
+        }
+
         this.factory = null;
         this.observer = null;
         this.properties = null;
         this.questionWindow = null;
+
+        this.dialog = null;
+        this.language = null;
 
         this._windows = null;
         this._windowsArray = null;
@@ -324,23 +332,23 @@ export class WindowService extends Destroyable {
         return true;
     }
 
-    public info(translationId?: string, translation?: any): Question {
+    public info(translationId?: string, translation?: any): IQuestion {
         let config = this.factory.createConfig(true, false, 450);
         let content: any = this.openWindow(this.questionWindow, config);
 
-        let question = content as Question;
+        let question = content as IQuestion;
         question.text = this.language.translate(translationId, translation);
         question.mode = QuestionMode.INFO;
         return question;
     }
 
-    public question(translationId?: string, translation?: any): Question {
+    public question(translationId?: string, translation?: any): IQuestion {
         let config = this.factory.createConfig(true, false, 450);
         let content: any = this.openWindow(this.questionWindow, config);
 
         config.disableClose = true;
 
-        let question = content as Question;
+        let question = content as IQuestion;
         question.text = this.language.translate(translationId, translation);
         question.mode = QuestionMode.QUESTION;
         return question;
@@ -361,14 +369,16 @@ export class WindowService extends Destroyable {
     }
 }
 
-export class PropertiesManager {
+export class PropertiesManager extends Destroyable {
     // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
     // --------------------------------------------------------------------------
 
-    constructor(private cookies: CookieService) {}
+    constructor(private cookies: CookieService) {
+        super();
+    }
 
     // --------------------------------------------------------------------------
     //
@@ -377,23 +387,27 @@ export class PropertiesManager {
     // --------------------------------------------------------------------------
 
     public load(name: string, config: WindowConfig): void {
-        let properties = this.cookies.getObject(name + 'Window') as any;
-        if (!properties) {
+        let item = this.cookies.getObject(name + 'Window') as any;
+        if (!item) {
             return;
         }
-        if (properties.hasOwnProperty('width')) {
-            config.defaultWidth = properties.width;
+        if (item.hasOwnProperty('width')) {
+            config.defaultWidth = item.width;
         }
-        if (properties.hasOwnProperty('height')) {
-            config.defaultHeight = properties.height;
+        if (item.hasOwnProperty('height')) {
+            config.defaultHeight = item.height;
         }
     }
 
     public save(name: string, window: IWindow): void {
-        let properties = {} as any;
-        properties.width = window.getWidth();
-        properties.height = window.getHeight();
-        this.cookies.putObject(name + 'Window', properties);
+        this.cookies.putObject(name + 'Window', {
+            width: window.getWidth(),
+            height: window.getHeight()
+        });
+    }
+
+    public destroy(): void {
+        this.cookies = null;
     }
 }
 

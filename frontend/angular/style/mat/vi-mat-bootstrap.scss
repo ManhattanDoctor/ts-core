@@ -1,0 +1,76 @@
+@import '~@angular/material/theming';
+
+/*--------------------------------------------------------------------------
+//
+//  Methods
+//
+//-------------------------------------------------------------------------*/
+
+@mixin vi-mat-theme-bootstrap($theme, $text-primary-default, $text-accent-default) {
+    $warn: map-get($theme, warn);
+    $accent: map-get($theme, accent);
+    $primary: map-get($theme, primary);
+    $is-dark: map-get($theme, is-dark);
+    $background: map-get($theme, background);
+    $foreground: map-get($theme, foreground);
+
+    $text-warn: mat-color($warn);
+    $text-accent: mat-color($accent, $text-accent-default);
+    $text-primary: mat-color($primary, $text-primary-default);
+    @if $is-dark {
+        $text-accent: mat-color($accent);
+        $text-primary: mat-color($primary);
+    }
+
+    .bg-primary {
+        background-color: $text-primary !important;
+    }
+    .border-primary {
+        border-color: $text-primary !important;
+    }
+
+    .border {
+        border-color: map-get($foreground, divider) !important;
+    }
+    .border-top {
+        border-color: map-get($foreground, divider) !important;
+    }
+    .border-left {
+        border-color: map-get($foreground, divider) !important;
+    }
+    .border-right {
+        border-color: map-get($foreground, divider) !important;
+    }
+    .border-bottom {
+        border-color: map-get($foreground, divider) !important;
+    }
+
+    .background {
+        background-color: map-get($background, background) !important;
+    }
+    .background-body {
+        background-color: map-get($background, body) !important;
+    }
+
+    .text-base {
+        color: map-get($foreground, text) !important;
+    }
+    .text-warn {
+        color: $text-warn !important;
+    }
+    .text-accent {
+        color: $text-accent !important;
+    }
+    .text-danger {
+        color: $text-warn !important;
+    }
+    .text-primary {
+        color: $text-primary !important;
+    }
+    .text-success {
+        color: map-get($foreground, success-text) !important;
+    }
+    .text-secondary {
+        color: map-get($foreground, secondary-text) !important;
+    }
+}

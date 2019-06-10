@@ -1,0 +1,47 @@
+/*--------------------------------------------------------------------------
+//
+//  Mixin
+//
+//-------------------------------------------------------------------------*/
+
+@mixin mouse-cursor-mixin($value) {
+	cursor: $value !important;
+}
+
+@mixin mouse-pointer-events-mixin($value) {
+	pointer-events: $value !important;
+}
+
+/*--------------------------------------------------------------------------
+//
+//  Common
+//
+//-------------------------------------------------------------------------*/
+
+@mixin mouse-active() {
+	@include mouse-cursor-mixin(pointer);
+}
+
+@mixin mouse-inactive() {
+	@include mouse-cursor-mixin(default);
+}
+
+@mixin mouse-move(){
+	@include mouse-cursor-mixin(move);
+}
+
+@mixin mouse-help(){
+	@include mouse-cursor-mixin(help);
+}
+
+@mixin mouse-wait(){
+	@include mouse-cursor-mixin(wait);
+}
+
+@mixin mouse-enabled() {
+	@include mouse-pointer-events-mixin(auto);
+}
+
+@mixin mouse-disabled() {
+	@include mouse-pointer-events-mixin(none);
+}

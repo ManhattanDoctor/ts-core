@@ -59,7 +59,7 @@ export enum LoadableEvent {
     ERROR = 'ERROR',
     STARTED = 'STARTED',
     COMPLETE = 'COMPLETE',
-    FINISHED = 'FINISHED'
+    FINISHED = 'FINISHED',
 }
 
 export enum LoadableStatus {

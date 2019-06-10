@@ -1,12 +1,12 @@
-import { AfterViewInit, ElementRef, ViewContainerRef } from '@angular/core';
-import { DestroyableContainer } from '../../DestroyableContainer';
-import { IWindow, WindowEvent } from './IWindow';
-import { WindowConfig } from './WindowConfig';
+import { AfterViewInit, ElementRef } from '@angular/core';
+import { DestroyableContainer } from '../../../DestroyableContainer';
+import { ViewUtil } from '../../util/ViewUtil';
+import { IWindow } from '../IWindow';
 
-export abstract class IWindowContent extends DestroyableContainer implements AfterViewInit {
+export class WindowElement extends DestroyableContainer implements AfterViewInit {
     // --------------------------------------------------------------------------
     //
-    //  Properties=
+    // 	Properties
     //
     // --------------------------------------------------------------------------
 
@@ -14,89 +14,71 @@ export abstract class IWindowContent extends DestroyableContainer implements Aft
 
     // --------------------------------------------------------------------------
     //
-    //  Constructor
+    // 	Constructor
     //
     // --------------------------------------------------------------------------
 
-    constructor(public container: ViewContainerRef) {
+    constructor(protected element: ElementRef) {
         super();
     }
 
     // --------------------------------------------------------------------------
     //
-    //  Private Methods
+    // 	Private Methods
     //
     // --------------------------------------------------------------------------
+
+    protected checkWindowParent(): void {
+        let container = ViewUtil.parseElement(this.element.nativeElement);
+        while (container && container.nodeName.toLowerCase() !== 'mat-dialog-container') {
+            container = container.parentElement;
+        }
+
+        if (container) {
+            ViewUtil.appendChild(container, this.element.nativeElement);
+        }
+    }
+
+    protected createChildren(): void {}
+
+    protected destroyChildren(): void {}
 
     protected commitWindowProperties(): void {}
 
     // --------------------------------------------------------------------------
     //
-    //  Public Methods
+    // 	Public Methods
     //
     // --------------------------------------------------------------------------
 
     public ngAfterViewInit(): void {
-        this.emit(WindowEvent.CONTENT_READY);
-    }
-
-    public blink(): void {
-        if (this.window) {
-            this.window.blink();
-        }
-    }
-
-    public shake(): void {
-        if (this.window) {
-            this.window.shake();
-        }
-    }
-
-    public emit(event: string): void {
-        if (this.window) {
-            this.window.emit(event);
-        }
-    }
-
-    public close(): void {
-        if (this.window) {
-            this.window.close();
-        }
+        this.createChildren();
+        this.checkWindowParent();
     }
 
     public destroy(): void {
         super.destroy();
+        this.destroyChildren();
+
+        this.element = null;
         this.window = null;
-        this.container = null;
     }
 
     // --------------------------------------------------------------------------
     //
-    //  Proxy Public Properties
+    // 	Protected Properties
     //
     // --------------------------------------------------------------------------
 
-    public get config(): WindowConfig {
-        return this.window ? this.window.config : null;
-    }
-
-    public get isOnTop(): boolean {
-        return this.window ? this.window.isOnTop : false;
-    }
-
-    public get isMinimized(): boolean {
-        return this.window ? this.window.isMinimized : false;
+    protected get nativeElement(): HTMLElement {
+        return this.element ? this.element.nativeElement : null;
     }
 
     // --------------------------------------------------------------------------
     //
-    //  Public Properties
+    // 	Public Properties
     //
     // --------------------------------------------------------------------------
-
-    public get element(): ElementRef {
-        return this.container ? this.container.element : null;
-    }
 
     public get window(): IWindow {
         return this._window;
@@ -106,7 +88,7 @@ export abstract class IWindowContent extends DestroyableContainer implements Aft
             return;
         }
         this._window = value;
-        if (this._window) {
+        if (this.window) {
             this.commitWindowProperties();
         }
     }

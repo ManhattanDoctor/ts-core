@@ -9,4 +9,4 @@ export * from './WindowDragAreaDirective';
 export * from './WindowFactory';
 export * from './WindowModule';
 export * from './WindowProperties';
-export * from './WindowService';
+export * from './WindowBaseService';

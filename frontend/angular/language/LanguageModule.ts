@@ -1,5 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { HttpClientModule, HttpHandler } from '@angular/common/http';
-import { Injector, NgModule } from '@angular/core';
+import { Injector, NgModule, ModuleWithProviders } from '@angular/core';
 import { TranslateModule, TranslateParser } from '@ngx-translate/core';
 import { CookieModule, CookieOptionsProvider, COOKIE_OPTIONS } from 'ngx-cookie';
 import { LanguageMatPaginatorIntl } from './LanguageMatPaginatorIntl';
@@ -9,6 +10,7 @@ import { LanguageService } from './LanguageService';
 
 @NgModule({
     imports: [
+        CommonModule,
         HttpClientModule,
         CookieModule.forChild(),
         TranslateModule.forRoot({

@@ -3,7 +3,7 @@ import { ExtendedError } from '../../common/error/ExtendedError';
 import { Destroyable } from '../Destroyable';
 import { UrlUtil } from '../util';
 
-export class DefaultSettings extends Destroyable {
+export class SettingsBaseService extends Destroyable {
     //--------------------------------------------------------------------------
     //
     //	Static Properties
@@ -28,8 +28,8 @@ export class DefaultSettings extends Destroyable {
     protected isInitialized: boolean;
 
     protected _language: string;
-    protected _defaultLanguage: string = DefaultSettings.LANGUAGE_EN;
-    protected _availableLanguages: Map<string, string>;
+    protected _languages: Map<string, string>;
+    protected _defaultLanguage: string = SettingsBaseService.LANGUAGE_EN;
 
     protected _sid: string;
     protected _apiUrl: string;
@@ -72,7 +72,7 @@ export class DefaultSettings extends Destroyable {
     }
 
     public destroy(): void {
-        this._availableLanguages = null;
+        this._languages = null;
     }
 
     //--------------------------------------------------------------------------
@@ -86,9 +86,9 @@ export class DefaultSettings extends Destroyable {
 
     protected parseLanguages(value: string): Map<string, string> {
         let map = new Map();
-        let items = value.split(DefaultSettings.LANGUAGE_SEPARATOR);
+        let items = value.split(SettingsBaseService.LANGUAGE_SEPARATOR);
         for (let item of items) {
-            let language = item.split(DefaultSettings.LANGUAGE_CODE_SEPARATOR);
+            let language = item.split(SettingsBaseService.LANGUAGE_CODE_SEPARATOR);
             if (language.length === 2) {
                 map.set(language[0], language[1]);
             }
@@ -102,11 +102,11 @@ export class DefaultSettings extends Destroyable {
         }
 
         value = value.toString();
-        if (value === DefaultSettings.LANGUAGE_EN_CODE) {
-            return DefaultSettings.LANGUAGE_EN;
+        if (value === SettingsBaseService.LANGUAGE_EN_CODE) {
+            return SettingsBaseService.LANGUAGE_EN;
         }
-        if (value === DefaultSettings.LANGUAGE_RU_CODE) {
-            return DefaultSettings.LANGUAGE_RU;
+        if (value === SettingsBaseService.LANGUAGE_RU_CODE) {
+            return SettingsBaseService.LANGUAGE_RU;
         }
         return value;
     }
@@ -143,8 +143,8 @@ export class DefaultSettings extends Destroyable {
                 this[variable] = this.parseLanguage(value);
                 break;
 
-            case 'availableLanguages':
-                this._availableLanguages = this.parseLanguages(value);
+            case 'languages':
+                this._languages = this.parseLanguages(value);
                 break;
 
             default:
@@ -183,7 +183,7 @@ export class DefaultSettings extends Destroyable {
     public get logoutUrl(): string {
         return this._logoutUrl;
     }
-    public get availableLanguages(): Map<string, string> {
-        return this._availableLanguages;
+    public get languages(): Map<string, string> {
+        return this._languages;
     }
 }

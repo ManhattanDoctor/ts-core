@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { IDestroyable } from '../../../common';
 import { ViewUtil } from '../util';
 
-export class WindowConfig extends MatDialogConfig implements IDestroyable {
+export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestroyable {
     // --------------------------------------------------------------------------
     //
     // 	Properties

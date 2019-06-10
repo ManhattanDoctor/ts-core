@@ -2,7 +2,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { filter } from 'rxjs/internal/operators';
 import { ViewUtil } from '../util';
-import { IWindow } from './IWindow';
+import { IWindow, WindowEvent } from './IWindow';
 import { IWindowContent } from './IWindowContent';
 import { WindowBase } from './WindowBase';
 import { WindowConfig } from './WindowConfig';
@@ -80,7 +80,7 @@ export class Window extends WindowBase implements IWindow {
                 .subscribe(this.setClosed)
         );
 
-        this.addSubscription(this.events.pipe(filter(event => event === IWindow.EVENT_CONTENT_READY)).subscribe(this.checkSizeAndUpdatePositionIfNeed));
+        this.addSubscription(this.events.pipe(filter(event => event === WindowEvent.CONTENT_READY)).subscribe(this.checkSizeAndUpdatePositionIfNeed));
     }
 
     // --------------------------------------------------------------------------
@@ -91,13 +91,13 @@ export class Window extends WindowBase implements IWindow {
 
     protected setClosed = (): void => {
         this.isOpened = false;
-        this.emit(IWindow.EVENT_CLOSED);
+        this.emit(WindowEvent.CLOSED);
         this.destroy();
     };
 
     protected setOpened = (): void => {
         this.isOpened = true;
-        this.emit(IWindow.EVENT_OPENED);
+        this.emit(WindowEvent.OPENED);
     };
 
     protected blinkToggle = (): void => {
@@ -109,7 +109,7 @@ export class Window extends WindowBase implements IWindow {
     };
 
     protected emitResize = (): void => {
-        this.emit(IWindow.EVENT_RESIZED);
+        this.emit(WindowEvent.RESIZED);
     };
 
     protected setProperties(): void {
@@ -230,7 +230,7 @@ export class Window extends WindowBase implements IWindow {
 
     public setOnTop = (): void => {
         this.isWasOnTop = this.isOnTop;
-        this.emit(IWindow.EVENT_SET_ON_TOP);
+        this.emit(WindowEvent.SET_ON_TOP);
     };
 
     // --------------------------------------------------------------------------
@@ -280,7 +280,7 @@ export class Window extends WindowBase implements IWindow {
     public setX(value: number, isNeedNotify: boolean = true): void {
         this.x = value;
         if (isNeedNotify) {
-            this.emit(IWindow.EVENT_MOVED);
+            this.emit(WindowEvent.MOVED);
         }
     }
 
@@ -290,14 +290,14 @@ export class Window extends WindowBase implements IWindow {
     public setY(value: number, isNeedNotify: boolean = true): void {
         this.y = value;
         if (isNeedNotify) {
-            this.emit(IWindow.EVENT_MOVED);
+            this.emit(WindowEvent.MOVED);
         }
     }
 
     public move(x: number, y: number): void {
         this.setX(x, false);
         this.setY(y, false);
-        this.emit(IWindow.EVENT_MOVED);
+        this.emit(WindowEvent.MOVED);
     }
 
     // --------------------------------------------------------------------------
@@ -389,7 +389,7 @@ export class Window extends WindowBase implements IWindow {
         }
         this._isMinimized = value;
         this.commitIsMinimizedProperties();
-        this.emit(IWindow.EVENT_MINIMIZED_CHANGED);
+        this.emit(WindowEvent.MINIMIZED_CHANGED);
         this.stopBlinkIfNeed();
     }
 }

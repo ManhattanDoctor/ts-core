@@ -3,21 +3,22 @@ import { NgModule } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { LanguageModule } from '../language';
 import { WindowDragAreaDirective } from './WindowDragAreaDirective';
-import { WindowService } from './WindowService';
+import { WindowBaseService } from './WindowBaseService';
 @NgModule({
     imports: [CommonModule, MatDialogModule, LanguageModule],
     declarations: [WindowDragAreaDirective],
     providers: [
-        WindowService,
+        // WindowBaseService,
+        /*
         {
-            provide: 'TEST',
+            provide: MatDialog,
             deps: [],
             useFactory: dialog => {
-                console.log(dialog);
                 return 123;
             }
         }
+        */
     ],
-    exports: [MatDialogModule, WindowDragAreaDirective]
+    exports: [WindowDragAreaDirective]
 })
 export class WindowModule {}

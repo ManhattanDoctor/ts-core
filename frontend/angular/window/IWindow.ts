@@ -6,22 +6,6 @@ import { WindowConfig } from './WindowConfig';
 export abstract class IWindow extends Destroyable {
     // --------------------------------------------------------------------------
     //
-    //  Constants
-    //
-    // --------------------------------------------------------------------------
-
-    public static EVENT_OPENED = 'OPENED';
-    public static EVENT_CLOSED = 'CLOSED';
-    public static EVENT_CONTENT_READY = 'EVENT_CONTENT_READY';
-
-    public static EVENT_MOVED = 'EVENT_MOVED';
-    public static EVENT_RESIZED = 'EVENT_RESIZED';
-    public static EVENT_MINIMIZED_CHANGED = 'EVENT_MINIMIZED_CHANGED';
-
-    public static EVENT_SET_ON_TOP = 'EVENT_SET_ON_TOP';
-
-    // --------------------------------------------------------------------------
-    //
     //  Public Methods
     //
     // --------------------------------------------------------------------------
@@ -63,4 +47,16 @@ export abstract class IWindow extends Destroyable {
 
     readonly config: WindowConfig;
     readonly content: IWindowContent;
+}
+
+export enum WindowEvent {
+    OPENED = 'OPENED',
+    CLOSED = 'CLOSED',
+    CONTENT_READY = 'CONTENT_READY',
+
+    MOVED = 'EVENT_MOVED',
+    RESIZED = 'RESIZED',
+    MINIMIZED_CHANGED = 'MINIMIZED_CHANGED',
+
+    SET_ON_TOP = 'SET_ON_TOP'
 }

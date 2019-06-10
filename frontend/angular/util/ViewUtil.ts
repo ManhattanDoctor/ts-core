@@ -575,7 +575,7 @@ export class ViewUtil {
     public static disposeObject(object: HTMLObjectElement, isIEBrowser?: boolean): void {
         if (isIEBrowser && object['readyState'] === 4) {
             for (let i in object) {
-                if (typeof object[i] === 'function') {
+                if (_.isFunction(object[i])) {
                     object[i] = null;
                 }
             }
