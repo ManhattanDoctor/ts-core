@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 import { IDestroyable } from '../common';
+import { ArrayUtil } from '../common/util';
 import { Destroyable } from './Destroyable';
-import { ArrayUtil } from './util';
 
 export class DestroyableContainer extends Destroyable {
     //--------------------------------------------------------------------------
@@ -13,7 +13,7 @@ export class DestroyableContainer extends Destroyable {
 
     private _destroyables: Array<IDestroyable>;
     private _subscriptions: Array<Subscription>;
-    
+
     protected isDestroyed: boolean = false;
 
     //--------------------------------------------------------------------------
@@ -74,7 +74,7 @@ export class DestroyableContainer extends Destroyable {
     public ngOnDestroy(): void {
         this.destroy();
     }
-    
+
     public destroy(): void {
         if (this.isDestroyed) {
             return;

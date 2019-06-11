@@ -1,6 +1,6 @@
 import { BadRequestException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
 import { validate, ValidationError, ValidatorOptions } from 'class-validator';
-import { ExtendedError } from '../../../common/error/ExtendedError';
+import { ExtendedError } from '../../../common/error';
 import { ILoggerService, LoggerWrapper } from '../../../common/logger';
 
 export abstract class DefaultController<U, V> extends LoggerWrapper {

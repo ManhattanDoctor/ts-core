@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { ExtendedError } from '../../common/error/ExtendedError';
+import { ExtendedError } from '../../common/error';
 import { Destroyable } from '../Destroyable';
 import { UrlUtil } from '../util';
 

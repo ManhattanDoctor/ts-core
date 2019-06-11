@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { CookieService } from 'ngx-cookie';
 import { Subscription } from 'rxjs';
 import { Loadable, LoadableEvent, LoadableStatus } from '../../../common';
-import { ExtendedError } from '../../../common/error/ExtendedError';
+import { ExtendedError } from '../../../common/error';
 import { MapCollection } from '../../../common/map';
 import { ObservableData } from '../../../common/observer';
 import { CloneUtil } from '../../util';

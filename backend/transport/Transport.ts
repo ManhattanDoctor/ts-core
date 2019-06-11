@@ -1,5 +1,5 @@
-import { Observable } from 'rxjs/internal/Observable';
-import { ExtendedError } from '../../common/error/ExtendedError';
+import { Observable } from 'rxjs';
+import { ExtendedError } from '../../common/error';
 import { LoggerWrapper } from '../../common/logger';
 import { ITransport, ITransportCommand, ITransportCommandOptions, ITransportEvent } from './ITransport';
 

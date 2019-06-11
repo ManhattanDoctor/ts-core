@@ -1,5 +1,5 @@
 import { DynamicModule, Global, Logger, Provider } from '@nestjs/common';
-import { ExtendedError } from '../../../common/error/ExtendedError';
+import { ExtendedError } from '../../../common/error';
 import { DefaultLogger } from './DefaultLogger';
 
 @Global()

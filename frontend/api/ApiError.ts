@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { TimeoutError } from 'rxjs';
-import { ObjectUtil } from '../../common/util/ObjectUtil';
+import { ObjectUtil } from '../../common/util';
 
 export class ApiError implements Error {
     // --------------------------------------------------------------------------

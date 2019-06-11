@@ -1,8 +1,7 @@
 import * as _ from 'lodash';
+import { ArrayUtil, ObjectUtil } from '../../common/util';
 import { Destroyable } from '../../frontend';
-import { ArrayUtil } from '../../frontend/util';
-import { ExtendedError } from '../error/ExtendedError';
-import { ObjectUtil } from '../util/ObjectUtil';
+import { ExtendedError } from '../error';
 
 export class MapCollection<U> extends Destroyable {
     //--------------------------------------------------------------------------

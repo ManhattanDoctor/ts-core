@@ -1,7 +1,7 @@
 import { Exclude, Expose } from 'class-transformer';
 import * as uuid from 'uuid';
-import { ExtendedError } from '../../common/error/ExtendedError';
-import { ObjectUtil } from '../../common/util/ObjectUtil';
+import { ExtendedError } from '../../common/error';
+import { ObjectUtil } from '../../common/util';
 import { ITransportCommand } from './ITransport';
 
 export class TransportCommand<U, V> implements ITransportCommand<U, V> {

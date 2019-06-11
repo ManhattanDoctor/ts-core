@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { ExtendedError } from '../../common/error/ExtendedError';
+import { ExtendedError } from '../../common/error';
 import { ITransportEvent } from './ITransport';
 
 export class TransportEvent<T> implements ITransportEvent<T> {

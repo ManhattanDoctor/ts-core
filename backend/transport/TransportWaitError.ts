@@ -1,4 +1,4 @@
-import { ExtendedError } from '../../common/error/ExtendedError';
+import { ExtendedError } from '../../common/error';
 
 export class TransportWaitError extends ExtendedError<void> {
     // --------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, InternalServerErrorException } from '@nestjs/common';
 import * as _ from 'lodash';
-import { ObjectUtil } from '../../../common/util/ObjectUtil';
+import { ObjectUtil } from '../../../common/util';
 
 @Catch(Error)
 export class DefaultHttpExceptionFilter implements ExceptionFilter<any> {

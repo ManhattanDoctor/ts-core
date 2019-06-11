@@ -1,4 +1,4 @@
-import { ExtendedError } from '../../common/error/ExtendedError';
+import { ExtendedError } from '../../common/error';
 import { ILoggerService, LoggerWrapper } from '../../common/logger';
 import { ITransport, ITransportCommand } from './ITransport';
 import { TransportWaitError } from './TransportWaitError';

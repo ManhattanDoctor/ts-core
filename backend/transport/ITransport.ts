@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs/internal/Observable';
-import { ExtendedError } from '../../common/error/ExtendedError';
+import { ExtendedError } from '../../common/error';
 
 export interface ITransport {
     send<U, V>(command: ITransportCommand<U, V>): void;

@@ -2,7 +2,7 @@ import { TranslateParser } from '@ngx-translate/core';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 import { ObservableData } from '../../../common/observer';
-import { ObjectUtil } from '../../../common/util/ObjectUtil';
+import { ObjectUtil } from '../../../common/util';
 import { LanguageServiceEvent } from './LanguageService';
 
 export class LanguageMessageFormatParser extends TranslateParser {

@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { ObjectUtil } from '../util/ObjectUtil';
+import { ObjectUtil } from '../util';
 
 export abstract class AbstractSettingsStorage {
     // --------------------------------------------------------------------------

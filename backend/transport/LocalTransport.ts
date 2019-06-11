@@ -2,7 +2,7 @@ import { ValidatorOptions } from '@nestjs/common/interfaces/external/validator-o
 import * as _ from 'lodash';
 import { Subject } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
-import { ExtendedError } from '../../common/error/ExtendedError';
+import { ExtendedError } from '../../common/error';
 import { ILoggerService } from '../../common/logger';
 import { ITransportCommand, ITransportCommandOptions, ITransportEvent } from './ITransport';
 import { Transport } from './Transport';

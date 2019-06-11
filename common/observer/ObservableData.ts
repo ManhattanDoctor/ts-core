@@ -1,4 +1,4 @@
-import { ExtendedError } from '../error/ExtendedError';
+import { ExtendedError } from '../error';
 
 export class ObservableData<U, V> {
     //--------------------------------------------------------------------------

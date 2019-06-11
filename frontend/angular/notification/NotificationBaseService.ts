@@ -3,7 +3,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import * as _ from 'lodash';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { ObservableData } from '../../../common/observer';
-import { ObjectUtil } from '../../../common/util/ObjectUtil';
+import { ObjectUtil } from '../../../common/util';
 import { ApiError } from '../../api';
 import { LanguageService } from '../language';
 import { WindowAlign } from '../window';

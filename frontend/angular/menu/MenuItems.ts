@@ -1,6 +1,6 @@
 import { LoadableEvent } from '../../../common';
 import { DestroyableContainer } from '../../DestroyableContainer';
-import { ArrayUtil } from '../../util/ArrayUtil';
+import { ArrayUtil } from '../../../common/util';
 import { LanguageService } from '../language';
 import { MenuItem } from './MenuItem';
 import { MenuItemBase } from './MenuItemBase';
