@@ -20,7 +20,9 @@ export class ObservableData<U, V> {
     constructor(type: U, data?: V, error?: Error | ExtendedError) {
         this._type = type;
         this._data = data;
-        this._error = error instanceof ExtendedError ? error : ExtendedError.create(error);
+        if (error) {
+            this._error = error instanceof ExtendedError ? error : ExtendedError.create(error);
+        }
     }
 
     //--------------------------------------------------------------------------

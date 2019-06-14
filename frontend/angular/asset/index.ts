@@ -1,3 +1,4 @@
+export * from './AssetBackgroundDirective';
 export * from './AssetBackgroundPipe';
 export * from './AssetIconPipe';
 export * from './AssetImagePipe';

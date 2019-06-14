@@ -4,11 +4,11 @@ import { ObjectUtil } from '../../../common/util';
 
 @Catch(Error)
 export class DefaultHttpExceptionFilter implements ExceptionFilter<any> {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Static Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     private static getMessage(exception: any): string {
         if (_.isNil(exception)) {
@@ -20,11 +20,11 @@ export class DefaultHttpExceptionFilter implements ExceptionFilter<any> {
         return exception;
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Public Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public catch(exception: any, host: ArgumentsHost) {
         let context = host.switchToHttp();

@@ -1,10 +1,10 @@
 import { Observable, Subject, Subscription } from 'rxjs';
-import { Destroyable } from '../../frontend';
+import { IDestroyable } from '../IDestroyable';
 import { LoadableEvent } from '../Loadable';
 import { ObservableData } from '../observer';
 import { DestroyableMapCollection } from './DestroyableMapCollection';
 
-export abstract class LoadableMapCollection<U extends Destroyable, V> extends DestroyableMapCollection<U> {
+export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollection<U> {
     //--------------------------------------------------------------------------
     //
     //  Properties

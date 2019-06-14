@@ -1,28 +1,28 @@
 import { HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
-import { LoadableEvent } from '../../common';
-import { ObservableData } from '../../common/observer';
 import { Destroyable } from '../Destroyable';
 import { ApiMethod } from './ApiMethod';
+import { ObservableData } from '../../common/observer';
+import { LoadableEvent } from '../../common';
 import { ApiRequest } from './ApiRequest';
 import { ApiResponse } from './ApiResponse';
 import { IApiRequestConfig } from './IApiRequestConfig';
 
 export abstract class ApiServiceBase extends Destroyable {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Static Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public static IDLE_TIMEOUT = 30000;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Private Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public sid: string;
 
@@ -31,24 +31,24 @@ export abstract class ApiServiceBase extends Destroyable {
     protected idleTimeout: number = ApiServiceBase.IDLE_TIMEOUT;
     protected responseType: string = 'json';
     protected defaultMethod: ApiMethod = ApiMethod.POST;
-    protected observer: Subject<ObservableData<LoadableEvent, ApiRequest | ApiResponse<any>>>;
+    protected observer: Subject<ObservableData<LoadableEvent, ApiRequest | ApiResponse>>;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected constructor() {
         super();
         this.observer = new Subject();
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Protected Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected sendRequest(request: ApiRequest, resolve?: any, reject?: any, observer?: any): void {
         this._isLoading = true;
@@ -101,7 +101,7 @@ export abstract class ApiServiceBase extends Destroyable {
     }
 
     protected sendRequestToServer(request: ApiRequest): Observable<any> {
-        let method: ApiMethod = request.method || this.defaultMethod;
+        let method = request.method || this.defaultMethod;
 
         let url = this.createUrlForRequest(request, method);
         let params = this.createParamsForRequest(request, method);
@@ -129,11 +129,11 @@ export abstract class ApiServiceBase extends Destroyable {
         return value;
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Create Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected abstract createUrlForRequest(request: ApiRequest, method: ApiMethod): string;
 
@@ -141,21 +141,21 @@ export abstract class ApiServiceBase extends Destroyable {
 
     protected abstract createHeadersForRequest(request: ApiRequest, method: ApiMethod, body: HttpParams): HttpHeaders;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Parse Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected abstract parseResponse<T>(data: any, request: ApiRequest): ApiResponse<T>;
 
     protected abstract parseErrorResponse<T>(error: HttpErrorResponse, request: ApiRequest): ApiResponse<T>;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public async send<T>(param: IApiRequestConfig): Promise<ApiResponse<T>> {
         if (_.isNil(param.isHandleLoading)) {
@@ -187,17 +187,17 @@ export abstract class ApiServiceBase extends Destroyable {
         this.observer = null;
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public get isLoading(): boolean {
         return this._isLoading;
     }
 
-    public get events(): Observable<ObservableData<LoadableEvent, ApiRequest | ApiResponse<any>>> {
+    public get events(): Observable<ObservableData<LoadableEvent, ApiRequest | ApiResponse>> {
         return this.observer.asObservable();
     }
 }

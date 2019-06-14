@@ -3,12 +3,13 @@ import { ObservableData } from '../../../common/observer';
 import { ApiResponse } from '../../api';
 import { Destroyable } from '../../Destroyable';
 
-export abstract class LoginBaseService<T = any, K = any, U = any, V = any> extends Destroyable {
-    // --------------------------------------------------------------------------
+
+export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
+    //--------------------------------------------------------------------------
     //
     // 	Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected _sid: string;
 
@@ -17,24 +18,24 @@ export abstract class LoginBaseService<T = any, K = any, U = any, V = any> exten
     protected _isLoading: boolean = false;
     protected _isLoggedIn: boolean = false;
 
-    protected observer: Subject<ObservableData<U | LoginBaseServiceEvent, ApiResponse<any>>>;
+    protected observer: Subject<ObservableData<U | LoginBaseServiceEvent, ApiResponse>>;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     constructor() {
         super();
         this.observer = new Subject();
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Protected Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected loginByParam(param?: any): void {
         if (this.isLoggedIn || this.isLoading) {
@@ -89,19 +90,17 @@ export abstract class LoginBaseService<T = any, K = any, U = any, V = any> exten
         this._resource = null;
     }
 
-    protected abstract makeLoginSidRequest<T>(isNeedHandleError: boolean, isHandleLoading: boolean): Observable<ApiResponse<T>>;
-
-    protected abstract makeLoginRequest<T>(param: any): Observable<ApiResponse<T>>;
-
-    protected abstract makeLogoutRequest<T>(): Observable<ApiResponse<T>>;
+    protected abstract makeLoginRequest(param: any): Observable<ApiResponse>;
+    protected abstract makeLoginSidRequest(isNeedHandleError: boolean, isHandleLoading: boolean): Observable<ApiResponse>;
+    protected abstract makeLogoutRequest(): Observable<ApiResponse>;
 
     protected abstract getSavedSid(): string;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Parse Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected abstract parseLoginResponse<T>(response: ApiResponse<T>): void;
 
@@ -117,15 +116,15 @@ export abstract class LoginBaseService<T = any, K = any, U = any, V = any> exten
         }
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
-    public abstract login(param: T): void;
+    public abstract login<T>(param: T): void;
 
-    public abstract registration(param: K): void;
+    public abstract registration<T>(param: T): void;
 
     public tryLoginBySid(isNeedHandleError: boolean = true, isHandleLoading: boolean = false): boolean {
         if (!this.isCanLoginWithSid()) {
@@ -159,13 +158,13 @@ export abstract class LoginBaseService<T = any, K = any, U = any, V = any> exten
         this._loginData = null;
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
-    public get events(): Observable<ObservableData<U | LoginBaseServiceEvent, ApiResponse<any>>> {
+    public get events(): Observable<ObservableData<U | LoginBaseServiceEvent, ApiResponse>> {
         return this.observer.asObservable();
     }
 

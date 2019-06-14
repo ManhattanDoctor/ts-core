@@ -1,40 +1,41 @@
 import { AfterViewInit, ElementRef, ViewContainerRef } from '@angular/core';
-import { DestroyableContainer } from '../../DestroyableContainer';
+import { DestroyableContainer } from '../../../common';
 import { IWindow, WindowEvent } from './IWindow';
 import { WindowConfig } from './WindowConfig';
+import { Observable } from 'rxjs';
 
 export abstract class IWindowContent extends DestroyableContainer implements AfterViewInit {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Properties=
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected _window: IWindow;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Constructor
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     constructor(public container: ViewContainerRef) {
         super();
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Private Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected commitWindowProperties(): void {}
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Public Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public ngAfterViewInit(): void {
         this.emit(WindowEvent.CONTENT_READY);
@@ -70,11 +71,11 @@ export abstract class IWindowContent extends DestroyableContainer implements Aft
         this.container = null;
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Proxy Public Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public get config(): WindowConfig {
         return this.window ? this.window.config : null;
@@ -88,11 +89,15 @@ export abstract class IWindowContent extends DestroyableContainer implements Aft
         return this.window ? this.window.isMinimized : false;
     }
 
-    // --------------------------------------------------------------------------
+    public get events(): Observable<string> {
+        return this.window ? this.window.events : null;
+    }
+
+    //--------------------------------------------------------------------------
     //
     //  Public Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public get element(): ElementRef {
         return this.container ? this.container.element : null;

@@ -1,15 +1,15 @@
 import { MatDialogRef } from '@angular/material/dialog';
 import * as _ from 'lodash';
-import { DestroyableContainer } from '../../DestroyableContainer';
+import { DestroyableContainer } from '../../../common';
 import { ViewUtil } from '../util';
 import { WindowAlign, WindowConfig } from './WindowConfig';
 
 export abstract class WindowBase extends DestroyableContainer {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected _x: number = NaN;
     protected _width: number = NaN;
@@ -17,21 +17,21 @@ export abstract class WindowBase extends DestroyableContainer {
     protected _y: number = NaN;
     protected _height: number = NaN;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     constructor() {
         super();
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Protected Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected abstract getConfig(): WindowConfig;
     protected abstract getReference(): MatDialogRef<any>;
@@ -122,11 +122,11 @@ export abstract class WindowBase extends DestroyableContainer {
         }
     };
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Position Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public get x(): number {
         return this._x;

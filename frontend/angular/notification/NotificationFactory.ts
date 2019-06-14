@@ -1,25 +1,24 @@
-import { OverlayRef } from '@angular/cdk/overlay';
-import { MatDialogRef } from '@angular/material/dialog';
-import { INotificationContent } from './INotificationContent';
+import { QuestionMode } from '../question';
 import { INotification } from './INotification';
 import { NotificationConfig } from './NotificationConfig';
+import { NotificationProperties } from './NotificationProperties';
 
 export class NotificationFactory<U extends INotification> {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
-    constructor(private classType) {}
+    constructor(protected classType: { new (properties: NotificationProperties): U }) {}
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
-    public create(reference: MatDialogRef<INotificationContent>, config?: NotificationConfig, overlay?: OverlayRef): U {
-        return new this.classType(reference, config, overlay);
+    public create(properties: NotificationProperties): U {
+        return new this.classType(properties);
     }
 }

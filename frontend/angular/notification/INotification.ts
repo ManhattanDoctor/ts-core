@@ -3,11 +3,11 @@ import { INotificationContent } from './INotificationContent';
 import { NotificationConfig } from './NotificationConfig';
 
 export abstract class INotification {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Public Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     abstract getX(): number;
     abstract getY(): number;
@@ -27,11 +27,11 @@ export abstract class INotification {
 
     abstract emit(event: string): void;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Interface Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     readonly events: Observable<string>;
     readonly container: HTMLElement;
@@ -41,8 +41,5 @@ export abstract class INotification {
 }
 
 export enum NotificationEvent {
-    OPENED = 'OPENED',
-    CLOSED = 'CLOSED',
-    REMOVED = 'REMOVED',
-    CONTENT_READY = 'CONTENT_READY'
+    REMOVED = 'REMOVED'
 }

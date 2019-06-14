@@ -1,1 +1,3 @@
-export * from '../INotificationContent';
+export * from './NotificationBaseComponent';
+export * from './NotificationQuestionBaseComponent';
+

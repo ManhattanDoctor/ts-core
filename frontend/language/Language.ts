@@ -1,3 +1,5 @@
+import * as _ from 'lodash';
+
 export class Language {
     //--------------------------------------------------------------------------
     //
@@ -14,7 +16,7 @@ export class Language {
     //
     //--------------------------------------------------------------------------
 
-    constructor(locale: string = '', name: string = '') {
+    constructor(locale: string, name: string) {
         this._name = name;
         this._locale = locale;
     }
@@ -26,11 +28,11 @@ export class Language {
     //--------------------------------------------------------------------------
 
     public toEqual(value: Language | string): boolean {
-        if (!value) {
+        if (_.isNil(value)) {
             return false;
         }
         if (value instanceof Language) {
-            return value.locale == this.locale;
+            return value.locale === this.locale;
         }
         return value === this.locale;
     }
@@ -40,10 +42,6 @@ export class Language {
     //	Public Properties
     //
     //--------------------------------------------------------------------------
-
-    public get id(): string {
-        return this._locale;
-    }
 
     public get locale(): string {
         return this._locale;

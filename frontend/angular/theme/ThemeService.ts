@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
-import { CookieService } from 'ngx-cookie';
 import { Observable, Subject } from 'rxjs';
 import { MapCollection } from '../../../common/map';
 import { Destroyable } from '../../Destroyable';
+import { CookieService } from '../cookie';
 import { ViewUtil } from '../util';
 import { Theme } from './Theme';
 
@@ -29,7 +29,7 @@ export class ThemeService extends Destroyable {
     constructor(protected cookies: CookieService) {
         super();
         this.observer = new Subject();
-        this._themes = new MapCollection('id');
+        this._themes = new MapCollection('name');
     }
 
     //--------------------------------------------------------------------------

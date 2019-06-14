@@ -1,46 +1,47 @@
 import { AfterViewInit, ViewContainerRef } from '@angular/core';
-import { LanguageService } from '../language';
-import { QuestionBaseComponent } from '../window/component';
-import { INotification, NotificationEvent } from './INotification';
+import { Observable } from 'rxjs';
+import { DestroyableContainer } from '../../../common';
+import { WindowEvent } from '../window';
+import { INotification } from './INotification';
 import { NotificationConfig } from './NotificationConfig';
 
-export abstract class INotificationContent extends QuestionBaseComponent implements AfterViewInit {
-    // --------------------------------------------------------------------------
+export abstract class INotificationContent extends DestroyableContainer implements AfterViewInit {
+    //--------------------------------------------------------------------------
     //
     //  Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected timer: any;
     protected _notification: INotification;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Constructor
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
-    constructor(container: ViewContainerRef, protected language: LanguageService) {
-        super(container, language);
+    constructor(public container: ViewContainerRef) {
+        super();
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Private Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected commitNotificationProperties(): void {
-        if (!this.config) {
-            return;
-        }
-
-        this.text = this.config.data;
-        this.mode = this.config.mode;
-
-        if (this.config.closeDuration) {
-            clearTimeout(this.timer);
+        this.clearTimer();
+        if (this.config.closeDuration > 0) {
             this.timer = setTimeout(this.timerHandler, this.config.closeDuration);
+        }
+    }
+
+    protected clearTimer(): void {
+        if (this.timer) {
+            clearTimeout(this.timer);
+            this.timer = null;
         }
     }
 
@@ -48,11 +49,11 @@ export abstract class INotificationContent extends QuestionBaseComponent impleme
         this.handleCloseClick();
     };
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Public Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public close(): void {
         if (this.notification) {
@@ -74,28 +75,22 @@ export abstract class INotificationContent extends QuestionBaseComponent impleme
 
     public destroy(): void {
         super.destroy();
+        this.clearTimer();
         this.notification = null;
-
-        if (this.timer) {
-            clearTimeout(this.timer);
-            this.timer = null;
-        }
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Event Handlers
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public ngAfterViewInit(): void {
-        this.emit(NotificationEvent.CONTENT_READY);
+        this.emit(WindowEvent.CONTENT_READY);
     }
 
     public handleCloseClick(): void {
-        if (this.timer) {
-            clearTimeout(this.timer);
-        }
+        this.clearTimer();
         if (this.config && this.config.isRemoveAfterClose) {
             this.remove();
         } else {
@@ -103,11 +98,11 @@ export abstract class INotificationContent extends QuestionBaseComponent impleme
         }
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
-    //  Public Properties
+    //  Proxy Public Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public get data(): any {
         return this.config ? this.config.data : null;
@@ -117,10 +112,19 @@ export abstract class INotificationContent extends QuestionBaseComponent impleme
         return this.notification ? this.notification.config : null;
     }
 
+    public get events(): Observable<string> {
+        return this.notification ? this.notification.events : null;
+    }
+
+    //--------------------------------------------------------------------------
+    //
+    //  Public Properties
+    //
+    //--------------------------------------------------------------------------
+
     public get notification(): INotification {
         return this._notification;
     }
-
     public set notification(value: INotification) {
         if (value === this._notification) {
             return;

@@ -1,9 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import * as moment from 'moment';
-import { DateUtil } from '../../util';
+import * as numeral from 'numeral';
+import { DateUtil } from '../../../common/util';
 
 @Pipe({
-    name: 'formatMomentTime'
+    name: 'viMomentTime'
 })
 export class MomentTimePipe implements PipeTransform {
     //--------------------------------------------------------------------------

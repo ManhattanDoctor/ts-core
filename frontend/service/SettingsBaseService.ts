@@ -1,6 +1,8 @@
 import * as _ from 'lodash';
 import { ExtendedError } from '../../common/error';
+import { MapCollection } from '../../common/map';
 import { Destroyable } from '../Destroyable';
+import { Language } from '../language/Language';
 import { UrlUtil } from '../util';
 
 export class SettingsBaseService extends Destroyable {
@@ -28,7 +30,7 @@ export class SettingsBaseService extends Destroyable {
     protected isInitialized: boolean;
 
     protected _language: string;
-    protected _languages: Map<string, string>;
+    protected _languages: MapCollection<Language>;
     protected _defaultLanguage: string = SettingsBaseService.LANGUAGE_EN;
 
     protected _sid: string;
@@ -47,6 +49,7 @@ export class SettingsBaseService extends Destroyable {
 
     constructor() {
         super();
+        this._languages = new MapCollection<Language>('locale');
     }
 
     //--------------------------------------------------------------------------
@@ -72,7 +75,10 @@ export class SettingsBaseService extends Destroyable {
     }
 
     public destroy(): void {
-        this._languages = null;
+        if (this._languages) {
+            this._languages.destroy();
+            this._languages = null;
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -84,16 +90,15 @@ export class SettingsBaseService extends Destroyable {
     protected getParamsFromCookies(): any {}
     protected setParamsToCookies(): any {}
 
-    protected parseLanguages(value: string): Map<string, string> {
-        let map = new Map();
+    protected parseLanguages(value: string): void {
+        this._languages.clear();
         let items = value.split(SettingsBaseService.LANGUAGE_SEPARATOR);
         for (let item of items) {
             let language = item.split(SettingsBaseService.LANGUAGE_CODE_SEPARATOR);
             if (language.length === 2) {
-                map.set(language[0], language[1]);
+                this._languages.add(new Language(language[0], language[1]));
             }
         }
-        return map;
     }
 
     protected parseLanguage(value: any): string {
@@ -144,7 +149,7 @@ export class SettingsBaseService extends Destroyable {
                 break;
 
             case 'languages':
-                this._languages = this.parseLanguages(value);
+                this.parseLanguages(value);
                 break;
 
             default:
@@ -183,7 +188,7 @@ export class SettingsBaseService extends Destroyable {
     public get logoutUrl(): string {
         return this._logoutUrl;
     }
-    public get languages(): Map<string, string> {
+    public get languages(): MapCollection<Language> {
         return this._languages;
     }
 }

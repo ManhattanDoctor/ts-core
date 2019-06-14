@@ -1,23 +1,23 @@
-import { EdgeOptions, InteractEvent, ResizableOptions, Interactable } from '@interactjs/types/types';
+import { EdgeOptions, Interactable, InteractEvent, ResizableOptions } from '@interactjs/types/types';
 import * as interact from 'interactjs';
 import { ViewUtil } from '../util';
 import { Window } from './Window';
 
 export class ResizeableWindow extends Window {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Properties Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     private _interactable: Interactable;
     private resizeMoveHandlerProxy: (...args) => any;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Protected Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected setProperties(): void {
         super.setProperties();
@@ -42,11 +42,11 @@ export class ResizeableWindow extends Window {
         this.interactable.on('resizemove', this.resizeMoveHandlerProxy);
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Event Handlers
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public resizeMoveHandler(event: InteractEvent): void {
         if (!this.isMinimized && (event.dx !== 0 || event.dy !== 0)) {
@@ -54,11 +54,11 @@ export class ResizeableWindow extends Window {
         }
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Public Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public destroy(): void {
         if (this._interactable) {
@@ -70,11 +70,11 @@ export class ResizeableWindow extends Window {
         super.destroy();
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Private Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected get interactable(): any {
         if (!this._interactable) {

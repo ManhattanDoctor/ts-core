@@ -1,7 +1,7 @@
 export * from './INotification';
 export * from './INotificationContent';
-export * from './NotificationBase';
-export * from './NotificationBaseService';
+export * from './NotificationModule';
+export * from './NotificationService';
 export * from './NotificationConfig';
 export * from './NotificationFactory';
-
+export * from './NotificationProperties';

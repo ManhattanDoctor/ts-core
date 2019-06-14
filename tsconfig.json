@@ -10,7 +10,7 @@
         "experimentalDecorators": true,
         "preserveSymlinks": true,
         "target": "esnext",
-        "sourceMap": true,
+        "sourceMap": false,
         "outDir": "./build",
         "baseUrl": "./src",
         "paths": {},

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatPaginatorIntl } from '@angular/material';
-import { Subscription } from '../../../backend/node_modules/rxjs';
+import { Subscription } from 'rxjs';
 import { LoadableEvent } from '../../../common';
 import { LanguageService } from './LanguageService';
 

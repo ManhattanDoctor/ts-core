@@ -5,7 +5,7 @@ import { Moment } from 'moment';
 import { MomentDatePipe } from './MomentDatePipe';
 
 @Pipe({
-    name: 'formatMomentAdaptiveDate'
+    name: 'viMomentAdaptiveDate'
 })
 export class MomentDateAdaptivePipe implements PipeTransform {
     //--------------------------------------------------------------------------

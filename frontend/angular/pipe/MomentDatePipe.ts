@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import { Moment } from 'moment';
 
 @Pipe({
-    name: 'formatMomentDate'
+    name: 'viMomentDate'
 })
 export class MomentDatePipe implements PipeTransform {
     //--------------------------------------------------------------------------

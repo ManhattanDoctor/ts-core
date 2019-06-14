@@ -1,15 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { CookieService } from 'ngx-cookie';
-import { Subscription } from 'rxjs';
-import { Loadable, LoadableEvent, LoadableStatus } from '../../../common';
+import * as _ from 'lodash';
+import { IDestroyable, Loadable, LoadableEvent, LoadableStatus } from '../../../common';
 import { ExtendedError } from '../../../common/error';
 import { MapCollection } from '../../../common/map';
 import { ObservableData } from '../../../common/observer';
+import { PromiseReflector, PromiseStatus } from '../../../common/promise';
+import { Language } from '../../language';
 import { CloneUtil } from '../../util';
-import { Language } from './Language';
-import { LanguageMessageFormatParser } from './LanguageMessageFormatParser';
+import { CookieService } from '../cookie';
+import { LanguageTranslator } from './LanguageTranslator';
 
 @Injectable()
 export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
@@ -25,10 +25,10 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
 
     private _language: Language;
     private _languages: MapCollection<Language>;
+    private _translator: ILanguageTranslator;
     private _rawTranslation: any;
 
-    private parser: LanguageMessageFormatParser;
-    private subscription: Subscription;
+    // private subscription: Subscription;
 
     //--------------------------------------------------------------------------
     //
@@ -36,10 +36,10 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     //
     //--------------------------------------------------------------------------
 
-    constructor(private http: HttpClient, private cookies: CookieService, private translation: TranslateService) {
+    constructor(private http: HttpClient, private cookies: CookieService) {
         super();
-        this._languages = new MapCollection<Language>('id');
-        this.parser = translation.parser as LanguageMessageFormatParser;
+        this._translator = new LanguageTranslator();
+        this.addDestroyable(this.translator);
         /*
         this.parser.events.subscribe(data => {
             if (data.type == LanguageServiceEvent.PARSE_ERROR) {
@@ -59,38 +59,30 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
         this.status = LoadableStatus.LOADING;
         this.observer.next(new ObservableData(LoadableEvent.STARTED, language));
 
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-        }
-
-        this.subscription = this.http.get(this.getLanguageUrl(language)).subscribe(
-            json => {
-                this.subscription.unsubscribe();
-                this.subscription = this.http.get(this.getCustomLanguageUrl(language)).subscribe(
-                    jsonCustom => {
-                        let translation = CloneUtil.deepExtend(json, jsonCustom);
-                        this.setLanguage(language, translation);
-                    },
-                    error => {
-                        this.setLanguage(language, json);
-                    }
-                );
-            },
-            error => {
+        Promise.all([
+            PromiseReflector.create(this.http.get(this.url + language.locale + '.json').toPromise()),
+            PromiseReflector.create(this.http.get(this.url + language.locale + 'Custom.json').toPromise())
+        ]).then(results => {
+            if (this.isDestroyed) {
+                return;
+            }
+            let items = results.filter(item => item.status === PromiseStatus.COMPLETE);
+            if (!_.isEmpty(items)) {
+                let translation = {} as any;
+                items.forEach(item => CloneUtil.deepExtend(translation, item.value));
+                this.setLanguage(language, translation);
+            } else {
                 this.status = LoadableStatus.ERROR;
-                this.observer.next(new ObservableData(LoadableEvent.ERROR, language, error.error.error));
+                this.observer.next(new ObservableData(LoadableEvent.ERROR, language, new ExtendedError(`Unable to load language: ${language}`)));
                 this.observer.next(new ObservableData(LoadableEvent.FINISHED, language));
             }
-        );
+        });
     }
 
     private setLanguage(language: Language, translation: Object): void {
         this._language = language;
         this._rawTranslation = translation;
-
-        this.translation.setTranslation(language.locale, translation);
-        this.translation.use(language.locale);
-        this.parser.locale = language.locale;
+        this._translator.setLocale(language.locale, translation);
 
         this.cookies.put('vi-language', language.locale);
 
@@ -105,55 +97,42 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     //
     //--------------------------------------------------------------------------
 
-    public initialize(url: string, languages: Map<string, string>, defaultLanguage: string): void {
+    public initialize(url: string, languages: MapCollection<Language>, defaultLanguage: string): void {
         if (this.isInitialized) {
-            throw new Error('Service already initialized');
+            throw new ExtendedError('Service already initialized');
         }
-        if (!url) {
+        if (_.isEmpty(url)) {
             throw new ExtendedError('Unable to initialize: url is undefined or empty');
         }
-        if (!languages || languages.size == 0) {
+        if (_.isEmpty(languages)) {
             throw new ExtendedError('Unable to initialize: available languages is undefined or empty');
         }
         if (!languages.has(defaultLanguage)) {
-            throw new ExtendedError('Unable to initialize: default language is undefined or doesnt contain in available languages');
+            throw new ExtendedError('Unable to initialize: default language is undefined or doesnt contain in languages');
         }
 
-        languages.forEach((name, locale) => this._languages.add(new Language(locale, name)));
+        this._languages = languages;
 
         this.url = url;
-        this.default = this._languages.get(defaultLanguage);
+        this.default = this.languages.get(defaultLanguage);
         this.isInitialized = true;
     }
 
-    public destroy(): void {
-        super.destroy();
-
-        this.parser = null;
-        this._language = null;
-        this._rawTranslation = null;
-
-        if (this._languages) {
-            this._languages.destroy();
-            this._languages = null;
-        }
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-            this.subscription = null;
-        }
-    }
-
-    public load(value?: string | Language): void {
-        let item = value instanceof Language ? value.locale : value;
-        if (!item) {
-            item = this.cookies.get('vi-language');
+    public load(locale?: string | Language): void {
+        if (!this.isInitialized) {
+            throw new ExtendedError('Service in not initialized');
         }
 
-        if (!item || !this._languages.has(item)) {
-            item = this.default.locale;
+        let value = locale instanceof Language ? locale.locale : locale;
+        if (!value) {
+            value = this.cookies.get('vi-language');
         }
 
-        let language = this._languages.get(item);
+        if (!value || !this._languages.has(value)) {
+            value = this.default.locale;
+        }
+
+        let language = this._languages.get(value);
         if (!this.language || !this.language.toEqual(language)) {
             this.loadLanguage(language);
         } else {
@@ -162,33 +141,34 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     }
 
     public translate(key: string, params?: Object): string {
-        return this.translation.instant(key, params);
+        return this.translator.translate(key, params);
     }
 
-    public compile(text: string, params: Object): string {
-        return this.parser.compile(text, params);
+    public isHasTranslation(key: string): boolean {
+        return this.translator.isHasTranslation(key);
     }
 
-    public hasTranslation(key: string, params?: Object): boolean {
-        return this.translation.instant(key, params) !== key;
+    public destroy(): void {
+        super.destroy();
+
+        this._language = null;
+        this._languages = null;
+        this._rawTranslation = null;
     }
 
-    public getRawTranslation(): any {
-        return this._rawTranslation;
-    }
-
-    public getLanguageUrl(item: Language): string {
-        return this.url + item.locale + '.json';
-    }
-
-    public getCustomLanguageUrl(item: Language): string {
-        return this.url + item.locale + 'Custom.json';
-    }
     //--------------------------------------------------------------------------
     //
     //	Public Properties
     //
     //--------------------------------------------------------------------------
+
+    public get translator(): ILanguageTranslator {
+        return this._translator;
+    }
+
+    public get rawTranslation(): any {
+        return this._rawTranslation;
+    }
 
     public get locale(): string {
         return this.language ? this.language.locale : this.defaultLocale;
@@ -205,6 +185,12 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     public get languages(): MapCollection<Language> {
         return this._languages;
     }
+}
+
+export interface ILanguageTranslator extends IDestroyable {
+    translate(key: string, params?: any): string;
+    setLocale(locale: string, rawTranslation: any): void;
+    isHasTranslation(key: string): boolean;
 }
 
 export enum LanguageServiceEvent {

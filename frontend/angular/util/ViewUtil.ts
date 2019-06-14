@@ -1,5 +1,6 @@
-import { ElementRef, Renderer2 } from '@angular/core';
+import { Renderer2 } from '@angular/core';
 import * as _ from 'lodash';
+import { ObjectUtil } from '../../../common/util';
 
 export class ViewUtil {
     //--------------------------------------------------------------------------
@@ -36,10 +37,7 @@ export class ViewUtil {
         if (element instanceof HTMLElement) {
             return element;
         }
-        if (element instanceof ElementRef) {
-            return element.nativeElement;
-        }
-        return null;
+        return ObjectUtil.hasOwnProperty(element, 'nativeElement') ? element.nativeElement : null;
     }
 
     public static createBase64(element: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement): string {

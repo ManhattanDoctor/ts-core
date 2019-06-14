@@ -1,7 +1,7 @@
 import { ApiMethod } from './ApiMethod';
 
-export interface IApiRequestConfig {
-    data?: any;
+export interface IApiRequestConfig<T = any> {
+    data?: T;
     name: string;
     method?: ApiMethod;
     idleTimeout?: number;

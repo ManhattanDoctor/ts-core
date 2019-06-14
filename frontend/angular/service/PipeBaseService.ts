@@ -1,21 +1,17 @@
 import { DatePipe } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
 import { LoadableEvent } from '../../../common';
-import { DestroyableContainer } from '../../DestroyableContainer';
+import { DestroyableContainer } from '../../../common';
 import { LanguageService } from '../language';
+import { MomentDateAdaptivePipe, MomentDatePipe, MomentTimePipe, SanitizePipe, TruncatePipe } from '../pipe';
 import { FinancePipe } from '../pipe/FinancePipe';
-import { MomentDateAdaptivePipe } from '../pipe';
-import { MomentDatePipe } from '../pipe';
-import { MomentTimePipe } from '../pipe';
-import { SanitizePipe } from '../pipe';
-import { TruncatePipe } from '../pipe';
 
 export class PipeBaseService extends DestroyableContainer {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Constants
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     private static DATE: DatePipe;
     private static FINANCE: FinancePipe;
@@ -26,19 +22,19 @@ export class PipeBaseService extends DestroyableContainer {
     private static MOMENT_DATE: MomentDatePipe;
     private static MOMENT_ADAPTIVE_DATE: MomentDateAdaptivePipe;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     private _locale: string;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     constructor(public language: LanguageService, public sanitizer: DomSanitizer) {
         super();
@@ -55,11 +51,11 @@ export class PipeBaseService extends DestroyableContainer {
         );
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Private Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected commitLanguageProperties(): void {
         let locale = this.language.locale ? this.language.language.locale : 'en';
@@ -70,11 +66,11 @@ export class PipeBaseService extends DestroyableContainer {
         }
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public get date(): DatePipe {
         if (!PipeBaseService.DATE) {

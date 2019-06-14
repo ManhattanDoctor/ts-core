@@ -3,22 +3,22 @@ import { ViewUtil } from '../util';
 import { ResizeableWindow } from './ResizeableWindow';
 
 export class DragableWindow extends ResizeableWindow {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Properties Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected isWasDragged: boolean = false;
 
     private dragMoveHandlerProxy: (...args) => any;
     private dragStartHandlerProxy: (...args) => any;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Protected Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected setProperties(): void {
         super.setProperties();
@@ -43,11 +43,11 @@ export class DragableWindow extends ResizeableWindow {
         return this.isWasDragged || super.isNeedClickStopPropagation(event);
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Event Handlers
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public dragStartHandler(event: InteractEvent): void {
         this.isWasDragged = true;
@@ -64,11 +64,11 @@ export class DragableWindow extends ResizeableWindow {
         this.isWasDragged = false;
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public destroy(): void {
         this.dragMoveHandlerProxy = null;

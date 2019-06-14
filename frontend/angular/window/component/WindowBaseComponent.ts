@@ -5,42 +5,42 @@ import { DragableWindow } from '../DragableWindow';
 import { WindowElement } from './WindowBaseElement';
 
 export class WindowBaseComponent extends DragableWindow {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Static Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public static CLOSE_WINDOW_COMPONENT = null;
     public static RESIZE_WINDOW_COMPONENT = null;
     public static MINIMIZE_WINDOW_COMPONENT = null;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Properties Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected closeWindow: ComponentRef<any>;
     protected resizedWindow: ComponentRef<any>;
     protected minimizeWindow: ComponentRef<any>;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Private Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     private setWindowElementProperties(item: WindowElement): void {
-        item.window = this;
+ 
         this.addDestroyable(item);
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Protected Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected setProperties(): void {
         super.setProperties();
@@ -48,19 +48,19 @@ export class WindowBaseComponent extends DragableWindow {
         if (!this.config.disableClose && !this.closeWindow) {
             let factory = this.resolver.resolveComponentFactory(WindowBaseComponent.CLOSE_WINDOW_COMPONENT);
             this.closeWindow = this.content.container.createComponent(factory);
-            this.setWindowElementProperties(this.closeWindow.instance);
+            this.closeWindow.instance.window = this;
         }
 
         if (this.config.isResizeable && !this.resizedWindow) {
             let factory = this.resolver.resolveComponentFactory(WindowBaseComponent.RESIZE_WINDOW_COMPONENT);
             this.resizedWindow = this.content.container.createComponent(factory);
-            this.setWindowElementProperties(this.resizedWindow.instance);
+            this.resizedWindow.instance.window = this;
         }
 
         if (this.config.isMinimizable && !this.minimizeWindow) {
             let factory = this.resolver.resolveComponentFactory(WindowBaseComponent.MINIMIZE_WINDOW_COMPONENT);
             this.minimizeWindow = this.content.container.createComponent(factory);
-            this.setWindowElementProperties(this.minimizeWindow.instance);
+            this.minimizeWindow.instance.window = this;
         }
     }
 
@@ -89,24 +89,25 @@ export class WindowBaseComponent extends DragableWindow {
         return true;
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Protected Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected get resolver(): ComponentFactoryResolver {
         return APPLICATION_INJECTOR().get(ComponentFactoryResolver);
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Public Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public destroy(): void {
         super.destroy();
+        // Components will destroy automatically
         this.closeWindow = null;
         this.resizedWindow = null;
         this.minimizeWindow = null;

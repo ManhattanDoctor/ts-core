@@ -4,11 +4,11 @@ import { IWindowContent } from './IWindowContent';
 import { WindowConfig } from './WindowConfig';
 
 export abstract class IWindow extends Destroyable {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Public Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     abstract close(): void;
     abstract destroy(): void;
@@ -31,11 +31,11 @@ export abstract class IWindow extends Destroyable {
 
     abstract emit(event: string): void;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Public Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public isOnTop: boolean = false;
     public isMinimized: boolean = false;

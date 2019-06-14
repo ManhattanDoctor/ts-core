@@ -4,11 +4,11 @@ import { ITransport, ITransportCommand } from './ITransport';
 import { TransportWaitError } from './TransportWaitError';
 
 export abstract class TransportCommandManager<U, V, T extends ITransportCommand<U, V>> extends LoggerWrapper {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Constructor
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected constructor(logger: ILoggerService, protected transport: ITransport, name: string) {
         super(logger);
@@ -21,11 +21,11 @@ export abstract class TransportCommandManager<U, V, T extends ITransportCommand<
         });
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     //  Private Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected abstract async execute(params: U): Promise<V>;
 

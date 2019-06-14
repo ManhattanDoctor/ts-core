@@ -1,30 +1,30 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { timeout } from 'rxjs/internal/operators';
-import { ExtendedError } from '../../common/error';
-import { ApiError } from './ApiError';
-import { ApiMethod } from './ApiMethod';
-import { ApiRequest } from './ApiRequest';
-import { ApiResponse } from './ApiResponse';
-import { ApiServiceBase } from './ApiServiceBase';
+import { ExtendedError } from '../../../common/error';
+import { ApiError } from '../../api/ApiError';
+import { ApiMethod } from '../../api/ApiMethod';
+import { ApiRequest } from '../../api/ApiRequest';
+import { ApiResponse } from '../../api/ApiResponse';
+import { ApiServiceBase } from '../../api/ApiServiceBase';
 
 export abstract class HttpApiServiceBase extends ApiServiceBase {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     constructor(protected http: HttpClient) {
         super();
         this.idleTimeout = 2 * ApiServiceBase.IDLE_TIMEOUT;
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Protected Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     protected makeRequest(url: string, method: ApiMethod, params: HttpParams, headers: HttpHeaders, idleTimeout: number, responseType: any): Observable<any> {
         let observable: Observable<any> = null;

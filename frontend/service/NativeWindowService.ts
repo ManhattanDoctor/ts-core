@@ -4,20 +4,20 @@ import { Loadable, LoadableStatus } from '../../common';
 import { ObservableData } from '../../common/observer';
 
 export class NativeWindowService extends Loadable<NativeWindowServiceEvent, void> {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     private _isFocused: boolean = true;
     private timer: any;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     constructor() {
         super();
@@ -32,11 +32,11 @@ export class NativeWindowService extends Loadable<NativeWindowServiceEvent, void
         window.addEventListener('focus', this.focusHandler);
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Private Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     private setFocus(value: boolean) {
         if (value === this._isFocused) {
@@ -46,11 +46,11 @@ export class NativeWindowService extends Loadable<NativeWindowServiceEvent, void
         this.observer.next(new ObservableData(NativeWindowServiceEvent.FOCUS_CHANGED));
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Event Handlers
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     private checkLoadState = (): void => {
         if (this.isLoaded) {
@@ -71,11 +71,11 @@ export class NativeWindowService extends Loadable<NativeWindowServiceEvent, void
         this.setFocus(true);
     };
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public open(url?: string, target?: string): void {
         window.open(url, target);
@@ -117,11 +117,11 @@ export class NativeWindowService extends Loadable<NativeWindowServiceEvent, void
         return params;
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public get isFocused(): boolean {
         return this._isFocused;

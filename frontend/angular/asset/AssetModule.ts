@@ -1,12 +1,11 @@
-import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { AssetBackgroundDirective } from '../directive';
+import { AssetBackgroundDirective } from './AssetBackgroundDirective';
+import { AssetBackgroundPipe } from './AssetBackgroundPipe';
 import { AssetIconPipe } from './AssetIconPipe';
 import { AssetImagePipe } from './AssetImagePipe';
 
 @NgModule({
-    imports: [CommonModule],
-    declarations: [AssetBackgroundDirective, AssetIconPipe, AssetImagePipe],
-    exports: [AssetBackgroundDirective, AssetIconPipe, AssetImagePipe]
+    declarations: [AssetBackgroundDirective, AssetIconPipe, AssetImagePipe, AssetBackgroundPipe],
+    exports: [AssetBackgroundDirective, AssetIconPipe, AssetImagePipe, AssetBackgroundPipe]
 })
 export class AssetModule {}

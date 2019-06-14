@@ -1,10 +1,9 @@
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
-import { IDestroyable } from '../common';
-import { ArrayUtil } from '../common/util';
-import { Destroyable } from './Destroyable';
+import { IDestroyable } from './IDestroyable';
+import { ArrayUtil } from './util';
 
-export class DestroyableContainer extends Destroyable {
+export class DestroyableContainer extends IDestroyable {
     //--------------------------------------------------------------------------
     //
     //	Properties

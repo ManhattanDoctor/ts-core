@@ -1,12 +1,12 @@
-import { OverlayRef } from '@angular/cdk/overlay';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Observable, Subject } from 'rxjs';
 import { filter } from 'rxjs/internal/operators';
 import { ViewUtil } from '../util';
-import { WindowBase } from '../window';
-import { INotificationContent } from './INotificationContent';
+import { WindowBase, WindowEvent } from '../window';
 import { INotification, NotificationEvent } from './INotification';
+import { INotificationContent } from './INotificationContent';
 import { NotificationConfig } from './NotificationConfig';
+import { NotificationProperties } from './NotificationProperties';
 
 export class Notification extends WindowBase implements INotification {
     // --------------------------------------------------------------------------
@@ -15,9 +15,9 @@ export class Notification extends WindowBase implements INotification {
     //
     // --------------------------------------------------------------------------
 
-    protected _config: NotificationConfig;
-    protected _overlay: OverlayRef;
-    protected _reference: MatDialogRef<INotificationContent>;
+    private _container: HTMLElement;
+
+    protected properties: NotificationProperties;
 
     protected timer: any;
     protected observer: Subject<string>;
@@ -28,23 +28,30 @@ export class Notification extends WindowBase implements INotification {
     //
     // --------------------------------------------------------------------------
 
-    constructor(reference: MatDialogRef<INotificationContent>, config?: NotificationConfig, overlay?: OverlayRef) {
+    constructor(properties: NotificationProperties) {
         super();
         this.observer = new Subject();
 
-        this._config = config;
-        this._overlay = overlay;
-        this._reference = reference;
-
+        this.properties = properties;
         this.content.notification = this;
+
+        // Have to save for unsubscribe on destroy
+        this._container = this.properties.overlay.overlayElement;
 
         this.setProperties();
         this.setPosition();
 
-        this.addSubscription(reference.afterOpen().subscribe(this.setOpened));
-        this.addSubscription(reference.afterClosed().subscribe(this.setClosed));
-
-        this.addSubscription(this.observer.pipe(filter(event => event === NotificationEvent.CONTENT_READY)).subscribe(this.checkSizeAndUpdatePositionIfNeed));
+        this.addSubscription(
+            this.getReference()
+                .afterOpen()
+                .subscribe(this.setOpened)
+        );
+        this.addSubscription(
+            this.getReference()
+                .afterClosed()
+                .subscribe(this.setClosed)
+        );
+        this.addSubscription(this.observer.pipe(filter(event => event === WindowEvent.CONTENT_READY)).subscribe(this.checkSizeAndUpdatePositionIfNeed));
     }
 
     // --------------------------------------------------------------------------
@@ -59,22 +66,22 @@ export class Notification extends WindowBase implements INotification {
     }
 
     protected setClosed = (): void => {
-        this.emit(NotificationEvent.CLOSED);
+        this.emit(WindowEvent.CLOSED);
         this.destroy();
     };
 
     protected setOpened = (): void => {
-        this.emit(NotificationEvent.OPENED);
+        this.emit(WindowEvent.OPENED);
     };
 
     protected getConfig(): NotificationConfig {
-        return this._config;
+        return this.properties.config;
     }
     protected getContainer(): HTMLElement {
         return this.container;
     }
     protected getReference(): MatDialogRef<INotificationContent> {
-        return this._reference;
+        return this.properties.reference;
     }
 
     // --------------------------------------------------------------------------
@@ -88,7 +95,7 @@ export class Notification extends WindowBase implements INotification {
     }
 
     public close(): void {
-        if (this._reference) this._reference.close();
+        this.getReference().close();
     }
 
     public remove(): void {
@@ -100,10 +107,9 @@ export class Notification extends WindowBase implements INotification {
         super.destroy();
 
         this.observer = null;
+        this.properties = null;
 
-        this._reference = null;
-        this._overlay = null;
-        this._config = null;
+        this._container = null;
     }
 
     // --------------------------------------------------------------------------
@@ -170,14 +176,14 @@ export class Notification extends WindowBase implements INotification {
     }
 
     public get config(): NotificationConfig {
-        return this._config;
+        return this.properties.config;
     }
 
     public get content(): INotificationContent {
-        return this._reference.componentInstance;
+        return this.properties.reference ? this.properties.reference.componentInstance : null;
     }
 
     public get container(): HTMLElement {
-        return this._overlay.overlayElement;
+        return this._container;
     }
 }

@@ -1,8 +1,20 @@
-import * as _ from 'lodash';
-import { Destroyable } from '../../frontend';
+import { IDestroyable } from '../IDestroyable';
 import { MapCollection } from './MapCollection';
 
-export class DestroyableMapCollection<U extends Destroyable> extends MapCollection<U> {
+export class DestroyableMapCollection<U> extends MapCollection<U> {
+    //--------------------------------------------------------------------------
+    //
+    //	Protected Methods
+    //
+    //--------------------------------------------------------------------------
+
+    protected destroyItem(item: U): U {
+        if (item instanceof IDestroyable) {
+            item.destroy();
+        }
+        return item;
+    }
+
     //--------------------------------------------------------------------------
     //
     //	Public Methods
@@ -11,16 +23,12 @@ export class DestroyableMapCollection<U extends Destroyable> extends MapCollecti
 
     public clear(): void {
         if (this.map.size > 0) {
-            this.map.forEach(item => item.destroy());
+            this.map.forEach(item => this.destroyItem(item));
         }
         super.clear();
     }
 
     public remove(key: string): U {
-        let item = super.remove(key);
-        if (!_.isNil(item)) {
-            item.destroy();
-        }
-        return item;
+        return this.destroyItem(super.remove(key));
     }
 }

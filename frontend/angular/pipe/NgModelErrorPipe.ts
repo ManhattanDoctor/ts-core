@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { LanguageService } from '../language';
 
 @Pipe({
-    name: 'formatNgModelError'
+    name: 'viNgModelError'
 })
 export class NgModelErrorPipe implements PipeTransform {
     //--------------------------------------------------------------------------

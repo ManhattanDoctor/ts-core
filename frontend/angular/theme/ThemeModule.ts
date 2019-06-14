@@ -1,15 +1,14 @@
-import { Injector, NgModule } from '@angular/core';
-import { CookieModule, CookieOptionsProvider, COOKIE_OPTIONS } from 'ngx-cookie';
+import { NgModule } from '@angular/core';
+import { CookieModule } from '../cookie';
 import { ThemeAssetBackgroundDirective } from './ThemeAssetBackgroundDirective';
 import { ThemeAssetDirective } from './ThemeAssetDirective';
 import { ThemeImageDirective } from './ThemeImageDirective';
 import { ThemeService } from './ThemeService';
 import { ThemeToggleDirective } from './ThemeToggleDirective';
-import { CommonModule } from '@angular/common';
 
 @NgModule({
-    imports: [CommonModule, CookieModule.forChild()],
-    providers: [ThemeService, { provide: CookieOptionsProvider, useValue: CookieOptionsProvider, deps: [COOKIE_OPTIONS, Injector] }],
+    imports: [CookieModule],
+    providers: [ThemeService],
     declarations: [ThemeAssetDirective, ThemeImageDirective, ThemeToggleDirective, ThemeAssetBackgroundDirective],
     exports: [ThemeAssetDirective, ThemeImageDirective, ThemeToggleDirective, ThemeAssetBackgroundDirective]
 })

@@ -1,8 +1,8 @@
 import { Observable, Subject } from 'rxjs';
-import { Destroyable } from '../frontend';
+import { DestroyableContainer } from './DestroyableContainer';
 import { ObservableData } from './observer';
 
-export abstract class Loadable<U, V> extends Destroyable {
+export abstract class Loadable<U, V> extends DestroyableContainer {
     //--------------------------------------------------------------------------
     //
     //	Properties
@@ -11,6 +11,8 @@ export abstract class Loadable<U, V> extends Destroyable {
 
     protected status: LoadableStatus;
     protected observer: Subject<ObservableData<U | LoadableEvent, V>>;
+
+    protected isDestroyed: boolean;
 
     //--------------------------------------------------------------------------
     //
@@ -32,6 +34,7 @@ export abstract class Loadable<U, V> extends Destroyable {
 
     public destroy(): void {
         this.observer = null;
+        this.isDestroyed = true;
     }
 
     //--------------------------------------------------------------------------
@@ -59,7 +62,7 @@ export enum LoadableEvent {
     ERROR = 'ERROR',
     STARTED = 'STARTED',
     COMPLETE = 'COMPLETE',
-    FINISHED = 'FINISHED',
+    FINISHED = 'FINISHED'
 }
 
 export enum LoadableStatus {

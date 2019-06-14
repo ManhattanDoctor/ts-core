@@ -4,11 +4,11 @@ import { IDestroyable } from '../../../common';
 import { ViewUtil } from '../util';
 
 export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestroyable {
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public id: string;
     public isResizeable: boolean = false;
@@ -17,8 +17,8 @@ export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestro
 
     public propertiesId: string;
 
-    public x: number;
-    public y: number;
+    public x: number = NaN;
+    public y: number = NaN;
 
     public defaultWidth: number = NaN;
     public defaultMinWidth: number = NaN;
@@ -38,11 +38,11 @@ export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestro
 
     protected _isModal: boolean = false;
 
-    protected _elementMaxX: number;
-    protected _elementMinX: number;
+    protected _elementMaxX: number = NaN;
+    protected _elementMinX: number = NaN;
 
-    protected _elementMaxY: number;
-    protected _elementMinY: number;
+    protected _elementMaxY: number = NaN;
+    protected _elementMinY: number = NaN;
 
     protected _elementWidth: string;
     protected _elementMinWidth: number = NaN;
@@ -52,11 +52,11 @@ export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestro
     protected _elementMinHeight: number = NaN;
     protected _elementMaxHeight: number = NaN;
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     constructor(isModal: boolean = false, isResizeable: boolean = false, width: number = NaN, height: number = NaN) {
         super();
@@ -73,11 +73,11 @@ export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestro
         }
     }
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public setDefaultProperties(): void {
         this.width = this.elementWidth;
@@ -115,11 +115,11 @@ export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestro
 
     public destroy(): void {}
 
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public get isModal(): boolean {
         return this._isModal;
@@ -136,7 +136,7 @@ export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestro
         if (!_.isNaN(this._elementMinY)) {
             return this._elementMinY;
         }
-        this._elementMinY = -ViewUtil.stageHeight;
+        this._elementMinY = 0 - ViewUtil.stageHeight;
         if (!_.isNaN(this.paddingTop)) {
             this._elementMinY += this.paddingTop;
         }
