@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
-import { IDestroyable, Loadable, LoadableEvent, LoadableStatus } from '../../../common';
+import { Loadable, LoadableEvent, LoadableStatus } from '../../../common';
 import { ExtendedError } from '../../../common/error';
 import { MapCollection } from '../../../common/map';
 import { ObservableData } from '../../../common/observer';
@@ -9,6 +9,7 @@ import { PromiseReflector, PromiseStatus } from '../../../common/promise';
 import { Language } from '../../language';
 import { CloneUtil } from '../../util';
 import { CookieService } from '../cookie';
+import { ILanguageTranslator } from './ILanguageTranslator';
 import { LanguageTranslator } from './LanguageTranslator';
 
 @Injectable()
@@ -27,8 +28,6 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     private _languages: MapCollection<Language>;
     private _translator: ILanguageTranslator;
     private _rawTranslation: any;
-
-    // private subscription: Subscription;
 
     //--------------------------------------------------------------------------
     //
@@ -181,18 +180,17 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     public get language(): Language {
         return this._language;
     }
+    public set language(value: Language) {
+        if (value === this._language) {
+            return;
+        }
+        this._language = value;
+        this.load(value);
+    }
 
     public get languages(): MapCollection<Language> {
         return this._languages;
     }
 }
 
-export interface ILanguageTranslator extends IDestroyable {
-    translate(key: string, params?: any): string;
-    setLocale(locale: string, rawTranslation: any): void;
-    isHasTranslation(key: string): boolean;
-}
-
-export enum LanguageServiceEvent {
-    PARSE_ERROR = 'PARSE_ERROR'
-}
+export enum LanguageServiceEvent {}

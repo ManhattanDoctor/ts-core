@@ -27,6 +27,7 @@ export class ThemeToggleDirective extends Destroyable {
         let index = 0;
         if (this.theme.theme) {
             index = this.theme.themes.collection.indexOf(this.theme.theme);
+            console.log(index);
             if (index >= this.theme.themes.length - 1) {
                 index = 0;
             } else {

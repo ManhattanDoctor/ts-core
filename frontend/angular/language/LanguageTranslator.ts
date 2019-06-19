@@ -5,7 +5,7 @@ import { ExtendedError } from '../../../common/error';
 import { DestroyableMapCollection } from '../../../common/map';
 import { ObservableData } from '../../../common/observer';
 import { ObjectUtil } from '../../../common/util';
-import { ILanguageTranslator, LanguageServiceEvent } from './LanguageService';
+import { ILanguageTranslator, LanguageTranslatorEvent } from './ILanguageTranslator';
 
 export class LanguageTranslator extends DestroyableContainer implements ILanguageTranslator {
     //--------------------------------------------------------------------------
@@ -18,7 +18,7 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
     private locale: LocaleContainer;
     private locales: DestroyableMapCollection<LocaleContainer>;
 
-    private observer: Subject<ObservableData<LanguageServiceEvent, ExtendedError>>;
+    private observer: Subject<ObservableData<LanguageTranslatorEvent, ExtendedError>>;
 
     //--------------------------------------------------------------------------
     //
@@ -58,7 +58,7 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
 
     public translate(key: string, params?: any): string {
         if (_.isNil(key)) {
-            this.observer.next(new ObservableData(LanguageServiceEvent.PARSE_ERROR, new ExtendedError(`Expression is undefined`)));
+            this.observer.next(new ObservableData(LanguageTranslatorEvent.PARSE_ERROR, new ExtendedError(`Expression is undefined`)));
             return null;
         }
 
@@ -99,7 +99,7 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
     //
     //--------------------------------------------------------------------------
 
-    public get events(): Observable<ObservableData<LanguageServiceEvent, Error>> {
+    public get events(): Observable<ObservableData<LanguageTranslatorEvent, Error>> {
         return this.observer.asObservable();
     }
 }

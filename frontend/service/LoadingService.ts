@@ -1,14 +1,15 @@
+import { Injectable } from '@angular/core';
 import { Loadable, LoadableStatus } from '../../common';
-import { ObservableData } from '../../common/observer';
 
-export class LoadingService extends Loadable<LoadingServiceEvent, number> {
+@Injectable()
+export class LoadingService extends Loadable<void, void> {
     //--------------------------------------------------------------------------
     //
     // 	Properties
     //
     //--------------------------------------------------------------------------
 
-    private _counter: number = 0;
+    private counter: number = 0;
 
     //--------------------------------------------------------------------------
     //
@@ -22,44 +23,32 @@ export class LoadingService extends Loadable<LoadingServiceEvent, number> {
 
     //--------------------------------------------------------------------------
     //
+    // 	Private Methods
+    //
+    //--------------------------------------------------------------------------
+
+    private checkStatus(): void {
+        this.status = this.counter === 0 ? LoadableStatus.LOADED : LoadableStatus.LOADING;
+    }
+
+    //--------------------------------------------------------------------------
+    //
     // 	Public Methods
     //
     //--------------------------------------------------------------------------
 
     public start(): void {
         this.counter++;
+        this.checkStatus();
     }
 
     public finish(): void {
         this.counter--;
+        this.checkStatus();
     }
 
     public destroy(): void {
         super.destroy();
         this.observer = null;
     }
-
-    //--------------------------------------------------------------------------
-    //
-    // 	Private Properties
-    //
-    //--------------------------------------------------------------------------
-
-    private get counter(): number {
-        return this._counter;
-    }
-
-    private set counter(value: number) {
-        if (value === this._counter) {
-            return;
-        }
-
-        this._counter = value;
-        this.status = value === 0 ? LoadableStatus.LOADING : LoadableStatus.LOADED;
-        this.observer.next(new ObservableData(LoadingServiceEvent.CHANGED, value));
-    }
-}
-
-export enum LoadingServiceEvent {
-    CHANGED = 'CHANGED'
 }

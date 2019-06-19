@@ -6,6 +6,14 @@
 //
 //-------------------------------------------------------------------------*/
 
+@mixin vi-mat-core-bootstrap($typography) {
+    // _reset.scss
+    body {
+        @include mat-typography-level-to-styles($typography, body-1);
+    }
+
+}
+
 @mixin vi-mat-theme-bootstrap($theme, $text-primary-default, $text-accent-default) {
     $warn: map-get($theme, warn);
     $accent: map-get($theme, accent);
@@ -21,6 +29,10 @@
         $text-accent: mat-color($accent);
         $text-primary: mat-color($primary);
     }
+
+    // _reset.scss
+    color: map-get($foreground, text);
+    background-color: map-get($background, body);
 
     .bg-primary {
         background-color: $text-primary !important;

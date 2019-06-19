@@ -24,6 +24,11 @@ export class MapCollection<U> extends Destroyable {
 
     constructor(uidPropertyName: keyof U) {
         super();
+
+        if (_.isNil(uidPropertyName)) {
+            throw new ExtendedError(`Unable to create map: uidPropertyName in undefined`);
+        }
+        
         this.map = new Map();
         this.uidPropertyName = uidPropertyName;
 
@@ -44,7 +49,11 @@ export class MapCollection<U> extends Destroyable {
 
         let uid = this.getUidValue(item);
         if (!_.isString(uid)) {
-            throw new ExtendedError(`Uid must be a string: "${uid}" is ${typeof uid}`);
+            if (_.isNumber(uid)) {
+                uid = (uid as Number).toString();
+            } else {
+                throw new ExtendedError(`Uid must be a string: "${uid}" is ${typeof uid}`);
+            }
         }
 
         if (this.has(uid)) {

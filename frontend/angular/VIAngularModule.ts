@@ -34,6 +34,6 @@ export class VIAngularModule {
     //--------------------------------------------------------------------------
 
     public static forRoot(options?: CookieOptions): ModuleWithProviders {
-        return { ngModule: VIAngularModule, providers: [...VIModule.forRoot().providers, ...CookieModule.forRoot(options).providers] };
+        return { ngModule: VIAngularModule, providers: [...CookieModule.forRoot(options).providers] };
     }
 }

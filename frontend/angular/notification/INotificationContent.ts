@@ -13,6 +13,7 @@ export abstract class INotificationContent extends DestroyableContainer implemen
     //--------------------------------------------------------------------------
 
     protected timer: any;
+    protected _config: NotificationConfig;
     protected _notification: INotification;
 
     //--------------------------------------------------------------------------

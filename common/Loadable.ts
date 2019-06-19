@@ -9,7 +9,7 @@ export abstract class Loadable<U, V> extends DestroyableContainer {
     //
     //--------------------------------------------------------------------------
 
-    protected status: LoadableStatus;
+    protected _status: LoadableStatus;
     protected observer: Subject<ObservableData<U | LoadableEvent, V>>;
 
     protected isDestroyed: boolean;
@@ -22,8 +22,18 @@ export abstract class Loadable<U, V> extends DestroyableContainer {
 
     protected constructor() {
         super();
-        this.status = LoadableStatus.NOT_LOADED;
+        this._status = LoadableStatus.NOT_LOADED;
         this.observer = new Subject();
+    }
+
+    //--------------------------------------------------------------------------
+    //
+    //	Private Methods
+    //
+    //--------------------------------------------------------------------------
+
+    protected commitStatusChangedProperties(oldStatus: LoadableStatus, newStatus: LoadableStatus): void {
+        this.observer.next(new ObservableData(LoadableEvent.STATUS_CHANGED));
     }
 
     //--------------------------------------------------------------------------
@@ -37,6 +47,23 @@ export abstract class Loadable<U, V> extends DestroyableContainer {
         this.isDestroyed = true;
     }
 
+    //--------------------------------------------------------------------------
+    //
+    //	Private Properties
+    //
+    //--------------------------------------------------------------------------
+
+    protected get status(): LoadableStatus {
+        return this._status;
+    }
+    protected set status(value: LoadableStatus) {
+        if (value === this._status) {
+            return;
+        }
+        let oldValue = this._status;
+        this._status = value;
+        this.commitStatusChangedProperties(oldValue, value);
+    }
     //--------------------------------------------------------------------------
     //
     //	Public Properties
@@ -62,7 +89,9 @@ export enum LoadableEvent {
     ERROR = 'ERROR',
     STARTED = 'STARTED',
     COMPLETE = 'COMPLETE',
-    FINISHED = 'FINISHED'
+    FINISHED = 'FINISHED',
+
+    STATUS_CHANGED = 'STATUS_CHANGED'
 }
 
 export enum LoadableStatus {

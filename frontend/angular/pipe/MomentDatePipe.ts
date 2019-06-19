@@ -34,7 +34,7 @@ export class MomentDatePipe implements PipeTransform {
     //--------------------------------------------------------------------------
 
     public transform(value: Date | Moment, format?: string): string {
-        if (_.isNaN(value)) {
+        if (_.isNil(value)) {
             return '---';
         }
 
@@ -43,7 +43,7 @@ export class MomentDatePipe implements PipeTransform {
     }
 
     public fromNow(value: Date | Moment, format: string = 'LLL'): string {
-        if (_.isNaN(value)) {
+        if (_.isNil(value)) {
             return null;
         }
 

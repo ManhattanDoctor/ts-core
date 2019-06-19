@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs';
-import { IDestroyable } from '../../../common';
 import { LoadableMapCollection } from '../../../common/map';
 import { ApiMethod, ApiResponse } from '../../api';
 import { ApiServiceBase } from '../../api/ApiServiceBase';
+import * as _ from 'lodash';
 
 export abstract class ApiBaseLoadableMapCollection<U, V> extends LoadableMapCollection<U, ApiResponse<V>> {
     //--------------------------------------------------------------------------
@@ -47,11 +47,11 @@ export abstract class ApiBaseLoadableMapCollection<U, V> extends LoadableMapColl
     }
 
     protected isErrorResponse(response: ApiResponse<V>): boolean {
-        return response.isHandleError;
+        return response.isHasError;
     }
 
     protected parseItems(items: Array<any>): void {
-        if (!items || items.length === 0) {
+        if (_.isEmpty(items)) {
             return;
         }
 

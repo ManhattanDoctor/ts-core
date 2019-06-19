@@ -1,3 +1,4 @@
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
@@ -34,11 +35,35 @@ export class ThemeService extends Destroyable {
 
     //--------------------------------------------------------------------------
     //
+    //	Protected Methods
+    //
+    //--------------------------------------------------------------------------
+
+    private removeTheme(value: Theme): void {
+        this.cookies.remove('vi-theme');
+        if (!value) {
+            return;
+        }
+        let element = document.body;
+        ViewUtil.removeClass(element, value.styleName);
+    }
+
+    private addTheme(value: Theme): void {
+        if (!value) {
+            return;
+        }
+        this.cookies.put('vi-theme', value.name);
+        let element = document.body;
+        ViewUtil.addClass(element, value.styleName);
+    }
+
+    //--------------------------------------------------------------------------
+    //
     //	Public Methods
     //
     //--------------------------------------------------------------------------
 
-    public initialize(themes: Array<any>, defaultTheme: string): void {
+    public initialize(themes: Array<any>, defaultTheme?: string): void {
         this.themes.clear();
 
         if (!_.isEmpty(themes)) {
@@ -49,7 +74,11 @@ export class ThemeService extends Destroyable {
             }
         }
 
-        let name = defaultTheme;
+        let name = this.cookies.get('vi-theme');
+        if (_.isNil(name)) {
+            name = defaultTheme;
+        }
+
         if (this.themes.has(name)) {
             this.theme = this.themes.get(name);
         } else if (this.themes.length > 0) {
@@ -91,21 +120,15 @@ export class ThemeService extends Destroyable {
         if (value === this._theme) {
             return;
         }
-        if (this._theme && document) {
-            ViewUtil.removeClass(document.body, this._theme.styleName);
+        if (this._theme) {
+            this.removeTheme(this._theme);
         }
 
         this._theme = value;
-        this.observer.next(ThemeServiceEvent.CHANGED);
-
         if (this._theme) {
-            this.cookies.put('vi-theme', this._theme.name);
-            if (document) {
-                ViewUtil.addClass(document.body, this._theme.styleName);
-            }
-        } else {
-            this.cookies.remove('vi-theme');
+            this.addTheme(value);
         }
+        this.observer.next(ThemeServiceEvent.CHANGED);
     }
 }
 

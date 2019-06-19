@@ -1,8 +1,8 @@
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationExtras, NavigationStart, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
-import { ObservableData } from '../../../common/observer';
 import { DestroyableContainer } from '../../../common';
+import { ObservableData } from '../../../common/observer';
 import { NativeWindowService } from '../../service/NativeWindowService';
 
 export class RouterBaseService extends DestroyableContainer {
@@ -31,7 +31,7 @@ export class RouterBaseService extends DestroyableContainer {
         this.map = new Map();
         this.observer = new Subject();
 
-        _.forEach(this.window.getParams(), (key, value) => this.map.set(key, value));
+        this.window.getParams().forEach((value, key) => this.map.set(key, value));
         this.initializeObservers();
     }
 
@@ -132,6 +132,7 @@ export class RouterBaseService extends DestroyableContainer {
         });
         return params;
     }
+
     public hasParam(name: string): boolean {
         return this.map.has(name);
     }

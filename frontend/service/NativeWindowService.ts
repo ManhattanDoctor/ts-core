@@ -103,15 +103,15 @@ export class NativeWindowService extends Loadable<NativeWindowServiceEvent, void
         return decodeURIComponent(results[2].replace(/\+/g, ' '));
     }
 
-    public getParams(): any {
-        let params = {} as any;
+    public getParams(): Map<string,string> {
+        let params = new Map();
         let items = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
         for (let item of items) {
             let array = item.split('=');
             let key = decodeURIComponent(array[0]);
             let value = decodeURIComponent(array[1]);
             if (value && value !== 'null' && value !== 'undefined') {
-                params[key] = value;
+                params.set(key, value);
             }
         }
         return params;

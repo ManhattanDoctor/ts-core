@@ -1,6 +1,7 @@
 import { Renderer2 } from '@angular/core';
 import * as _ from 'lodash';
 import { ObjectUtil } from '../../../common/util';
+import { OverlayContainer } from '@angular/cdk/overlay';
 
 export class ViewUtil {
     //--------------------------------------------------------------------------
@@ -9,6 +10,7 @@ export class ViewUtil {
     //
     //--------------------------------------------------------------------------
 
+    private static OVERLAY: OverlayContainer;
     private static RENDEDER: Renderer2;
 
     //--------------------------------------------------------------------------

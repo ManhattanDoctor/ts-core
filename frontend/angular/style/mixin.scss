@@ -12,15 +12,15 @@
     -webkit-filter: grayscale($value);
 }
 
-@mixin scroll-auto() {
-    overflow-y: auto;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
 @mixin scroll-no() {
     overflow-y: hidden;
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+@mixin scroll-auto() {
+    overflow-y: auto;
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
 

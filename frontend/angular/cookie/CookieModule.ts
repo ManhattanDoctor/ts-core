@@ -1,4 +1,4 @@
-import { ModuleWithProviders, NgModule } from '@angular/core';
+import { ModuleWithProviders, NgModule, InjectionToken } from '@angular/core';
 import { CookieOptions } from './CookieOptions';
 import { CookieService } from './CookieService';
 
@@ -10,27 +10,23 @@ export class CookieModule {
     //
     //--------------------------------------------------------------------------
 
-    public static forChild(options?: CookieOptions): ModuleWithProviders {
-        return {
-            ngModule: CookieModule,
-            providers: [
-                {
-                    provide: CookieService,
-                    useValue: new CookieService(options)
-                }
-            ]
-        };
-    }
-
     public static forRoot(options?: CookieOptions): ModuleWithProviders {
         return {
             ngModule: CookieModule,
             providers: [
                 {
+                    provide: COOKIE_OPTIONS_TOKEN,
+                    useValue: options
+                },
+                {
                     provide: CookieService,
-                    useValue: new CookieService(options)
+                    deps: [COOKIE_OPTIONS_TOKEN],
+                    useClass: CookieService
                 }
+                
             ]
         };
     }
 }
+
+export let COOKIE_OPTIONS_TOKEN = new InjectionToken<CookieOptions>(`Cookie Options`);

@@ -138,7 +138,6 @@ export class NotificationService {
             config.closeDuration = this.defaultCloseDuration;
         }
 
-        console.log(config);
         config.setDefaultProperties();
     }
 
