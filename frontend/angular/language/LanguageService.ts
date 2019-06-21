@@ -21,7 +21,6 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     //--------------------------------------------------------------------------
 
     private url: string;
-    private default: Language;
     private isInitialized: boolean;
 
     private _language: Language;
@@ -54,7 +53,16 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     //
     //--------------------------------------------------------------------------
 
-    private loadLanguage(language: Language): void {
+    private load(locale?: string | Language): void {
+        if (locale instanceof Language) {
+            locale = locale.locale;
+        }
+
+        let language = this.languages.get(locale);
+        if (!language) {
+            throw new ExtendedError(`Unable lo load language: can't find locale ${locale}`);
+        }
+
         this.status = LoadableStatus.LOADING;
         this.observer.next(new ObservableData(LoadableEvent.STARTED, language));
 
@@ -78,6 +86,7 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
         });
     }
 
+
     private setLanguage(language: Language, translation: Object): void {
         this._language = language;
         this._rawTranslation = translation;
@@ -96,7 +105,7 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     //
     //--------------------------------------------------------------------------
 
-    public initialize(url: string, languages: MapCollection<Language>, defaultLanguage: string): void {
+    public initialize(url: string, languages: MapCollection<Language>): void {
         if (this.isInitialized) {
             throw new ExtendedError('Service already initialized');
         }
@@ -106,37 +115,18 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
         if (_.isEmpty(languages)) {
             throw new ExtendedError('Unable to initialize: available languages is undefined or empty');
         }
-        if (!languages.has(defaultLanguage)) {
-            throw new ExtendedError('Unable to initialize: default language is undefined or doesnt contain in languages');
-        }
 
         this._languages = languages;
 
         this.url = url;
-        this.default = this.languages.get(defaultLanguage);
         this.isInitialized = true;
     }
 
-    public load(locale?: string | Language): void {
+    public loadIfExist(defaultLocale?: string): void {
         if (!this.isInitialized) {
             throw new ExtendedError('Service in not initialized');
         }
-
-        let value = locale instanceof Language ? locale.locale : locale;
-        if (!value) {
-            value = this.cookies.get('vi-language');
-        }
-
-        if (!value || !this._languages.has(value)) {
-            value = this.default.locale;
-        }
-
-        let language = this._languages.get(value);
-        if (!this.language || !this.language.toEqual(language)) {
-            this.loadLanguage(language);
-        } else {
-            this.observer.next(new ObservableData(LoadableEvent.COMPLETE, language));
-        }
+        this.load(this.cookies.get('vi-language') || defaultLocale);
     }
 
     public translate(key: string, params?: Object): string {
@@ -149,7 +139,6 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
 
     public destroy(): void {
         super.destroy();
-
         this._language = null;
         this._languages = null;
         this._rawTranslation = null;
@@ -170,11 +159,7 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     }
 
     public get locale(): string {
-        return this.language ? this.language.locale : this.defaultLocale;
-    }
-
-    public get defaultLocale(): string {
-        return this.default ? this.default.locale : null;
+        return this.language ? this.language.locale : null;
     }
 
     public get language(): Language {

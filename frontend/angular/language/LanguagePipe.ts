@@ -1,19 +1,21 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { DestroyableContainer, LoadableEvent } from '../../../common';
 import { LanguageService } from './LanguageService';
 
 @Pipe({
-    name: 'viTranslate'
+    name: 'viTranslate',
+    pure: false
 })
-export class LanguagePipe implements PipeTransform {
+export class LanguagePipe extends DestroyableContainer implements PipeTransform {
     //--------------------------------------------------------------------------
     //
-    //	Public Methods
+    //	Properties
     //
     //--------------------------------------------------------------------------
 
-    public transform(key: string, params?: any): string {
-        return this.language.translate(key, params);
-    }
+    private key: string;
+    private params: string;
+    private _value: string;
 
     //--------------------------------------------------------------------------
     //
@@ -21,5 +23,39 @@ export class LanguagePipe implements PipeTransform {
     //
     //--------------------------------------------------------------------------
 
-    constructor(private language: LanguageService) {}
+    constructor(private language: LanguageService) {
+        super();
+        this.addSubscription(
+            language.events.subscribe(data => {
+                if (data.type === LoadableEvent.COMPLETE) {
+                    this.updateValue();
+                }
+            })
+        );
+    }
+
+    //--------------------------------------------------------------------------
+    //
+    //	Private Methods
+    //
+    //--------------------------------------------------------------------------
+
+    private updateValue(): void {
+        this._value = this.language.translate(this.key, this.params);
+    }
+
+    //--------------------------------------------------------------------------
+    //
+    //	Public Methods
+    //
+    //--------------------------------------------------------------------------
+
+    public transform(key: string, params?: any): string {
+        this.key = key;
+        this.params = params;
+        if (!this._value) {
+            this.updateValue();
+        }
+        return this._value;
+    }
 }

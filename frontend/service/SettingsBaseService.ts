@@ -31,7 +31,6 @@ export class SettingsBaseService extends Destroyable {
 
     protected _language: string;
     protected _languages: MapCollection<Language>;
-    protected _defaultLanguage: string = SettingsBaseService.LANGUAGE_EN;
 
     protected _sid: string;
     protected _apiUrl: string;
@@ -175,9 +174,6 @@ export class SettingsBaseService extends Destroyable {
     }
     public get language(): string {
         return this._language;
-    }
-    public get defaultLanguage(): string {
-        return this._defaultLanguage;
     }
     public get assetsUrl(): string {
         return this._assetsUrl;
