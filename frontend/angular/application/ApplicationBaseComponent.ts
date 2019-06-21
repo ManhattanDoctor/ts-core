@@ -1,5 +1,6 @@
 import { AfterViewInit, ElementRef } from '@angular/core';
 import { DestroyableContainer } from '../../../common';
+import { PromiseHandler } from '../../../common/promise';
 
 export abstract class ApplicationBaseComponent extends DestroyableContainer implements AfterViewInit {
     //--------------------------------------------------------------------------
@@ -8,12 +9,11 @@ export abstract class ApplicationBaseComponent extends DestroyableContainer impl
     //
     //--------------------------------------------------------------------------
 
+    private timeout: any;
     private isViewReady: boolean;
-    private viewTimeout: any;
-    private viewReadyResolver: () => void;
 
-    private _viewReady: Promise<void>;
-    private isReadyCalled: boolean;
+    private _viewReady: PromiseHandler;
+    private isReadyAlreadyCalled: boolean;
 
     //--------------------------------------------------------------------------
     //
@@ -23,7 +23,7 @@ export abstract class ApplicationBaseComponent extends DestroyableContainer impl
 
     constructor(protected element: ElementRef, private viewReadyDelay: number = NaN) {
         super();
-        this._viewReady = new Promise(resolve => (this.viewReadyResolver = resolve));
+        this._viewReady = PromiseHandler.create<void>();
     }
 
     //--------------------------------------------------------------------------
@@ -33,8 +33,8 @@ export abstract class ApplicationBaseComponent extends DestroyableContainer impl
     //--------------------------------------------------------------------------
 
     private makeViewReady = (): void => {
+        this._viewReady.resolve();
         this.isViewReady = true;
-        this.viewReadyResolver();
         this.checkReady();
     };
 
@@ -45,10 +45,10 @@ export abstract class ApplicationBaseComponent extends DestroyableContainer impl
     //--------------------------------------------------------------------------
 
     protected checkReady(): void {
-        if (!this.isReady() || this.isReadyCalled) {
+        if (!this.isReady() || this.isReadyAlreadyCalled) {
             return;
         }
-        this.isReadyCalled = true;
+        this.isReadyAlreadyCalled = true;
         this.readyHandler();
     }
 
@@ -66,19 +66,19 @@ export abstract class ApplicationBaseComponent extends DestroyableContainer impl
 
     public ngAfterViewInit(): void {
         if (this.viewReadyDelay > 0) {
-            this.viewTimeout = setTimeout(this.makeViewReady, this.viewReadyDelay);
-            return;
+            this.timeout = setTimeout(this.makeViewReady, this.viewReadyDelay);
+        } else {
+            this.makeViewReady();
         }
-        this.makeViewReady();
     }
 
     public destroy(): void {
         super.destroy();
         this.element = null;
 
-        if (this.viewTimeout) {
-            clearTimeout(this.viewTimeout);
-            this.viewTimeout = null;
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = null;
         }
     }
 
@@ -89,6 +89,6 @@ export abstract class ApplicationBaseComponent extends DestroyableContainer impl
     //--------------------------------------------------------------------------
 
     public get viewReady(): Promise<void> {
-        return this._viewReady;
+        return this._viewReady.promise;
     }
 }

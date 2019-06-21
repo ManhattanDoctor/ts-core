@@ -26,27 +26,25 @@
         vertical-align: middle;
     }
 
-    table tr.ng2-smart-titles {
+    .ng2-smart-titles {
         th {
             padding: $padding;
             @include nb-ltr(padding-right, 1.75rem);
             @include nb-rtl(padding-left, 1.75rem);
         }
 
-        th a {
-            &:hover, &:active, &:visited {
-                text-decoration: none;
-            }
+        .ng2-smart-sort-link {
             &.sort.asc, &.sort.desc {
                 font-weight: mat-font-weight($typography, body-2);
 
                 &::after {
+                    @include nb-ltr(right, 0.75rem);
+                    @include nb-rtl(left, 0.75rem);
                     border-width: 0.375rem;
                     position: absolute;
                     margin: 0;
-                    @include nb-ltr(right, 0.75rem);
-                    @include nb-rtl(left, 0.75rem);
                     top: 50%;
+                    margin-left: 4px;
                     transform: translate(0, -50%);
                 }
 
@@ -74,7 +72,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1.75rem !important;
-            padding: nb-theme(smart-table-filter-padding);
+            padding: $padding;
             border-radius: 0.375rem;
 
             &:hover {
@@ -119,40 +117,67 @@
     }
 
     ng2-smart-table-pager {
-        display: block;
+        justify-content: center !important;
     }
 
     //Paging
-    nav.ng2-smart-pagination-nav {
+    .ng2-smart-pagination-nav {
         display: flex;
         justify-content: center;
-        margin-top: 1.25rem;
+        margin-top: $padding;
 
         .ng2-smart-pagination {
             display: flex;
             padding: 0;
+            margin: 0;
         }
 
         .pagination {
             @include mat-typography-level-to-styles($typography, body-1);
-            font-family: nb-theme(button-text-font-family);
-            font-size: nb-theme(button-medium-text-font-size);
-            line-height: nb-theme(button-medium-text-line-height);
             border: 1px solid;
             border-radius: 4px;
 
-            li {
+            .page-item {
+                &:last-child {
+                    .page-link {
+                        @include nb-ltr() {
+                            border-top-right-radius: 4px;
+                            border-bottom-right-radius: 4px;
+                        };
+                        @include nb-rtl() {
+                            border-top-left-radius: 4px;
+                            border-bottom-left-radius: 4px;
+                        };
+                    }
+                }
                 &:not(:last-child) {
                     @include nb-ltr(border-right, 1px solid);
                     @include nb-rtl(border-left, 1px solid);
                 }
 
-                a.page-link-prev, a.page-link-next {
-                    font-size: nb-theme(button-medium-text-font-size);
+                &:first-child {
+                    .page-link {
+                        @include nb-ltr() {
+                            border-top-left-radius: 4px;
+                            border-bottom-left-radius: 4px;
+                        };
+                        @include nb-rtl() {
+                            border-top-right-radius: 4px;
+                            border-bottom-right-radius: 4px;
+                        };
+                    }
                 }
 
-                a, > span {
+                &.active {
+                    .page-link {
+                        font-weight: mat-font-weight($typography, body-2);
+                    }
+                }
+
+                .page-link {
+                    @include mat-typography-level-to-styles($typography, body-1);
                     background: transparent;
+                    border: none;
                     padding: 0.75rem 1.25rem;
                     border: none;
 
@@ -161,105 +186,103 @@
                     }
                 }
 
-                &:first-child {
-                    a, > span {
-                        @include nb-ltr() {
-                            border-top-left-radius: 4px;
-                            border-bottom-left-radius: 4px;
-                        };
-                        @include nb-rtl() {
-                            border-top-right-radius: 4px;
-                            border-bottom-right-radius: 4px;
-                        };
-                    }
+                .page-link-prev,
+                .page-link-next {
+                    font-size: mat-font-size($typography, body-1) !important;
                 }
 
-                &:last-child {
-                    a, > span {
-                        @include nb-ltr() {
-                            border-top-right-radius: 4px;
-                            border-bottom-right-radius: 4px;
-                        };
-                        @include nb-rtl() {
-                            border-top-left-radius: 4px;
-                            border-bottom-left-radius: 4px;
-                        };
-                    }
-                }
             }
+
         }
     }
 }
 
 @mixin vi-mat-theme-ng2-smart-table($theme, $text-primary-default, $text-accent-default) {
+    $warn: map-get($theme, warn);
+    $accent: map-get($theme, accent);
+    $primary: map-get($theme, primary);
+    $is-dark: map-get($theme, is-dark);
+    $background: map-get($theme, background);
+    $foreground: map-get($theme, foreground);
+
+    $text-warn: mat-color($warn);
+    $text-accent: mat-color($accent, $text-accent-default);
+    $text-primary: mat-color($primary, $text-primary-default);
+    @if $is-dark {
+        $text-accent: mat-color($accent);
+        $text-primary: mat-color($primary);
+    }
+
+    color: map-get($foreground, text);
+    background-color: map-get($background, card);
+
     table tr th,
     table tr th a {
-        color: nb-theme(smart-table-header-fg);
+        // color: map-get($foreground, text);
     }
 
     table tr td {
-        color: nb-theme(smart-table-fg);
+        // color: map-get($foreground, text);
     }
 
     table tr th,
     table tr td {
-        border-color: 1px solid nb-theme(smart-table-separator);
+        border-color: map-get($foreground, divider);
     }
 
-    table tr.ng2-smart-titles {
-        th a {
-            &:hover, &:active, &:visited {
-                color: nb-theme(smart-table-header-fg);
-            }
+    .ng2-smart-titles {
+        .ng2-smart-sort-link {
+            color: $text-primary;
+
             &.sort.asc, &.sort.desc {
                 &::after {
-                    border-bottom-color: nb-theme(smart-table-fg-secondary);
+                    border-bottom-color: $text-primary;
                 }
             }
         }
     }
 
     thead tr {
-        background: nb-theme(smart-table-header-bg);
+        // background: nb-theme(smart-table-header-bg);
     }
 
     tbody tr {
         &.selected, &:hover {
-            background: nb-theme(smart-table-bg-active) !important;
+            background: map-get($background, hover) !important;
         }
 
         &:nth-child(2n) {
-            background-color: nb-theme(smart-table-bg-even);
+            background-color: map-get($background, row-hover);
         }
     }
 
     // Actions
     th.ng2-smart-actions-title-add {
         a {
-            background: nb-theme(color-success-500);
-            color: #ffffff;
+            // background: nb-theme(color-success-500);
+            // color: #ffffff;
         }
     }
 
     .ng2-smart-actions {
         a.ng2-smart-action {
-            color: nb-theme(smart-table-fg-secondary);
+            // color: nb-theme(smart-table-fg-secondary);
 
             &:not(:last-child) {
-                border-color: nb-theme(smart-table-separator);
+                // border-color: nb-theme(smart-table-separator);
             }
         }
 
         .ng2-smart-action-add-create:hover,
         .ng2-smart-action-edit-edit:hover,
         .ng2-smart-action-edit-save:hover {
-            color: nb-theme(color-success-500);
+            // color: nb-theme(color-success-500);
         }
 
         .ng2-smart-action-add-cancel:hover,
         .ng2-smart-action-delete-delete:hover,
         .ng2-smart-action-edit-cancel:hover {
-            color: nb-theme(color-danger-500);
+            // color: nb-theme(color-danger-500);
         }
     }
 
@@ -267,69 +290,43 @@
     nav.ng2-smart-pagination-nav {
         .ng2-smart-pagination {
             .page-item.disabled .page-link, .page-item.disabled .page-link:focus, .page-item.disabled .page-link:hover {
-                background-color: nb-theme(smart-table-paging-hover);
-                color: nb-theme(button-outline-success-text-color);
+                color: map-get($foreground, secondary-text);
             }
         }
 
         .pagination {
-            border: nb-theme(smart-table-paging-border-color) solid nb-theme(smart-table-paging-border-width);
+            border-color: map-get($foreground, divider);
 
-            li {
+            .page-item {
                 &:not(:last-child) {
-                    @include nb-ltr(border-right, 1px solid nb-theme(smart-table-separator));
-                    @include nb-rtl(border-left, 1px solid nb-theme(smart-table-separator));
+                    @include nb-ltr(border-color, map-get($foreground, divider));
+                    @include nb-rtl(border-color, map-get($foreground, divider));
                 }
 
-                a.page-link-prev, a.page-link-next {
-                    font-size: nb-theme(button-medium-text-font-size);
-                }
-
-                a, > span {
-                    background: transparent;
-                    color: nb-theme(button-outline-success-text-color);
-                    padding: 0.75rem 1.25rem;
-                    border: none;
-
+                &:not(.active):not(.disabled) {
                     &:hover {
-                        background-color: nb-theme(smart-table-paging-hover);
-                        color: nb-theme(button-outline-success-text-color);
-                        text-decoration: none;
+                        background: map-get($background, hover);
+                        .page-link {
+                            color: $text-primary;
+                        }
                     }
                 }
-
-                &:first-child {
-                    a, > span {
-                        @include nb-ltr() {
-                            border-top-left-radius: nb-theme(smart-table-border-radius);
-                            border-bottom-left-radius: nb-theme(smart-table-border-radius);
-                        };
-                        @include nb-rtl() {
-                            border-top-right-radius: nb-theme(smart-table-border-radius);
-                            border-bottom-right-radius: nb-theme(smart-table-border-radius);
-                        };
+         
+                .page-link {
+                    color: map-get($foreground, text);
+                    &:hover {
+                        color: $text-primary;
                     }
                 }
-
-                &:last-child {
-                    a, > span {
-                        @include nb-ltr() {
-                            border-top-right-radius: nb-theme(smart-table-border-radius);
-                            border-bottom-right-radius: nb-theme(smart-table-border-radius);
-                        };
-                        @include nb-rtl() {
-                            border-top-left-radius: nb-theme(smart-table-border-radius);
-                            border-bottom-left-radius: nb-theme(smart-table-border-radius);
-                        };
-                    }
-                }
-
+        
                 &.active {
-                    a, a:hover, a:focus, > span, > span:hover, > span:focus {
-                        color: nb-theme(smart-table-paging-fg-active);
-                        background-color: nb-theme(smart-table-paging-bg-active);
+                    background: map-get($background, hover);
+                    .page-link {
+                        color: $text-primary;
+                        cursor: default;
                     }
                 }
+
             }
         }
     }
