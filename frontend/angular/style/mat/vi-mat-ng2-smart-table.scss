@@ -205,7 +205,6 @@
     $background: map-get($theme, background);
     $foreground: map-get($theme, foreground);
 
-    $text-warn: mat-color($warn);
     $text-accent: mat-color($accent, $text-accent-default);
     $text-primary: mat-color($primary, $text-primary-default);
     @if $is-dark {

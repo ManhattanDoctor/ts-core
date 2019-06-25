@@ -54,13 +54,13 @@ export class DestroyableContainer extends IDestroyable {
         ArrayUtil.remove(this._subscriptions, value);
     }
 
-    public addDestroyable(value: IDestroyable): IDestroyable {
+    public addDestroyable<T extends IDestroyable>(value: T): T {
         if (_.isNil(this._destroyables)) {
             this._destroyables = [];
         }
-        return this.addItem(value, this._destroyables);
+        return this.addItem(value as any, this._destroyables);
     }
-    public removeDestroyable(value: IDestroyable): void {
+    public removeDestroyable<T extends IDestroyable>(value: T): void {
         ArrayUtil.remove(this._destroyables, value);
     }
 

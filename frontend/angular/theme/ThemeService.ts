@@ -1,4 +1,3 @@
-import { OverlayContainer } from '@angular/cdk/overlay';
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
@@ -21,6 +20,8 @@ export class ThemeService extends Destroyable {
 
     private observer: Subject<string>;
 
+    public cookieStorageName: string = 'vi-theme';
+
     //--------------------------------------------------------------------------
     //
     //	Constructor
@@ -40,7 +41,7 @@ export class ThemeService extends Destroyable {
     //--------------------------------------------------------------------------
 
     private removeTheme(value: Theme): void {
-        this.cookies.remove('vi-theme');
+        this.cookies.remove(this.cookieStorageName);
         if (!value) {
             return;
         }
@@ -52,7 +53,7 @@ export class ThemeService extends Destroyable {
         if (!value) {
             return;
         }
-        this.cookies.put('vi-theme', value.name);
+        this.cookies.put(this.cookieStorageName, value.name);
         let element = document.body;
         ViewUtil.addClass(element, value.styleName);
     }
@@ -74,7 +75,7 @@ export class ThemeService extends Destroyable {
             }
         }
 
-        let name = this.cookies.get('vi-theme');
+        let name = this.cookies.get(this.cookieStorageName);
         if (_.isNil(name)) {
             name = defaultTheme;
         }

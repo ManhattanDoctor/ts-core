@@ -1,8 +1,8 @@
 import { Observable, Subject } from 'rxjs';
+import { LoadableEvent } from '../../../common';
 import { ObservableData } from '../../../common/observer';
 import { ApiResponse } from '../../api';
 import { Destroyable } from '../../Destroyable';
-
 
 export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
     //--------------------------------------------------------------------------
@@ -18,7 +18,7 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
     protected _isLoading: boolean = false;
     protected _isLoggedIn: boolean = false;
 
-    protected observer: Subject<ObservableData<U | LoginBaseServiceEvent, ApiResponse>>;
+    protected observer: Subject<ObservableData<U | LoadableEvent | LoginBaseServiceEvent, ApiResponse>>;
 
     //--------------------------------------------------------------------------
     //
@@ -43,6 +43,7 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
         }
 
         this._isLoading = true;
+        this.observer.next(new ObservableData(LoadableEvent.STARTED));
         this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_STARTED));
 
         let subscription = this.makeLoginRequest(param).subscribe(response => {
@@ -52,6 +53,8 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
             if (response.isHasError) {
                 this.parseLoginErrorResponse(response);
                 this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_ERROR, response));
+
+                this.observer.next(new ObservableData(LoadableEvent.FINISHED));
                 this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_FINISHED, response));
                 return;
             }
@@ -81,6 +84,7 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
                 this.parseLoginSidErrorResponse(response);
                 this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_ERROR, response));
             }
+            this.observer.next(new ObservableData(LoadableEvent.FINISHED));
             this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_FINISHED, response));
         });
     }
@@ -132,6 +136,7 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
         }
 
         if (!this.isLoggedIn && !this.isLoading) {
+            this.observer.next(new ObservableData(LoadableEvent.STARTED));
             this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_STARTED));
             this.loginBySid(isNeedHandleError, isHandleLoading);
         }
@@ -139,6 +144,7 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
     }
 
     public logout(): void {
+        this.observer.next(new ObservableData(LoadableEvent.STARTED));
         this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGOUT_STARTED));
         if (this.isLoggedIn) {
             this.makeLogoutRequest();
@@ -146,6 +152,7 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
 
         this.reset();
         this._isLoggedIn = false;
+        this.observer.next(new ObservableData(LoadableEvent.FINISHED));
         this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGOUT_FINISHED));
     }
 
@@ -164,7 +171,7 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
     //
     //--------------------------------------------------------------------------
 
-    public get events(): Observable<ObservableData<U | LoginBaseServiceEvent, ApiResponse>> {
+    public get events(): Observable<ObservableData<U | LoadableEvent | LoginBaseServiceEvent, ApiResponse>> {
         return this.observer.asObservable();
     }
 

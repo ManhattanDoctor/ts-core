@@ -4,7 +4,7 @@ import { LanguageService } from './LanguageService';
 @Pipe({
     name: 'viTranslatePure'
 })
-export class LanguagePipePure implements PipeTransform {
+export class LanguagePurePipe implements PipeTransform {
     //--------------------------------------------------------------------------
     //
     //	Public Methods

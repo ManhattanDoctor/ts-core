@@ -76,13 +76,13 @@ export class QuestionManager extends Destroyable implements IQuestion<string> {
     public yesClickHandler(): void {
         this._yesNotPromise.resolve();
         this.content.emit(QuestionEvent.YES);
-        this.content.close();
+        this.closeClickHandler();
     }
 
     public notClickHandler(): void {
         this._yesNotPromise.reject();
         this.content.emit(QuestionEvent.NOT);
-        this.content.close();
+        this.closeClickHandler();
     }
 
     //--------------------------------------------------------------------------
@@ -92,6 +92,14 @@ export class QuestionManager extends Destroyable implements IQuestion<string> {
     //--------------------------------------------------------------------------
 
     public destroy(): void {
+        if (this._yesNotPromise) {
+            this._yesNotPromise.reject();
+            this._yesNotPromise = null;
+        }
+        if (this._closePromise) {
+            this._closePromise.resolve();
+            this._closePromise = null;
+        }
         this.content = null;
     }
 

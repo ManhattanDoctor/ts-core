@@ -4,15 +4,15 @@ import { ObservableData } from '../../../common/observer';
 import { LoginBaseService, LoginBaseServiceEvent } from '../login';
 import { IUser } from './IUser';
 
-export abstract class UserBaseService<U, V extends IUser> {
+export abstract class UserBaseService<U extends IUser = any, V = void> {
     //--------------------------------------------------------------------------
     //
     // 	Properties
     //
     //--------------------------------------------------------------------------
 
-    protected _user: V;
-    protected observer: Subject<ObservableData<U | UserBaseServiceEvent, V>>;
+    protected _user: U;
+    protected observer: Subject<ObservableData<V | UserBaseServiceEvent, U>>;
 
     //--------------------------------------------------------------------------
     //
@@ -54,7 +54,7 @@ export abstract class UserBaseService<U, V extends IUser> {
         this.observer.next(new ObservableData(UserBaseServiceEvent.LOGOUTED));
     }
 
-    protected abstract createUser(data: any): V;
+    protected abstract createUser(data: any): U;
 
     //--------------------------------------------------------------------------
     //
@@ -87,7 +87,7 @@ export abstract class UserBaseService<U, V extends IUser> {
     //
     //--------------------------------------------------------------------------
 
-    public get events(): Observable<ObservableData<U | UserBaseServiceEvent, V>> {
+    public get events(): Observable<ObservableData<V | UserBaseServiceEvent, U>> {
         return this.observer.asObservable();
     }
 
@@ -99,7 +99,7 @@ export abstract class UserBaseService<U, V extends IUser> {
         return this.hasUser;
     }
 
-    public get user(): V {
+    public get user(): U {
         return this._user;
     }
 

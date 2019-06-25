@@ -28,6 +28,8 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     private _translator: ILanguageTranslator;
     private _rawTranslation: any;
 
+    public cookieStorageName: string = 'vi-language';
+
     //--------------------------------------------------------------------------
     //
     //	Constructor
@@ -86,13 +88,12 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
         });
     }
 
-
     private setLanguage(language: Language, translation: Object): void {
         this._language = language;
         this._rawTranslation = translation;
         this._translator.setLocale(language.locale, translation);
 
-        this.cookies.put('vi-language', language.locale);
+        this.cookies.put(this.cookieStorageName, language.locale);
 
         this.status = LoadableStatus.LOADED;
         this.observer.next(new ObservableData(LoadableEvent.COMPLETE, language));
@@ -126,7 +127,7 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
         if (!this.isInitialized) {
             throw new ExtendedError('Service in not initialized');
         }
-        this.load(this.cookies.get('vi-language') || defaultLocale);
+        this.load(this.cookies.get(this.cookieStorageName) || defaultLocale);
     }
 
     public translate(key: string, params?: Object): string {

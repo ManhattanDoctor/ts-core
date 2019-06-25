@@ -24,19 +24,23 @@ export class ThemeToggleDirective extends Destroyable {
 
     @HostListener('click', ['$event'])
     private clickHandler(event: MouseEvent) {
+        let themes = this.theme.themes.collection;
+        let length = themes.length;
+        if (length < 2) {
+            return;
+        }
+
         let index = 0;
         if (this.theme.theme) {
-            index = this.theme.themes.collection.indexOf(this.theme.theme);
-            console.log(index);
-            if (index >= this.theme.themes.length - 1) {
-                index = 0;
-            } else {
+            index = themes.indexOf(this.theme.theme);
+            if (index < length - 1) {
                 index++;
+            } else {
+                index = 0;
             }
         }
-        if (index <= this.theme.themes.length - 1) {
-            this.theme.theme = this.theme.themes.collection[index];
-        }
+
+        this.theme.theme = themes[index];
     }
 
     //--------------------------------------------------------------------------

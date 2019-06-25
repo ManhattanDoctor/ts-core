@@ -31,8 +31,8 @@
 }
 
 @mixin horizontal-scroll-only() {
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow-y: hidden;
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
 

@@ -22,7 +22,6 @@
     $background: map-get($theme, background);
     $foreground: map-get($theme, foreground);
 
-    $text-warn: mat-color($warn);
     $text-accent: mat-color($accent, $text-accent-default);
     $text-primary: mat-color($primary, $text-primary-default);
     @if $is-dark {
@@ -32,13 +31,19 @@
 
     // _reset.scss
     color: map-get($foreground, text);
-    background-color: map-get($background, body);
+    background-color: map-get($background, body) !important;
 
     .bg-primary {
         background-color: $text-primary !important;
     }
     .border-primary {
         border-color: $text-primary !important;
+    }
+
+    .form-control {
+        background: transparent;
+        color: map-get($foreground, text);
+        border-color: map-get($foreground, divider);
     }
 
     .border {
@@ -67,17 +72,17 @@
     .text-base {
         color: map-get($foreground, text) !important;
     }
-    .text-warn {
-        color: $text-warn !important;
-    }
     .text-accent {
         color: $text-accent !important;
     }
-    .text-danger {
-        color: $text-warn !important;
-    }
     .text-primary {
         color: $text-primary !important;
+    }
+    .text-danger {
+        color: mat-color($warn) !important;
+    }
+    .text-warning {
+        color: map-get($foreground, warning-text) !important;
     }
     .text-success {
         color: map-get($foreground, success-text) !important;
