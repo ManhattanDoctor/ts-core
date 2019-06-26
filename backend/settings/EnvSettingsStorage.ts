@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
-import { AbstractSettingsStorage } from '../../common/settings/AbstractSettingsStorage';
+import { AbstractSettingsStorage } from '../../common/settings';
 
 export class EnvSettingsStorage extends AbstractSettingsStorage {
     //--------------------------------------------------------------------------

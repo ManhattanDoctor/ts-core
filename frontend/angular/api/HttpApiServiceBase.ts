@@ -58,6 +58,6 @@ export abstract class HttpApiServiceBase extends ApiServiceBase {
     }
 
     protected parseErrorResponse<T>(error: HttpErrorResponse, request: ApiRequest): ApiResponse<T> {
-        return this.parseResponse(ApiError.createSystemError(error), request);
+        return this.parseResponse(new ApiError(error), request);
     }
 }

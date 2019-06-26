@@ -113,7 +113,9 @@ export class ThemeAssetDirective extends Destroyable implements OnInit {
     //--------------------------------------------------------------------------
 
     public ngOnInit(): void {
-        this.updateSourceProperties();
+        if (this.theme.theme) {
+            this.updateSourceProperties();
+        }
 
         this.subscription = this.theme.events.subscribe(event => {
             if (event === ThemeServiceEvent.CHANGED) {

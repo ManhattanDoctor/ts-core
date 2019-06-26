@@ -1,11 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { Loadable, LoadableEvent, LoadableStatus } from '../../../common';
 import { ExtendedError } from '../../../common/error';
 import { MapCollection } from '../../../common/map';
 import { ObservableData } from '../../../common/observer';
-import { PromiseReflector, PromiseStatus } from '../../../common/promise';
 import { Language } from '../../language';
 import { CloneUtil } from '../../util';
 import { CookieService } from '../cookie';
@@ -68,17 +69,17 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
         this.status = LoadableStatus.LOADING;
         this.observer.next(new ObservableData(LoadableEvent.STARTED, language));
 
-        Promise.all([
-            PromiseReflector.create(this.http.get(this.url + language.locale + '.json').toPromise()),
-            PromiseReflector.create(this.http.get(this.url + language.locale + 'Custom.json').toPromise())
-        ]).then(results => {
+        forkJoin(
+            this.http.get(this.url + language.locale + '.json').pipe(catchError(error => of(error))),
+            this.http.get(this.url + language.locale + 'Custom.json').pipe(catchError(error => of(error)))
+        ).subscribe(results => {
             if (this.isDestroyed) {
                 return;
             }
-            let items = results.filter(item => item.status === PromiseStatus.COMPLETE);
+            let items = results.filter(item => !(item instanceof Error));
             if (!_.isEmpty(items)) {
                 let translation = {} as any;
-                items.forEach(item => CloneUtil.deepExtend(translation, item.value));
+                items.forEach(item => CloneUtil.deepExtend(translation, item));
                 this.setLanguage(language, translation);
             } else {
                 this.status = LoadableStatus.ERROR;

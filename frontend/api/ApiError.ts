@@ -1,27 +1,7 @@
 import * as _ from 'lodash';
-import { TimeoutError } from 'rxjs';
 import { ObjectUtil } from '../../common/util';
 
 export class ApiError implements Error {
-    //--------------------------------------------------------------------------
-    //
-    // 	Static Methods
-    //
-    //--------------------------------------------------------------------------
-
-    public static createSystemError(error: any): ApiError {
-        let data = { code: error instanceof TimeoutError ? ApiError.ERROR_CODE_IDLE_TIMEOUT : ApiError.ERROR_CODE_NO_CONNECTION, message: error.message };
-
-        if (error.hasOwnProperty('code')) {
-            data.code = error.code;
-        }
-        if (error.hasOwnProperty('message')) {
-            data.message = error.message;
-        }
-
-        return new ApiError(data);
-    }
-
     //--------------------------------------------------------------------------
     //
     // 	Static Properties
@@ -32,7 +12,31 @@ export class ApiError implements Error {
     public static ERROR_CODE_NO_CONNECTION: number = -1;
     public static ERROR_SPECIAL_CODES: Array<number> = [];
 
+    public static CODE_FILEDS: Array<string> = ['text', 'message', 'description', 'error', 'statusText'];
+    public static MESSAGES_FILEDS: Array<string> = ['text', 'message', 'description', 'error', 'statusText'];
+
     public static DEFAULT_LANGUAGE = 'en';
+
+    //--------------------------------------------------------------------------
+    //
+    // 	Static Methods
+    //
+    //--------------------------------------------------------------------------
+
+    public static getValidatorMessage(items: Array<any>, newLine: string = '\n'): string {
+        let value = ``;
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+            value += `"${item.property}" property has failed the following constraints:${newLine}`;
+            _.forIn(item.constraints, (description, validator) => {
+                value += `- ${validator} : ${description}`;
+            });
+            if (i < items.length - 1) {
+                value += `${newLine}${newLine}`;
+            }
+        }
+        return value;
+    }
 
     //--------------------------------------------------------------------------
     //
@@ -51,10 +55,8 @@ export class ApiError implements Error {
     //--------------------------------------------------------------------------
 
     constructor(data: any, language?: string) {
-        if (data.hasOwnProperty('code')) {
-            this._code = data.code;
-        }
-        this.parseMessage(data, language);
+        this._code = this.getCode(data);
+        this._message = this.getMessage(data, language || ApiError.DEFAULT_LANGUAGE);
     }
 
     //--------------------------------------------------------------------------
@@ -63,23 +65,48 @@ export class ApiError implements Error {
     //
     //--------------------------------------------------------------------------
 
-    protected parseMessage(data: any, language: string): void {
-        this._message = data;
-
-        if (data.hasOwnProperty('text')) {
-            this._message = data.text;
-        } else if (data.hasOwnProperty('message')) {
-            this._message = data.message;
-        } else if (data.hasOwnProperty('description')) {
-            this._message = data.description;
+    protected getCode(data: any): number {
+        if (_.isNumber(data)) {
+            return data;
         }
 
-        if (!language) {
-            language = ApiError.DEFAULT_LANGUAGE;
+        if (!_.isObject(data)) {
+            return null;
         }
-        if (ObjectUtil.hasOwnProperty(data, language)) {
-            this._message = data[language];
+
+        for (let item of ApiError.CODE_FILEDS) {
+            let value = data[item];
+            if (_.isNumber(value)) {
+                data = value;
+                break;
+            }
         }
+
+        this._code = data;
+    }
+
+    protected getMessage(data: any, language: string): string {
+        if (_.isString(data)) {
+            return data;
+        }
+
+        if (!_.isObject(data)) {
+            return null;
+        }
+
+        for (let item of ApiError.MESSAGES_FILEDS) {
+            let value = data[item];
+            if (!_.isEmpty(value)) {
+                data = value;
+                break;
+            }
+        }
+    
+        return _.isString(data) ? data : this.getTranslatedMessage(data, language);
+    }
+
+    protected getTranslatedMessage(data: any, language: string): string {
+        return ObjectUtil.hasOwnProperty(data, language) ? data[language] : data.toString();
     }
 
     //--------------------------------------------------------------------------

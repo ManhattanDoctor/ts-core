@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
+import { ExtendedError } from '../../../common/error';
 import { MapCollection } from '../../../common/map';
 import { Destroyable } from '../../Destroyable';
 import { CookieService } from '../cookie';
@@ -18,6 +19,7 @@ export class ThemeService extends Destroyable {
     private _theme: Theme;
     private _themes: MapCollection<Theme>;
 
+    private isInitialized: boolean;
     private observer: Subject<string>;
 
     public cookieStorageName: string = 'vi-theme';
@@ -64,9 +66,13 @@ export class ThemeService extends Destroyable {
     //
     //--------------------------------------------------------------------------
 
-    public initialize(themes: Array<any>, defaultTheme?: string): void {
-        this.themes.clear();
+    public initialize(themes: Array<any>): void {
+        if (this.isInitialized) {
+            throw new ExtendedError('Service already initialized');
+        }
+        this.isInitialized = true;
 
+        this.themes.clear();
         if (!_.isEmpty(themes)) {
             for (let item of themes) {
                 let theme = new Theme();
@@ -75,11 +81,14 @@ export class ThemeService extends Destroyable {
             }
         }
 
-        let name = this.cookies.get(this.cookieStorageName);
-        if (_.isNil(name)) {
-            name = defaultTheme;
+    }
+
+    public loadIfExist(defaultTheme?: string): void {
+        if (!this.isInitialized) {
+            throw new ExtendedError('Service in not initialized');
         }
 
+        let name = this.cookies.get(this.cookieStorageName) || defaultTheme;
         if (this.themes.has(name)) {
             this.theme = this.themes.get(name);
         } else if (this.themes.length > 0) {
