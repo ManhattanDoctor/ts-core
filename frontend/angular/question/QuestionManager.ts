@@ -22,10 +22,12 @@ export class QuestionManager extends Destroyable implements IQuestion<string> {
     public closeText: string;
     public checkText: string;
 
+    public isNeedActionOnDestroy: boolean = true;
+
     protected _isChecked: boolean = false;
 
-    protected _closePromise: PromiseHandler<void>;
-    protected _yesNotPromise: PromiseHandler<void>;
+    protected _closePromise: PromiseHandler<void, void>;
+    protected _yesNotPromise: PromiseHandler<void, void>;
 
     //--------------------------------------------------------------------------
     //
@@ -36,8 +38,8 @@ export class QuestionManager extends Destroyable implements IQuestion<string> {
     constructor(protected content: IWindowContent | INotificationContent) {
         super();
         this.mode = QuestionMode.QUESTION;
-        this._closePromise = PromiseHandler.create<void>();
-        this._yesNotPromise = PromiseHandler.create<void>();
+        this._closePromise = PromiseHandler.create();
+        this._yesNotPromise = PromiseHandler.create();
     }
 
     //--------------------------------------------------------------------------
@@ -68,20 +70,26 @@ export class QuestionManager extends Destroyable implements IQuestion<string> {
     //--------------------------------------------------------------------------
 
     public closeClickHandler(): void {
+        if (this._closePromise.isPending) {
+            this.content.emit(QuestionEvent.CLOSE);
+        }
         this._closePromise.resolve();
-        this.content.emit(QuestionEvent.CLOSE);
         this.content.close();
     }
 
     public yesClickHandler(): void {
+        if (this._yesNotPromise.isPending) {
+            this.content.emit(QuestionEvent.YES);
+        }
         this._yesNotPromise.resolve();
-        this.content.emit(QuestionEvent.YES);
         this.closeClickHandler();
     }
 
     public notClickHandler(): void {
+        if (this._yesNotPromise.isPending) {
+            this.content.emit(QuestionEvent.NOT);
+        }
         this._yesNotPromise.reject();
-        this.content.emit(QuestionEvent.NOT);
         this.closeClickHandler();
     }
 
@@ -92,14 +100,12 @@ export class QuestionManager extends Destroyable implements IQuestion<string> {
     //--------------------------------------------------------------------------
 
     public destroy(): void {
-        if (this._yesNotPromise) {
-            this._yesNotPromise.reject();
-            this._yesNotPromise = null;
+        if (this.isNeedActionOnDestroy) {
+            this.notClickHandler();
         }
-        if (this._closePromise) {
-            this._closePromise.resolve();
-            this._closePromise = null;
-        }
+
+        this._yesNotPromise = null;
+        this._closePromise = null;
         this.content = null;
     }
 

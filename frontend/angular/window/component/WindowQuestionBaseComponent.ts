@@ -20,7 +20,7 @@ export abstract class WindowQuestionBaseComponent extends IWindowContent impleme
 
     constructor(container: ViewContainerRef) {
         super(container);
-        this.question = this.createQuestionManager();
+        this.question = this.addDestroyable(this.createQuestionManager());
     }
 
     //--------------------------------------------------------------------------
@@ -32,7 +32,7 @@ export abstract class WindowQuestionBaseComponent extends IWindowContent impleme
     protected createQuestionManager(): QuestionManager {
         return new QuestionManager(this);
     }
-    
+
     //--------------------------------------------------------------------------
     //
     // 	Public Methods

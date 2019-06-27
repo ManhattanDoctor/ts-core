@@ -10,9 +10,8 @@ export abstract class ApplicationBaseComponent extends DestroyableContainer impl
     //--------------------------------------------------------------------------
 
     private timeout: any;
-    private isViewReady: boolean;
 
-    private _viewReady: PromiseHandler;
+    private _viewReady: PromiseHandler<void, void>;
     private isReadyAlreadyCalled: boolean;
 
     //--------------------------------------------------------------------------
@@ -23,7 +22,7 @@ export abstract class ApplicationBaseComponent extends DestroyableContainer impl
 
     constructor(protected element: ElementRef, private viewReadyDelay: number = NaN) {
         super();
-        this._viewReady = PromiseHandler.create<void>();
+        this._viewReady = PromiseHandler.create();
     }
 
     //--------------------------------------------------------------------------
@@ -34,7 +33,6 @@ export abstract class ApplicationBaseComponent extends DestroyableContainer impl
 
     private makeViewReady = (): void => {
         this._viewReady.resolve();
-        this.isViewReady = true;
         this.checkReady();
     };
 
@@ -88,6 +86,9 @@ export abstract class ApplicationBaseComponent extends DestroyableContainer impl
     //
     //--------------------------------------------------------------------------
 
+    public get isViewReady(): boolean {
+        return this._viewReady.isResolved;
+    }
     public get viewReady(): Promise<void> {
         return this._viewReady.promise;
     }

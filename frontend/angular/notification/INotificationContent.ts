@@ -1,4 +1,4 @@
-import { AfterViewInit, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Input, ViewContainerRef } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DestroyableContainer } from '../../../common';
 import { WindowEvent } from '../window';
@@ -38,6 +38,8 @@ export abstract class INotificationContent extends DestroyableContainer implemen
             this.timer = setTimeout(this.timerHandler, this.config.closeDuration);
         }
     }
+
+    protected commitConfigProperties(): void {}
 
     protected clearTimer(): void {
         if (this.timer) {
@@ -109,10 +111,6 @@ export abstract class INotificationContent extends DestroyableContainer implemen
         return this.config ? this.config.data : null;
     }
 
-    public get config(): NotificationConfig {
-        return this.notification ? this.notification.config : null;
-    }
-
     public get events(): Observable<string> {
         return this.notification ? this.notification.events : null;
     }
@@ -131,8 +129,23 @@ export abstract class INotificationContent extends DestroyableContainer implemen
             return;
         }
         this._notification = value;
+        this.config = value ? value.config : null;
         if (this._notification) {
             this.commitNotificationProperties();
+        }
+    }
+
+    public get config(): NotificationConfig {
+        return this._config;
+    }
+    @Input()
+    public set config(value: NotificationConfig) {
+        if (value === this._config) {
+            return;
+        }
+        this._config = value;
+        if (this._config) {
+            this.commitConfigProperties();
         }
     }
 }

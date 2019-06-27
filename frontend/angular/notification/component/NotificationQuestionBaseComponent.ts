@@ -21,6 +21,7 @@ export abstract class NotificationQuestionBaseComponent extends INotificationCon
     constructor(container: ViewContainerRef) {
         super(container);
         this.question = this.createQuestionManager();
+        this.question.isNeedActionOnDestroy = false;
     }
 
     //--------------------------------------------------------------------------

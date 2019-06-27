@@ -338,6 +338,7 @@ export class WindowService extends Destroyable {
 
         let content: IQuestion = this.open(this.questionComponent, config) as any;
         content.initialize(_.assign(options, { mode: QuestionMode.QUESTION, text: this.language.translate(translationId, translation) }));
+
         return content;
     }
 

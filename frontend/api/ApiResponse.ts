@@ -22,11 +22,9 @@ export class ApiResponse<T = any> {
 
     constructor(data: any, request?: ApiRequest, language?: string) {
         this._request = request;
-
         if (request) {
             this._name = request.name;
         }
-
         this.parse(data, language);
     }
 
@@ -65,7 +63,6 @@ export class ApiResponse<T = any> {
         if (data instanceof ApiError) {
             return true;
         }
-
         return data ? data.hasOwnProperty('error') : false;
     }
 

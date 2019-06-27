@@ -10,8 +10,7 @@ export class PromiseHandler<U = any, V = string> implements IDestroyable {
     public static create<U = any, V = string>(): PromiseHandler<U, V> {
         let item = new PromiseHandler<U, V>();
         item.promise = new Promise<U>((resolve, reject) => {
-            item.resolve = resolve;
-            item.reject = reject;
+            item.initialize(resolve, reject);
         });
         return item;
     }
@@ -22,9 +21,11 @@ export class PromiseHandler<U = any, V = string> implements IDestroyable {
     //
     //--------------------------------------------------------------------------
 
-    public reject: (item?: V) => void;
-    public resolve: (item?: U) => void;
     public promise: Promise<U>;
+
+    private status: PromiseHandlerStatus;
+    private rejectFunction: (item?: V) => void;
+    private resolveFunction: (item?: U) => void;
 
     //--------------------------------------------------------------------------
     //
@@ -32,7 +33,9 @@ export class PromiseHandler<U = any, V = string> implements IDestroyable {
     //
     //--------------------------------------------------------------------------
 
-    constructor() {}
+    constructor() {
+        this.status = PromiseHandlerStatus.PENDING;
+    }
 
     //--------------------------------------------------------------------------
     //
@@ -40,9 +43,59 @@ export class PromiseHandler<U = any, V = string> implements IDestroyable {
     //
     //--------------------------------------------------------------------------
 
-    public destroy(): void {
-        this.reject = null;
-        this.promise = null;
-        this.resolve = null;
+    public initialize(resolve: (item?: U) => void, reject: (item?: V) => void) {
+        this.rejectFunction = reject;
+        this.resolveFunction = resolve;
     }
+
+    public resolve(item: U): void {
+        if (!this.isPending) {
+            return;
+        }
+        this.status = PromiseHandlerStatus.RESOLVED;
+        this.resolveFunction(item);
+    }
+    public reject(item: V): void {
+        if (!this.isPending) {
+            return;
+        }
+        this.status = PromiseHandlerStatus.REJECTED;
+        this.rejectFunction(item);
+    }
+
+    public destroy(): void {
+        this.status = null;
+        this.promise = null;
+
+        this.rejectFunction = null;
+        this.resolveFunction = null;
+    }
+
+    //--------------------------------------------------------------------------
+    //
+    // 	Public Properties
+    //
+    //--------------------------------------------------------------------------
+
+    public get isResolved(): boolean {
+        return this.status === PromiseHandlerStatus.RESOLVED;
+    }
+
+    public get isRejected(): boolean {
+        return this.status === PromiseHandlerStatus.REJECTED;
+    }
+
+    public get isPending(): boolean {
+        return this.status === PromiseHandlerStatus.PENDING;
+    }
+
+    public get isCompleted(): boolean {
+        return !this.isPending;
+    }
+}
+
+export enum PromiseHandlerStatus {
+    PENDING = 'PENDING',
+    REJECTED = 'REJECTED',
+    RESOLVED = 'RESOLVED'
 }

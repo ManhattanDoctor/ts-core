@@ -12,7 +12,7 @@ export class ApiError implements Error {
     public static ERROR_CODE_NO_CONNECTION: number = -1;
     public static ERROR_SPECIAL_CODES: Array<number> = [];
 
-    public static CODE_FILEDS: Array<string> = ['text', 'message', 'description', 'error', 'statusText'];
+    public static CODE_FILEDS: Array<string> = ['code', 'status', 'errorCode'];
     public static MESSAGES_FILEDS: Array<string> = ['text', 'message', 'description', 'error', 'statusText'];
 
     public static DEFAULT_LANGUAGE = 'en';
@@ -44,7 +44,7 @@ export class ApiError implements Error {
     //
     //--------------------------------------------------------------------------
 
-    protected _code: number = NaN;
+    protected _code: number;
     protected _name: string;
     protected _message: string;
 
@@ -77,12 +77,10 @@ export class ApiError implements Error {
         for (let item of ApiError.CODE_FILEDS) {
             let value = data[item];
             if (_.isNumber(value)) {
-                data = value;
-                break;
+                return value;
             }
         }
-
-        this._code = data;
+        return null;
     }
 
     protected getMessage(data: any, language: string): string {
@@ -101,7 +99,7 @@ export class ApiError implements Error {
                 break;
             }
         }
-    
+
         return _.isString(data) ? data : this.getTranslatedMessage(data, language);
     }
 
