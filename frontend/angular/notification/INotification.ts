@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { INotificationContent } from './INotificationContent';
 import { NotificationConfig } from './NotificationConfig';
 
-export abstract class INotification {
+export abstract class INotification<T = any> {
     //--------------------------------------------------------------------------
     //
     //  Public Methods
@@ -36,8 +36,8 @@ export abstract class INotification {
     readonly events: Observable<string>;
     readonly container: HTMLElement;
 
-    readonly config: NotificationConfig;
-    readonly content: INotificationContent;
+    readonly config: NotificationConfig<T>;
+    readonly content: INotificationContent<T>;
 }
 
 export enum NotificationEvent {

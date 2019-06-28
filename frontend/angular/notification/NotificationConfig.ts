@@ -1,14 +1,12 @@
-import { QuestionMode } from '../question';
 import { WindowConfig } from '../window';
 
-export class NotificationConfig<T = any> extends WindowConfig {
+export class NotificationConfig<T = any> extends WindowConfig<T> {
     //--------------------------------------------------------------------------
     //
     // 	Properties
     //
     //--------------------------------------------------------------------------
 
-    public data: T;
     public icon: string;
     public sound: string;
     public iconId: string;
@@ -29,3 +27,5 @@ export class NotificationConfig<T = any> extends WindowConfig {
         this.isModal = false;
     }
 }
+
+export type NotificationConfigOptions<T = any> = { [P in keyof NotificationConfig<T>]?: any };

@@ -48,8 +48,6 @@ export abstract class WindowBase extends DestroyableContainer {
     }
 
     protected setPosition(): void {
-        let width = null;
-        let height = null;
         let config = this.getConfig();
 
         switch (config.horizontalAlign) {
@@ -57,16 +55,14 @@ export abstract class WindowBase extends DestroyableContainer {
                 this.x = !_.isNaN(this.paddingLeft) ? this.paddingLeft : 0;
                 break;
             case WindowAlign.END:
-                width = !_.isNaN(this.width) ? this.width : ViewUtil.getWidth(this.getContainer());
-                let value = ViewUtil.stageWidth - width;
+                let value = ViewUtil.stageWidth - this.calculateWidth();
                 if (!_.isNaN(this.paddingRight)) {
                     value -= this.paddingRight;
                 }
                 this.x = value;
                 break;
             default:
-                width = !_.isNaN(this.width) ? this.width : ViewUtil.getWidth(this.getContainer());
-                this.x = (ViewUtil.stageWidth - width) / 2;
+                this.x = (ViewUtil.stageWidth - this.calculateWidth()) / 2;
                 break;
         }
 
@@ -75,16 +71,14 @@ export abstract class WindowBase extends DestroyableContainer {
                 this.y = !_.isNaN(this.paddingTop) ? this.paddingTop : 0;
                 break;
             case WindowAlign.END:
-                height = !_.isNaN(this.height) ? this.height : ViewUtil.getHeight(this.getContainer());
-                let value = ViewUtil.stageHeight - height;
+                let value = ViewUtil.stageHeight - this.calculateHeight();
                 if (!_.isNaN(this.paddingBottom)) {
                     value -= this.paddingBottom;
                 }
                 this.y = value;
                 break;
             default:
-                height = !_.isNaN(this.height) ? this.height : ViewUtil.getHeight(this.getContainer());
-                this.y = (ViewUtil.stageHeight - height) / 2;
+                this.y = (ViewUtil.stageHeight - this.calculateHeight()) / 2;
                 break;
         }
     }
@@ -97,8 +91,8 @@ export abstract class WindowBase extends DestroyableContainer {
     }
 
     protected commitSizeProperties(): void {
-        let width = !_.isNaN(this._width) ? this._width + 'px' : 'auto';
-        let height = !_.isNaN(this._height) ? this._height + 'px' : 'auto';
+        let width = !_.isNaN(this.width) ? this.width + 'px' : 'auto';
+        let height = !_.isNaN(this.height) ? this.height + 'px' : 'auto';
         this.getReference().updateSize(width, height);
     }
 
@@ -124,7 +118,50 @@ export abstract class WindowBase extends DestroyableContainer {
 
     //--------------------------------------------------------------------------
     //
-    // 	Position Methods
+    // 	Public Methods
+    //
+    //--------------------------------------------------------------------------
+
+    public calculateWidth(): number {
+        return !_.isNaN(this.width) ? this.width : ViewUtil.getWidth(this.getContainer());
+    }
+    public calculateHeight(): number {
+        return !_.isNaN(this.height) ? this.height : ViewUtil.getHeight(this.getContainer());
+    }
+
+    //--------------------------------------------------------------------------
+    //
+    // 	Private Properties
+    //
+    //--------------------------------------------------------------------------
+
+    protected get width(): number {
+        return this._width;
+    }
+    protected set width(value: number) {
+        value = this.getConfig().parseWidth(value);
+        if (value === this._width) {
+            return;
+        }
+        this._width = value;
+        this.commitSizeProperties();
+    }
+
+    protected get height(): number {
+        return this._height;
+    }
+    protected set height(value: number) {
+        value = this.getConfig().parseHeight(value);
+        if (value === this._height) {
+            return;
+        }
+        this._height = value;
+        this.commitSizeProperties();
+    }
+    
+    //--------------------------------------------------------------------------
+    //
+    // 	Public Properties
     //
     //--------------------------------------------------------------------------
 
@@ -168,29 +205,5 @@ export abstract class WindowBase extends DestroyableContainer {
 
     public get paddingBottom(): number {
         return this.getConfig().paddingBottom;
-    }
-
-    protected get width(): number {
-        return this._width;
-    }
-    protected set width(value: number) {
-        value = this.getConfig().parseWidth(value);
-        if (value === this._width) {
-            return;
-        }
-        this._width = value;
-        this.commitSizeProperties();
-    }
-
-    protected get height(): number {
-        return this._height;
-    }
-    protected set height(value: number) {
-        value = this.getConfig().parseHeight(value);
-        if (value === this._height) {
-            return;
-        }
-        this._height = value;
-        this.commitSizeProperties();
     }
 }

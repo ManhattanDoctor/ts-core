@@ -4,15 +4,15 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 import { ObservableData } from '../../../common/observer';
-import { ArrayUtil } from '../../../common/util';
 import { Destroyable } from '../../Destroyable';
 import { CookieService } from '../cookie';
 import { LanguageService } from '../language';
-import { IQuestion, QuestionMode, QuestionOptions } from '../question';
+import { IQuestion, IQuestionOptions, QuestionMode } from '../question';
+import { QuestionManager } from '../question/QuestionManager';
 import { ViewUtil } from '../util';
 import { IWindow, WindowEvent } from './IWindow';
 import { IWindowContent } from './IWindowContent';
-import { WindowAlign, WindowConfig } from './WindowConfig';
+import { WindowAlign, WindowConfig, WindowConfigOptions } from './WindowConfig';
 import { WindowFactory } from './WindowFactory';
 
 @Injectable()
@@ -31,7 +31,6 @@ export class WindowService extends Destroyable {
     protected language: LanguageService;
 
     private _windows: Map<WindowConfig, IWindowContent>;
-    private _windowsArray: Array<IWindow>;
 
     private observer: Subject<ObservableData<WindowServiceEvent, IWindow>>;
     private properties: PropertiesManager;
@@ -61,7 +60,6 @@ export class WindowService extends Destroyable {
     constructor(dialog: MatDialog, language: LanguageService, cookies: CookieService) {
         super();
         this._windows = new Map();
-        this._windowsArray = [];
 
         this.dialog = dialog;
         this.language = language;
@@ -94,7 +92,7 @@ export class WindowService extends Destroyable {
         let zIndex = 0;
         let topWindow: IWindow = null;
 
-        this._windowsArray.forEach(window => {
+        this.windowsArray.forEach(window => {
             if (window.container) {
                 let wrapper = window.container.parentElement;
 
@@ -115,7 +113,7 @@ export class WindowService extends Destroyable {
 
     private setWindowOnTop(topWindow: IWindow): void {
         let currentIndex = this.topZIndex - 2;
-        for (let window of this._windowsArray) {
+        for (let window of this.windowsArray) {
             if (window.container) {
                 window.isOnTop = window === topWindow;
                 let zIndex = window.isOnTop ? this.topZIndex : currentIndex--;
@@ -124,7 +122,7 @@ export class WindowService extends Destroyable {
             }
         }
 
-        this._windowsArray.sort(this.sortFunction);
+        this.windowsArray.sort(this.sortFunction);
         this.observer.next(new ObservableData(WindowServiceEvent.SETTED_ON_TOP, topWindow));
     }
 
@@ -139,7 +137,7 @@ export class WindowService extends Destroyable {
         let y = itemWindow.getY();
 
         let result = false;
-        this._windowsArray.forEach(window => {
+        this.windowsArray.forEach(window => {
             if (window !== itemWindow && x === window.getX() && y === window.getY()) {
                 result = true;
             }
@@ -155,19 +153,23 @@ export class WindowService extends Destroyable {
 
     private add(config: WindowConfig, content: IWindowContent): void {
         this._windows.set(config, content);
-        this._windowsArray.push(content.window);
         this.observer.next(new ObservableData(WindowServiceEvent.OPENED, content.window));
     }
 
-    private remove(config: WindowConfig, window: IWindow): void {
+    private remove(config: WindowConfig): void {
+        let window = this._windows.get(config);
+        if (!window) {
+            return null;
+        }
+
+        window.close();
         this._windows.delete(config);
-        ArrayUtil.remove(this._windowsArray, window);
-        this.observer.next(new ObservableData(WindowServiceEvent.CLOSED, window));
+        this.observer.next(new ObservableData(WindowServiceEvent.CLOSED, window.window));
     }
 
     private getById(id: string): IWindow {
         let result = null;
-        this._windowsArray.forEach(item => {
+        this.windows.forEach(item => {
             if (item.config.id === id) {
                 result = item;
                 return true;
@@ -246,8 +248,7 @@ export class WindowService extends Destroyable {
 
                 case WindowEvent.CLOSED:
                     subscription.unsubscribe();
-                    this.remove(config, window);
-
+                    this.remove(config);
                     if (window.isOnTop && this.windows.size > 0) {
                         this.updateTop();
                     }
@@ -267,25 +268,23 @@ export class WindowService extends Destroyable {
         return window.content;
     }
 
-    public get<T extends IWindowContent>(value: WindowConfig | string): T {
+    public get<T extends IWindowContent>(value: WindowId): T {
         let id = value.toString();
         if (value instanceof WindowConfig) {
             id = value.id;
         }
-
         if (!id) {
             return null;
         }
-
         let window = this.getById(id);
         return window ? (window.content as any) : null;
     }
 
-    public has(value: WindowConfig | string): boolean {
+    public has(value: WindowId): boolean {
         return !_.isNil(this.get(value));
     }
 
-    public setOnTop(value: WindowConfig | string): boolean {
+    public setOnTop(value: WindowId): boolean {
         let content = this.get(value);
         if (!content) {
             return false;
@@ -295,7 +294,7 @@ export class WindowService extends Destroyable {
     }
 
     public removeAll(): void {
-        this._windowsArray.forEach(window => window.close());
+        this.windowsArray.forEach(window => window.close());
     }
 
     public destroy(): void {
@@ -315,7 +314,6 @@ export class WindowService extends Destroyable {
         this.language = null;
 
         this._windows = null;
-        this._windowsArray = null;
     }
 
     //--------------------------------------------------------------------------
@@ -324,22 +322,28 @@ export class WindowService extends Destroyable {
     //
     //--------------------------------------------------------------------------
 
-    public info(translationId?: string, translation?: any, options?: QuestionOptions): IQuestion {
-        let config = this.factory.createConfig(true, false, 450);
-
-        let content: IQuestion = this.open(this.questionComponent, config) as any;
-        content.initialize(_.assign(options, { mode: QuestionMode.INFO, text: this.language.translate(translationId, translation) }));
-        return content;
+    public info(translationId?: string, translation?: any, questionOptions?: IQuestionOptions, configOptions?: WindowConfigOptions): IQuestion {
+        let text = this.language.translate(translationId, translation);
+        let config: WindowConfig<QuestionManager> = _.assign(this.factory.createConfig(true, false, 450), configOptions);
+        config.data = new QuestionManager(_.assign(questionOptions, { mode: QuestionMode.INFO, text }));
+        return this.open(this.questionComponent, config).config.data;
     }
 
-    public question(translationId?: string, translation?: any, options?: QuestionOptions): IQuestion {
-        let config = this.factory.createConfig(true, false, 450);
-        config.disableClose = true;
+    public question(translationId?: string, translation?: any, questionOptions?: IQuestionOptions, configOptions?: WindowConfigOptions): IQuestion {
+        let text = this.language.translate(translationId, translation);
+        let config: WindowConfig<QuestionManager> = _.assign(this.factory.createConfig(true, false, 450), configOptions);
+        config.data = new QuestionManager(_.assign(questionOptions, { mode: QuestionMode.QUESTION, text }));
+        return this.open(this.questionComponent, config).config.data;
+    }
 
-        let content: IQuestion = this.open(this.questionComponent, config) as any;
-        content.initialize(_.assign(options, { mode: QuestionMode.QUESTION, text: this.language.translate(translationId, translation) }));
+    //--------------------------------------------------------------------------
+    //
+    // 	Private Properties
+    //
+    //--------------------------------------------------------------------------
 
-        return content;
+    private get windowsArray(): Array<IWindow> {
+        return Array.from(this.windows.values()).map(item => item.window);
     }
 
     //--------------------------------------------------------------------------
@@ -398,6 +402,8 @@ export class PropertiesManager extends Destroyable {
         this.cookies = null;
     }
 }
+
+export type WindowId = string | WindowConfig;
 
 export enum WindowServiceEvent {
     OPENED = 'OPENED',

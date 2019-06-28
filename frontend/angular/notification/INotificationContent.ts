@@ -5,7 +5,7 @@ import { WindowEvent } from '../window';
 import { INotification } from './INotification';
 import { NotificationConfig } from './NotificationConfig';
 
-export abstract class INotificationContent extends DestroyableContainer implements AfterViewInit {
+export abstract class INotificationContent<T = any> extends DestroyableContainer implements AfterViewInit {
     //--------------------------------------------------------------------------
     //
     //  Properties
@@ -13,8 +13,8 @@ export abstract class INotificationContent extends DestroyableContainer implemen
     //--------------------------------------------------------------------------
 
     protected timer: any;
-    protected _config: NotificationConfig;
-    protected _notification: INotification;
+    protected _config: NotificationConfig<T>;
+    protected _notification: INotification<T>;
 
     //--------------------------------------------------------------------------
     //
@@ -33,13 +33,15 @@ export abstract class INotificationContent extends DestroyableContainer implemen
     //--------------------------------------------------------------------------
 
     protected commitNotificationProperties(): void {
+        this.config = this.notification.config;
+    }
+
+    protected commitConfigProperties(): void {
         this.clearTimer();
         if (this.config.closeDuration > 0) {
             this.timer = setTimeout(this.timerHandler, this.config.closeDuration);
         }
     }
-
-    protected commitConfigProperties(): void {}
 
     protected clearTimer(): void {
         if (this.timer) {
@@ -79,6 +81,7 @@ export abstract class INotificationContent extends DestroyableContainer implemen
     public destroy(): void {
         super.destroy();
         this.clearTimer();
+        this.config = null;
         this.notification = null;
     }
 
@@ -107,7 +110,7 @@ export abstract class INotificationContent extends DestroyableContainer implemen
     //
     //--------------------------------------------------------------------------
 
-    public get data(): any {
+    public get data(): T {
         return this.config ? this.config.data : null;
     }
 
@@ -129,17 +132,13 @@ export abstract class INotificationContent extends DestroyableContainer implemen
             return;
         }
         this._notification = value;
-        this.config = value ? value.config : null;
         if (this._notification) {
             this.commitNotificationProperties();
         }
     }
 
-    public get config(): NotificationConfig {
-        return this._config;
-    }
     @Input()
-    public set config(value: NotificationConfig) {
+    public set config(value: NotificationConfig<T>) {
         if (value === this._config) {
             return;
         }
@@ -147,5 +146,8 @@ export abstract class INotificationContent extends DestroyableContainer implemen
         if (this._config) {
             this.commitConfigProperties();
         }
+    }
+    public get config(): NotificationConfig<T> {
+        return this._config;
     }
 }

@@ -1,6 +1,4 @@
-import { Observable } from 'rxjs';
-
-export interface IQuestion<T = any> {
+export interface IQuestion {
     readonly mode: QuestionMode;
     readonly isChecked: boolean;
 
@@ -10,14 +8,11 @@ export interface IQuestion<T = any> {
     readonly closeText: string;
     readonly checkText: string;
 
-    readonly events: Observable<QuestionEvent | T>;
     readonly closePromise: Promise<void>;
     readonly yesNotPromise: Promise<void>;
-
-    initialize(options: QuestionOptions): void;
 }
 
-export interface QuestionOptions {
+export interface IQuestionOptions {
     text: string;
     mode: QuestionMode;
     isChecked?: boolean;

@@ -1,6 +1,6 @@
 import { MatDialogConfig } from '@angular/material/dialog';
 import * as _ from 'lodash';
-import { IDestroyable } from '../../../common';
+import { destroyIfCan, IDestroyable } from '../../../common';
 import { ViewUtil } from '../util';
 
 export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestroyable {
@@ -113,7 +113,10 @@ export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestro
         return value;
     }
 
-    public destroy(): void {}
+    public destroy(): void {
+        destroyIfCan(this.data);
+        this.data = null;
+    }
 
     //--------------------------------------------------------------------------
     //
@@ -269,3 +272,5 @@ export enum WindowAlign {
     CENTER = 'CENTER',
     END = 'END'
 }
+
+export type WindowConfigOptions<T = any> = { [P in keyof WindowConfig<T>]?: any };

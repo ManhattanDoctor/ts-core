@@ -3,7 +3,7 @@ import { Destroyable } from '../../Destroyable';
 import { IWindowContent } from './IWindowContent';
 import { WindowConfig } from './WindowConfig';
 
-export abstract class IWindow extends Destroyable {
+export abstract class IWindow<T = any> extends Destroyable {
     //--------------------------------------------------------------------------
     //
     //  Public Methods
@@ -45,8 +45,8 @@ export abstract class IWindow extends Destroyable {
     readonly wrapper: HTMLElement;
     readonly backdrop: HTMLElement;
 
-    readonly config: WindowConfig;
-    readonly content: IWindowContent;
+    readonly config: WindowConfig<T>;
+    readonly content: IWindowContent<T>;
 }
 
 export enum WindowEvent {

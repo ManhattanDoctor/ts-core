@@ -119,11 +119,11 @@ export class Notification extends WindowBase implements INotification {
     // --------------------------------------------------------------------------
 
     public getWidth(): number {
-        return this.width;
+        return this.calculateWidth();
     }
 
     public getHeight(): number {
-        return this.height;
+        return this.calculateHeight();
     }
 
     public setWidth(value: number): void {

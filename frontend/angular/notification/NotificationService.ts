@@ -6,11 +6,12 @@ import { Observable, Subject } from 'rxjs';
 import { ObservableData } from '../../../common/observer';
 import { ArrayUtil } from '../../../common/util';
 import { LanguageService } from '../language';
-import { IQuestion, QuestionMode, QuestionOptions } from '../question';
-import { WindowAlign, WindowConfig, WindowEvent } from '../window';
+import { IQuestion, IQuestionOptions, QuestionMode } from '../question';
+import { QuestionManager } from '../question/QuestionManager';
+import { WindowAlign, WindowEvent } from '../window';
 import { INotification, NotificationEvent } from './INotification';
 import { INotificationContent } from './INotificationContent';
-import { NotificationConfig } from './NotificationConfig';
+import { NotificationConfig, NotificationConfigOptions } from './NotificationConfig';
 import { NotificationFactory } from './NotificationFactory';
 
 @Injectable()
@@ -22,17 +23,17 @@ export class NotificationService {
     //--------------------------------------------------------------------------
 
     public factory: NotificationFactory<INotification>;
-    public questionComponent: ComponentType<INotificationContent>;
+    public questionComponent: ComponentType<INotificationContent<any>>;
 
     protected dialog: MatDialog;
     protected language: LanguageService;
 
     protected _configs: Array<NotificationConfig>;
-    protected _notifications: Map<NotificationConfig, INotificationContent>;
+    protected _closedConfigs: Array<NotificationConfig>;
+    protected _notifications: Map<NotificationConfig, INotificationContent<any>>;
 
     private observer: Subject<ObservableData<NotificationServiceEvent, INotification | NotificationConfig>>;
 
-    public gapX: number = 0;
     public gapY: number = 25;
 
     public minWidth: number = 25;
@@ -43,10 +44,7 @@ export class NotificationService {
     public paddingRight: number = 25;
     public paddingBottom: number = 25;
 
-    public defaultVerticalAlign: WindowAlign = WindowAlign.START;
-    public defaulthorizontalAlign: WindowAlign = WindowAlign.END;
-
-    public defaultCloseDuration: number = 5000;
+    public defaultCloseDuration: number = 3000;
 
     //--------------------------------------------------------------------------
     //
@@ -56,6 +54,7 @@ export class NotificationService {
 
     constructor(dialog: MatDialog, language: LanguageService) {
         this._configs = [];
+        this._closedConfigs = [];
         this._notifications = new Map();
 
         this.dialog = dialog;
@@ -69,10 +68,10 @@ export class NotificationService {
     //
     //--------------------------------------------------------------------------
 
-    public openNotification(component: ComponentType<INotificationContent>, config: NotificationConfig): INotificationContent {
+    public open<T>(component: ComponentType<INotificationContent<T>>, config: NotificationConfig): INotificationContent<T> {
         let notification = null;
-        if (!_.isNil(config.id)) {
-            notification = this.notifications.get(notification.id);
+        if (config.id) {
+            notification = this.getById(config.id);
             if (notification) {
                 return notification.content;
             }
@@ -80,21 +79,28 @@ export class NotificationService {
 
         this.setDefaultProperties(config);
 
-        let reference: MatDialogRef<INotificationContent> = this.dialog.open(component, config);
+        let reference: MatDialogRef<INotificationContent<T>> = this.dialog.open(component, config);
         notification = this.factory.create({ config, reference, overlay: (reference as any)._overlayRef });
 
-        let subscription = notification.events.subscribe(data => {
-            if (data === NotificationEvent.REMOVED) {
-                subscription.unsubscribe();
-                this.remove(config);
-            } else if (data === WindowEvent.CLOSED) {
-                this.close(config);
-            } else if (data === WindowEvent.OPENED) {
-                this.add(config, reference.componentInstance);
-                this.checkPosition(notification);
-                if (config.sound) {
-                    // Assets.playSound(config.sound);
-                }
+        let subscription = notification.events.subscribe(event => {
+            switch (event) {
+                case WindowEvent.OPENED:
+                    this.add(config, reference.componentInstance);
+                    this.checkPosition(notification);
+                    if (config.sound) {
+                        // Assets.playSound(config.sound);
+                    }
+                    break;
+
+                case WindowEvent.CLOSED:
+                    subscription.unsubscribe();
+                    this.close(config);
+                    break;
+
+                case NotificationEvent.REMOVED:
+                    subscription.unsubscribe();
+                    this.remove(config);
+                    break;
             }
         });
         return notification.content;
@@ -106,14 +112,18 @@ export class NotificationService {
     //
     //--------------------------------------------------------------------------
 
-    private setDefaultProperties(config: NotificationConfig): void {
-        if (!config.verticalAlign) {
-            config.verticalAlign = this.defaultVerticalAlign;
-        }
-        if (!config.horizontalAlign) {
-            config.horizontalAlign = this.defaulthorizontalAlign;
-        }
+    private getById(id: string): INotification {
+        let result = null;
+        this._notifications.forEach(item => {
+            if (item.config.id === id) {
+                result = item;
+                return true;
+            }
+        });
+        return result;
+    }
 
+    private setDefaultProperties(config: NotificationConfig): void {
         if (_.isNaN(config.defaultMinWidth)) {
             config.defaultMinWidth = this.minWidth;
         }
@@ -138,26 +148,32 @@ export class NotificationService {
             config.closeDuration = this.defaultCloseDuration;
         }
 
+        config.verticalAlign = WindowAlign.START;
+        config.horizontalAlign = WindowAlign.END;
         config.setDefaultProperties();
     }
 
     private checkPosition(item: INotification): void {
-        while (this.hasWithSamePosition(item)) {
-            item.move(item.getX() + this.gapX, item.getY() + this.gapY);
+        let previous = this.getPrevious(item);
+        if (previous) {
+            item.setY(previous.getY() + previous.getHeight() + this.gapY);
         }
     }
 
-    private hasWithSamePosition(itemNotification: INotification): boolean {
-        let y = itemNotification.getY();
+    private getPrevious(value: INotification): INotification {
+        if (this.notifications.size === 0) {
+            return null;
+        }
 
-        let result = false;
-        this._notifications.forEach(content => {
-            let notification = content.notification;
-            if (notification !== itemNotification && y === notification.getY()) {
-                result = true;
+        let items = Array.from(this.notifications.values());
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].notification === value) {
+                if (i === 0) {
+                    return null;
+                }
+                return items[i - 1].notification;
             }
-        });
-        return result;
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -166,11 +182,9 @@ export class NotificationService {
     //
     //--------------------------------------------------------------------------
 
-    private add(config: NotificationConfig, content: INotificationContent): void {
-        if (content) {
-            this._configs.push(config);
-            this.observer.next(new ObservableData(NotificationServiceEvent.ADDED, config));
-        }
+    private add<T>(config: NotificationConfig, content: INotificationContent<T>): void {
+        this._configs.push(config);
+        this.observer.next(new ObservableData(NotificationServiceEvent.ADDED, config));
 
         this._notifications.set(config, content);
         this.observer.next(new ObservableData(NotificationServiceEvent.OPENED, content.notification));
@@ -182,46 +196,41 @@ export class NotificationService {
     //
     //--------------------------------------------------------------------------
 
-    public open(config: NotificationConfig): INotificationContent {
-        return this.openNotification(this.questionComponent, config);
-    }
-
-    public remove(item: NotificationConfig): void {
-        this.close(item);
-        ArrayUtil.remove(this._configs, item);
-        this.observer.next(new ObservableData(NotificationServiceEvent.REMOVED, item));
-        item.destroy();
+    public remove(config: NotificationConfig): void {
+        this.close(config);
+        ArrayUtil.remove(this._configs, config);
+        ArrayUtil.remove(this._closedConfigs, config);
+        this.observer.next(new ObservableData(NotificationServiceEvent.REMOVED, config));
+        config.destroy();
     }
 
     public close(config: NotificationConfig): INotification {
-        let item = this._notifications.get(config);
-        if (!item) {
+        let notification = this._notifications.get(config);
+        if (!notification) {
             return null;
         }
 
-        item.close();
+        notification.close();
         this._notifications.delete(config);
-        this.observer.next(new ObservableData(NotificationServiceEvent.CLOSED, item.notification));
+
+        this._closedConfigs.push(config);
+        this.observer.next(new ObservableData(NotificationServiceEvent.CLOSED, notification.notification));
     }
 
-    public info(translationId?: string, translation?: any, options?: QuestionOptions): IQuestion {
+    public info(translationId?: string, translation?: any, questionOptions?: IQuestionOptions, configOptions?: NotificationConfigOptions): IQuestion {
         let text = this.language.translate(translationId, translation);
-        let config = new NotificationConfig(text);
-
-        let content: IQuestion = this.open(config) as any;
-        content.initialize(_.assign(options, { mode: QuestionMode.INFO, text }));
-        return content;
+        let data = new QuestionManager(_.assign(questionOptions, { mode: QuestionMode.INFO, text }));
+        let config = _.assign(new NotificationConfig(data), configOptions);
+        return this.open(this.questionComponent, config).config.data;
     }
 
-    public question(translationId?: string, translation?: any, options?: QuestionOptions): IQuestion {
+    public question(translationId?: string, translation?: any, questionOptions?: IQuestionOptions, configOptions?: NotificationConfigOptions): IQuestion {
         let text = this.language.translate(translationId, translation);
-        let config = new NotificationConfig(text);
-        // config.closeDuration = 0;
-
-        let content: IQuestion = this.open(config) as any;
-        content.initialize(_.assign(options, { mode: QuestionMode.QUESTION, text }));
-        return content;
+        let data = new QuestionManager(_.assign(questionOptions, { mode: QuestionMode.QUESTION, text }));
+        let config = _.assign(new NotificationConfig(data), configOptions);
+        return this.open(this.questionComponent, config).config.data;
     }
+
     //--------------------------------------------------------------------------
     //
     // 	Public Properties
@@ -236,7 +245,11 @@ export class NotificationService {
         return this._configs;
     }
 
-    public get notifications(): Map<NotificationConfig, INotificationContent> {
+    public get closedConfigs(): Array<NotificationConfig> {
+        return this._closedConfigs;
+    }
+
+    public get notifications(): Map<NotificationConfig, INotificationContent<any>> {
         return this._notifications;
     }
 }

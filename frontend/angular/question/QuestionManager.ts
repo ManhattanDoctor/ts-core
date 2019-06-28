@@ -1,12 +1,9 @@
 import * as _ from 'lodash';
-import { Observable } from 'rxjs';
 import { PromiseHandler } from '../../../common/promise';
 import { Destroyable } from '../../Destroyable';
-import { INotificationContent } from '../notification';
-import { IWindowContent } from '../window';
-import { IQuestion, QuestionEvent, QuestionMode, QuestionOptions } from './IQuestion';
+import { IQuestion, QuestionMode, QuestionOptions } from './IQuestion';
 
-export class QuestionManager extends Destroyable implements IQuestion<string> {
+export class QuestionManager extends Destroyable implements IQuestion {
     //--------------------------------------------------------------------------
     //
     // 	Properties
@@ -22,8 +19,6 @@ export class QuestionManager extends Destroyable implements IQuestion<string> {
     public closeText: string;
     public checkText: string;
 
-    public isNeedActionOnDestroy: boolean = true;
-
     protected _isChecked: boolean = false;
 
     protected _closePromise: PromiseHandler<void, void>;
@@ -35,20 +30,11 @@ export class QuestionManager extends Destroyable implements IQuestion<string> {
     //
     //--------------------------------------------------------------------------
 
-    constructor(protected content: IWindowContent | INotificationContent) {
+    constructor(options?: QuestionOptions) {
         super();
-        this.mode = QuestionMode.QUESTION;
         this._closePromise = PromiseHandler.create();
         this._yesNotPromise = PromiseHandler.create();
-    }
 
-    //--------------------------------------------------------------------------
-    //
-    // 	Public Methods
-    //
-    //--------------------------------------------------------------------------
-
-    public initialize(options: QuestionOptions): void {
         this.options = _.assign(
             {
                 mode: QuestionMode.INFO,
@@ -70,25 +56,15 @@ export class QuestionManager extends Destroyable implements IQuestion<string> {
     //--------------------------------------------------------------------------
 
     public closeClickHandler(): void {
-        if (this._closePromise.isPending) {
-            this.content.emit(QuestionEvent.CLOSE);
-        }
         this._closePromise.resolve();
-        this.content.close();
     }
 
     public yesClickHandler(): void {
-        if (this._yesNotPromise.isPending) {
-            this.content.emit(QuestionEvent.YES);
-        }
         this._yesNotPromise.resolve();
         this.closeClickHandler();
     }
 
     public notClickHandler(): void {
-        if (this._yesNotPromise.isPending) {
-            this.content.emit(QuestionEvent.NOT);
-        }
         this._yesNotPromise.reject();
         this.closeClickHandler();
     }
@@ -100,13 +76,9 @@ export class QuestionManager extends Destroyable implements IQuestion<string> {
     //--------------------------------------------------------------------------
 
     public destroy(): void {
-        if (this.isNeedActionOnDestroy) {
-            this.notClickHandler();
-        }
-
+        this.notClickHandler();
         this._yesNotPromise = null;
         this._closePromise = null;
-        this.content = null;
     }
 
     //--------------------------------------------------------------------------
@@ -114,10 +86,6 @@ export class QuestionManager extends Destroyable implements IQuestion<string> {
     // 	Interface Properties
     //
     //--------------------------------------------------------------------------
-
-    public get events(): Observable<QuestionEvent | string> {
-        return this.content.events;
-    }
 
     public get yesNotPromise(): Promise<void> {
         return this._yesNotPromise.promise;
@@ -133,6 +101,14 @@ export class QuestionManager extends Destroyable implements IQuestion<string> {
     //
     //--------------------------------------------------------------------------
 
+    public get isInfo(): boolean {
+        return this.mode === QuestionMode.INFO;
+    }
+
+    public get isQuestion(): boolean {
+        return this.mode === QuestionMode.QUESTION;
+    }
+
     public get isChecked(): boolean {
         return this._isChecked;
     }
@@ -141,6 +117,6 @@ export class QuestionManager extends Destroyable implements IQuestion<string> {
             return;
         }
         this._isChecked = value;
-        this.content.emit(value ? QuestionEvent.CHECK : QuestionEvent.UNCHECK);
+        // this.content.emit(value ? QuestionEvent.CHECK : QuestionEvent.UNCHECK);
     }
 }
