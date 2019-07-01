@@ -204,6 +204,10 @@ export class NotificationService {
         config.destroy();
     }
 
+    public removeAll(): void {
+        this.configs.forEach(item => this.remove(item));
+    }
+
     public close(config: NotificationConfig): INotification {
         let notification = this._notifications.get(config);
         if (!notification) {
