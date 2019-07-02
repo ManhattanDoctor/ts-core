@@ -1,6 +1,4 @@
 import { HttpParams } from '@angular/common/http';
-import { LinkifyOptions } from 'linkifyjs';
-import { linkifyStr } from 'linkifyjs/string';
 import * as _ from 'lodash';
 
 export class UrlUtil {
@@ -45,10 +43,6 @@ export class UrlUtil {
             value = value.append(item[0], item[1].toString());
         }
         return value;
-    }
-
-    public static convertLinks(text: string, options?: LinkifyOptions): string {
-        return linkifyStr(text, options);
     }
 
     public static isImageUrl(url: string): boolean {
