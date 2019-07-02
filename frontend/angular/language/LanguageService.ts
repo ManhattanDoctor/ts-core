@@ -79,7 +79,6 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
             if (this.isDestroyed) {
                 return;
             }
-            console.log(results);
             let items = results.filter(item => !(item instanceof Error));
             if (!_.isEmpty(items)) {
                 let translation = {} as any;

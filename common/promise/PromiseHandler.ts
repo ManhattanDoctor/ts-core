@@ -48,14 +48,14 @@ export class PromiseHandler<U = any, V = string> implements IDestroyable {
         this.resolveFunction = resolve;
     }
 
-    public resolve(item: U): void {
+    public resolve(item?: U): void {
         if (!this.isPending) {
             return;
         }
         this.status = PromiseHandlerStatus.RESOLVED;
         this.resolveFunction(item);
     }
-    public reject(item: V): void {
+    public reject(item?: V): void {
         if (!this.isPending) {
             return;
         }

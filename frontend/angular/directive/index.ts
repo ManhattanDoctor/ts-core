@@ -1,5 +1,5 @@
 export * from './AspectRatioResizeDirective';
-export * from '../asset/AssetBackgroundDirectivee';
+export * from '../asset/AssetBackgroundDirective';
 export * from './ClickToSelectDirective';
 export * from './FocusDirective';
 export * from './InfiniteScrollDirective';

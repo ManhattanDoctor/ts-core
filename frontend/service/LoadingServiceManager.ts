@@ -1,8 +1,8 @@
 import { Observable, Subscription } from 'rxjs';
 import { LoadableEvent } from '../../common';
 import { ObservableData } from '../../common/observer';
-import { Destroyable } from '../Destroyable';
-import { LoadingService } from '../service';
+import { Destroyable } from '..';
+import { LoadingService } from '../service/LoadingService';
 
 export class LoadingServiceManager extends Destroyable {
     //--------------------------------------------------------------------------

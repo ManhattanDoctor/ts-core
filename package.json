@@ -7,10 +7,10 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "frontend": "file:frontend",
         "backend": "file:backend",
         "class-transformer": "0.2.3",
         "class-validator": "0.9.1",
+        "frontend": "file:frontend",
         "lodash": "4.17.11",
         "rxjs": "6.5.2",
         "uuid": "3.3.2"
