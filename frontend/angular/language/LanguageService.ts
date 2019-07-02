@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Loadable, LoadableEvent, LoadableStatus } from '../../../common';
 import { ExtendedError } from '../../../common/error';
@@ -29,6 +29,7 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     private _translator: ILanguageTranslator;
     private _rawTranslation: any;
 
+    public filePrefixes: Array<string> = ['.json', 'Custom.json'];
     public cookieStorageName: string = 'vi-language';
 
     //--------------------------------------------------------------------------
@@ -69,13 +70,16 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
         this.status = LoadableStatus.LOADING;
         this.observer.next(new ObservableData(LoadableEvent.STARTED, language));
 
-        forkJoin(
-            this.http.get(this.url + language.locale + '.json').pipe(catchError(error => of(error))),
-            this.http.get(this.url + language.locale + 'Custom.json').pipe(catchError(error => of(error)))
-        ).subscribe(results => {
+        let files: Array<Observable<any>> = [];
+        for (let prefix of this.filePrefixes) {
+            files.push(this.http.get(this.url + language.locale + prefix).pipe(catchError(error => of(error))));
+        }
+
+        forkJoin(...files).subscribe(results => {
             if (this.isDestroyed) {
                 return;
             }
+            console.log(results);
             let items = results.filter(item => !(item instanceof Error));
             if (!_.isEmpty(items)) {
                 let translation = {} as any;

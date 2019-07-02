@@ -27,7 +27,7 @@ export class Language {
     //
     //--------------------------------------------------------------------------
 
-    public toEqual(value: Language | string): boolean {
+    public isEqual(value: Language | string): boolean {
         if (_.isNil(value)) {
             return false;
         }

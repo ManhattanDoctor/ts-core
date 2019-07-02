@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { PromiseHandler } from '../../../common/promise';
 import { Destroyable } from '../../Destroyable';
-import { IQuestion, QuestionMode, QuestionOptions } from './IQuestion';
+import { IQuestion, IQuestionOptions, QuestionMode } from './IQuestion';
 
 export class QuestionManager extends Destroyable implements IQuestion {
     //--------------------------------------------------------------------------
@@ -12,7 +12,7 @@ export class QuestionManager extends Destroyable implements IQuestion {
 
     public text: string;
     public mode: QuestionMode;
-    public options: QuestionOptions;
+    public options: IQuestionOptions;
 
     public notText: string;
     public yesText: string;
@@ -30,7 +30,7 @@ export class QuestionManager extends Destroyable implements IQuestion {
     //
     //--------------------------------------------------------------------------
 
-    constructor(options?: QuestionOptions) {
+    constructor(options?: IQuestionOptions) {
         super();
         this._closePromise = PromiseHandler.create();
         this._yesNotPromise = PromiseHandler.create();
