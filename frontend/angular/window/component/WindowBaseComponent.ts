@@ -32,7 +32,6 @@ export class WindowBaseComponent extends DragableWindow {
     //--------------------------------------------------------------------------
 
     private setWindowElementProperties(item: WindowElement): void {
- 
         this.addDestroyable(item);
     }
 

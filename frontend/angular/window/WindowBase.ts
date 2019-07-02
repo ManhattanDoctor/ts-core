@@ -158,7 +158,7 @@ export abstract class WindowBase extends DestroyableContainer {
         this._height = value;
         this.commitSizeProperties();
     }
-    
+
     //--------------------------------------------------------------------------
     //
     // 	Public Properties

@@ -28,7 +28,7 @@ export class MapCollection<U> extends Destroyable {
         if (_.isNil(uidPropertyName)) {
             throw new ExtendedError(`Unable to create map: uidPropertyName in undefined`);
         }
-        
+
         this.map = new Map();
         this.uidPropertyName = uidPropertyName;
 

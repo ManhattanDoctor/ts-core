@@ -80,7 +80,6 @@ export class ThemeService extends Destroyable {
                 this.themes.add(theme);
             }
         }
-
     }
 
     public loadIfExist(defaultTheme?: string): void {

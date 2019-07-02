@@ -7,4 +7,3 @@ export * from './LanguagePurePipe';
 export * from './LanguageResolver';
 export * from './LanguageService';
 export * from './LanguageTranslator';
-

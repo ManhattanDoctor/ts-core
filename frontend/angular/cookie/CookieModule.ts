@@ -23,7 +23,6 @@ export class CookieModule {
                     deps: [COOKIE_OPTIONS_TOKEN],
                     useClass: CookieService
                 }
-                
             ]
         };
     }

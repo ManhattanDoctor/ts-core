@@ -7,38 +7,32 @@ export class ArrayUtil {
     //
     //--------------------------------------------------------------------------
 
-    public static sort(array:Array<{sortIndex:number}>):void {
-        if(!_.isEmpty(array)) {
-			array.sort(ArrayUtil.sortFunction);
+    public static sort(array: Array<{ sortIndex: number }>): void {
+        if (!_.isEmpty(array)) {
+            array.sort(ArrayUtil.sortFunction);
         }
-	}
-	
-	private static sortFunction(first:{sortIndex:number},second:{sortIndex:number}):number
-	{
-        if(!first && !second){
-			return 0;
+    }
+
+    private static sortFunction(first: { sortIndex: number }, second: { sortIndex: number }): number {
+        if (!first && !second) {
+            return 0;
         }
 
-        if(first && !second)
-        {
+        if (first && !second) {
             return -1;
         }
-	
-        if(!first && second)
-        {
+
+        if (!first && second) {
             return 1;
         }
-	
-		
-        if(first.sortIndex == second.sortIndex)
-        {
-			return 0;
+
+        if (first.sortIndex == second.sortIndex) {
+            return 0;
         }
 
-		return first.sortIndex < second.sortIndex? -1:1;
-	}
-    
-    
+        return first.sortIndex < second.sortIndex ? -1 : 1;
+    }
+
     public static move(array: Array<any>, oldIndex: number, newIndex: number): void {
         if (_.isEmpty(array) || oldIndex === newIndex) {
             return;
