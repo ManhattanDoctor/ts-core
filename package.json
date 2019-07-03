@@ -7,15 +7,17 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "backend": "file:backend",
         "class-transformer": "0.2.3",
         "class-validator": "0.9.1",
-        "frontend": "file:frontend",
         "lodash": "4.17.11",
+        "buffer": "5.2.1",
+        "process": "0.11.10",
         "rxjs": "6.5.2",
         "uuid": "3.3.2"
     },
     "devDependencies": {
-        "@types/lodash": "4.14.134"
+        "prettier": "1.18.2",
+        "@types/node": "8.9.4",
+        "@types/lodash": "4.14.135"
     }
 }

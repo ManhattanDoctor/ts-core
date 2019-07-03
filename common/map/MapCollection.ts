@@ -50,7 +50,7 @@ export class MapCollection<U> extends Destroyable {
         let uid = this.getUidValue(item);
         if (!_.isString(uid)) {
             if (_.isNumber(uid)) {
-                uid = (uid as Number).toString();
+                uid = uid.toString();
             } else {
                 throw new ExtendedError(`Uid must be a string: "${uid}" is ${typeof uid}`);
             }
