@@ -28,7 +28,7 @@ export abstract class ApiBaseService extends Destroyable {
 
     protected _isLoading: boolean;
 
-    protected idleTimeout: number = ApiServiceBase.IDLE_TIMEOUT;
+    protected idleTimeout: number = ApiBaseService.IDLE_TIMEOUT;
     protected responseType: string = 'json';
     protected defaultMethod: ApiMethod = ApiMethod.POST;
     protected observer: Subject<ObservableData<LoadableEvent, ApiRequest | ApiResponse>>;

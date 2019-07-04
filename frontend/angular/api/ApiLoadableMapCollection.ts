@@ -1,10 +1,10 @@
+import * as _ from 'lodash';
 import { Observable } from 'rxjs';
 import { LoadableMapCollection } from '../../../common/map';
 import { ApiMethod, ApiResponse } from '../../api';
 import { ApiBaseService } from '../../api/ApiBaseService';
-import * as _ from 'lodash';
 
-export abstract class ApiBaseLoadableMapCollection<U, V> extends LoadableMapCollection<U, ApiResponse<V>> {
+export abstract class ApiLoadableMapCollection<U, V> extends LoadableMapCollection<U, ApiResponse<V>> {
     //--------------------------------------------------------------------------
     //
     //  Properties

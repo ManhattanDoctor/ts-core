@@ -2,13 +2,13 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular
 import { Observable } from 'rxjs';
 import { timeout } from 'rxjs/internal/operators';
 import { ExtendedError } from '../../../common/error';
+import { ApiBaseService } from '../../api/ApiBaseService';
 import { ApiError } from '../../api/ApiError';
 import { ApiMethod } from '../../api/ApiMethod';
 import { ApiRequest } from '../../api/ApiRequest';
 import { ApiResponse } from '../../api/ApiResponse';
-import { ApiBaseService } from '../../api/ApiBaseService';
 
-export abstract class HttpApiBaseService extends ApiBaseService {
+export abstract class HttpApiService extends ApiBaseService {
     //--------------------------------------------------------------------------
     //
     // 	Constructor
