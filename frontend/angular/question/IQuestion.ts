@@ -13,8 +13,8 @@ export interface IQuestion {
 }
 
 export interface IQuestionOptions {
-    text: string;
-    mode: QuestionMode;
+    text?: string;
+    mode?: QuestionMode;
     isChecked?: boolean;
     yesTextId?: string;
     notTextId?: string;

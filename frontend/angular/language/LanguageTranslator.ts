@@ -58,7 +58,9 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
 
     public translate(key: string, params?: any): string {
         if (_.isNil(key)) {
-            this.observer.next(new ObservableData(LanguageTranslatorEvent.PARSE_ERROR, new ExtendedError(`Expression is undefined`)));
+            this.observer.next(
+                new ObservableData(LanguageTranslatorEvent.UNDEFINED_KEY, new ExtendedError(`Unable to translate: key is undefined`, null, key))
+            );
             return null;
         }
 
@@ -80,6 +82,14 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
         }
         this.locale.translations.set(uniqueKey, text);
         return text;
+    }
+
+    public compile(expression: string, params?: any): string {
+        if (_.isNil(expression)) {
+            this.observer.next(new ObservableData(LanguageTranslatorEvent.UNDEFINED_KEY, new ExtendedError(`Unable to compile: key is undefined`, null, key)));
+            return null;
+        }
+        return this.locale.compile(expression, params);
     }
 
     public setLocale(locale: string, rawTranslation: any): void {
@@ -136,8 +146,8 @@ export class LocaleContainer extends IDestroyable {
         return this.compile(_.get(this.rawTranslation, key), params);
     }
 
-    public compile(text: string, params?: any): string {
-        return this.formatter.compile(text)(!_.isNil(params) ? params : {});
+    public compile(expression: string, params?: any): string {
+        return this.formatter.compile(expression)(!_.isNil(params) ? params : {});
     }
 
     public isHasTranslation(key: string): boolean {

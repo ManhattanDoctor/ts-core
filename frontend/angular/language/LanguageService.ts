@@ -134,6 +134,10 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
         this.load(this.cookies.get(this.cookieStorageName) || defaultLocale);
     }
 
+    public compile(expression: string, params?: Object): string {
+        return this.translator.compile(expression, params);
+    }
+
     public translate(key: string, params?: Object): string {
         return this.translator.translate(key, params);
     }
