@@ -12,6 +12,7 @@ export interface ILanguageTranslator extends IDestroyable {
 }
 
 export enum LanguageTranslatorEvent {
-    UNDEFINED_KEY = 'UNDEFINED_KEY',
-    PARSE_ERROR = 'PARSE_ERROR'
+    INVALID_KEY = 'INVALID_KEY',
+    INVALID_EXPRESSION = 'INVALID_EXPRESSION',
+    COMPILE_ERROR = 'COMPILE_ERROR'
 }

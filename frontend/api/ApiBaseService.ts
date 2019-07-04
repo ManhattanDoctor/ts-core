@@ -9,7 +9,7 @@ import { ApiRequest } from './ApiRequest';
 import { ApiResponse } from './ApiResponse';
 import { IApiRequestConfig } from './IApiRequestConfig';
 
-export abstract class ApiServiceBase extends Destroyable {
+export abstract class ApiBaseService extends Destroyable {
     //--------------------------------------------------------------------------
     //
     // 	Static Properties

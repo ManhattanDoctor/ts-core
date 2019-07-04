@@ -6,9 +6,9 @@ import { ApiError } from '../../api/ApiError';
 import { ApiMethod } from '../../api/ApiMethod';
 import { ApiRequest } from '../../api/ApiRequest';
 import { ApiResponse } from '../../api/ApiResponse';
-import { ApiServiceBase } from '../../api/ApiServiceBase';
+import { ApiBaseService } from '../../api/ApiBaseService';
 
-export abstract class HttpApiServiceBase extends ApiServiceBase {
+export abstract class HttpApiBaseService extends ApiBaseService {
     //--------------------------------------------------------------------------
     //
     // 	Constructor
@@ -17,7 +17,7 @@ export abstract class HttpApiServiceBase extends ApiServiceBase {
 
     constructor(protected http: HttpClient) {
         super();
-        this.idleTimeout = 2 * ApiServiceBase.IDLE_TIMEOUT;
+        this.idleTimeout = 2 * ApiBaseService.IDLE_TIMEOUT;
     }
 
     //--------------------------------------------------------------------------

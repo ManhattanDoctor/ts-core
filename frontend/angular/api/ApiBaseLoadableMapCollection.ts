@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { LoadableMapCollection } from '../../../common/map';
 import { ApiMethod, ApiResponse } from '../../api';
-import { ApiServiceBase } from '../../api/ApiServiceBase';
+import { ApiBaseService } from '../../api/ApiBaseService';
 import * as _ from 'lodash';
 
 export abstract class ApiBaseLoadableMapCollection<U, V> extends LoadableMapCollection<U, ApiResponse<V>> {
@@ -11,7 +11,7 @@ export abstract class ApiBaseLoadableMapCollection<U, V> extends LoadableMapColl
     //
     //--------------------------------------------------------------------------
 
-    protected api: ApiServiceBase;
+    protected api: ApiBaseService;
 
     protected requestName: string;
     protected requestMethod: ApiMethod;
@@ -22,7 +22,7 @@ export abstract class ApiBaseLoadableMapCollection<U, V> extends LoadableMapColl
     //
     //--------------------------------------------------------------------------
 
-    protected constructor(api: ApiServiceBase, requestName?: string, requestMethod?: ApiMethod, uidPropertyName?: keyof U) {
+    protected constructor(api: ApiBaseService, requestName?: string, requestMethod?: ApiMethod, uidPropertyName?: keyof U) {
         super(uidPropertyName);
 
         this.api = api;

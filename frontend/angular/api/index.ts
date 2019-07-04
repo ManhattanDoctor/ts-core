@@ -1,2 +1,2 @@
-export * from './HttpApiServiceBase';
+export * from './HttpApiBaseService';
 export * from './ApiBaseLoadableMapCollection';
