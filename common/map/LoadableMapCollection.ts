@@ -1,5 +1,4 @@
 import { Observable, Subject, Subscription } from 'rxjs';
-import { IDestroyable } from '../IDestroyable';
 import { LoadableEvent } from '../Loadable';
 import { ObservableData } from '../observer';
 import { DestroyableMapCollection } from './DestroyableMapCollection';
