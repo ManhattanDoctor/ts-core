@@ -8,6 +8,14 @@ import * as numeral from 'numeral';
 export class FinancePipe implements PipeTransform {
     //--------------------------------------------------------------------------
     //
+    //	Static Properties
+    //
+    //--------------------------------------------------------------------------
+
+    public static DEFAULT_FORMAT = '0,0';
+
+    //--------------------------------------------------------------------------
+    //
     //	Public Methods
     //
     //--------------------------------------------------------------------------
@@ -17,7 +25,7 @@ export class FinancePipe implements PipeTransform {
             return '---';
         }
         if (_.isNil(format)) {
-            format = '0,0';
+            format = FinancePipe.DEFAULT_FORMAT;
         }
         if (isNeedPlus) {
             format = '+' + format;

@@ -22,7 +22,7 @@ export abstract class ApiLoadableMapCollection<U, V> extends LoadableMapCollecti
     //
     //--------------------------------------------------------------------------
 
-    protected constructor(api: ApiBaseService, requestName?: string, requestMethod?: ApiMethod, uidPropertyName?: keyof U) {
+    protected constructor(api: ApiBaseService, requestName: string, requestMethod: ApiMethod, uidPropertyName: keyof U) {
         super(uidPropertyName);
 
         this.api = api;
