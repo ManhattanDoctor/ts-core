@@ -1,19 +1,22 @@
 import { ComponentFactoryResolver, ComponentRef } from '@angular/core';
 import { APPLICATION_INJECTOR } from '../../ApplicationInjector';
 import { ViewUtil } from '../../util';
-import { DragableWindow } from '../DragableWindow';
-import { WindowElement } from './WindowBaseElement';
+import { CloseWindowElementComponent } from './close-window-element/close-window-element.component';
+import { MinimizeWindowElementComponent } from './minimize-window-element/minimize-window-element.component';
+import { ResizeWindowElementComponent } from './resize-window-element/resize-window-element.component';
+import { WindowDragable } from './WindowDragable';
+import { WindowElement } from './WindowElement';
 
-export class WindowBaseComponent extends DragableWindow {
+export class WindowBaseComponent extends WindowDragable {
     //--------------------------------------------------------------------------
     //
     //  Static Properties
     //
     //--------------------------------------------------------------------------
 
-    public static CLOSE_WINDOW_COMPONENT = null;
-    public static RESIZE_WINDOW_COMPONENT = null;
-    public static MINIMIZE_WINDOW_COMPONENT = null;
+    public static CLOSE_WINDOW_COMPONENT = CloseWindowElementComponent;
+    public static RESIZE_WINDOW_COMPONENT = ResizeWindowElementComponent;
+    public static MINIMIZE_WINDOW_COMPONENT = MinimizeWindowElementComponent;
 
     //--------------------------------------------------------------------------
     //

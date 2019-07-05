@@ -1,7 +1,7 @@
 import { AfterViewInit, ElementRef } from '@angular/core';
 import { DestroyableContainer } from '../../../../common';
 import { ViewUtil } from '../../util';
-import { IWindow } from '../IWindow';
+import { IWindow } from '../../window';
 
 export class WindowElement extends DestroyableContainer implements AfterViewInit {
     //--------------------------------------------------------------------------
@@ -29,14 +29,18 @@ export class WindowElement extends DestroyableContainer implements AfterViewInit
     //--------------------------------------------------------------------------
 
     protected checkWindowParent(): void {
-        let container = ViewUtil.parseElement(this.element.nativeElement);
-        while (container && container.nodeName.toLowerCase() !== 'mat-dialog-container') {
-            container = container.parentElement;
-        }
-
+        let container = this.getContainer();
         if (container) {
             ViewUtil.appendChild(container, this.element.nativeElement);
         }
+    }
+
+    protected getContainer(): HTMLElement {
+        let item = ViewUtil.parseElement(this.element.nativeElement);
+        while (item && item.nodeName.toLowerCase() !== 'mat-dialog-container') {
+            item = item.parentElement;
+        }
+        return item;
     }
 
     protected createChildren(): void {}

@@ -20,8 +20,4 @@ export class WindowFactory<U extends IWindow> {
     public create(properties: WindowProperties): U {
         return new this.classType(properties);
     }
-
-    public createConfig<T>(isModal: boolean = false, isResizeable: boolean = false, width: number = NaN, height: number = NaN): WindowConfig {
-        return new WindowConfig<T>(isModal, isResizeable, width, height);
-    }
 }

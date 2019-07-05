@@ -1,9 +1,9 @@
 import { EdgeOptions, Interactable, InteractEvent, ResizableOptions } from '@interactjs/types/types';
 import * as interact from 'interactjs';
-import { ViewUtil } from '../util';
-import { Window } from './Window';
+import { ViewUtil } from '../../util';
+import { Window } from '../../window/Window';
 
-export class ResizeableWindow extends Window {
+export class WindowResizeable extends Window {
     //--------------------------------------------------------------------------
     //
     //  Properties Methods

@@ -1,9 +1,9 @@
 import { Directive, ElementRef, Input } from '@angular/core';
 import { Interactable } from '@interactjs/types/types';
 import * as interact from 'interactjs';
-import { Destroyable } from '../../Destroyable';
-import { DragableWindow } from './DragableWindow';
-import { IWindow } from './IWindow';
+import { Destroyable } from '../../../Destroyable';
+import { IWindow } from '../../window/IWindow';
+import { WindowDragable } from './WindowDragable';
 
 @Directive({
     selector: '[vi-window-drag-area]'
@@ -15,7 +15,7 @@ export class WindowDragAreaDirective extends Destroyable {
     //
     //--------------------------------------------------------------------------
 
-    private _window: DragableWindow;
+    private _window: WindowDragable;
     private _interactable: Interactable;
 
     //--------------------------------------------------------------------------
@@ -96,7 +96,7 @@ export class WindowDragAreaDirective extends Destroyable {
         if (value === this._window) {
             return;
         }
-        this._window = value as DragableWindow;
+        this._window = value as WindowDragable;
         if (this._window) {
             this.commitWindowProperties();
         }

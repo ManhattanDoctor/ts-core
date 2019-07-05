@@ -1,0 +1,13 @@
+<p class="text m-4 text-center mouse-inactive" [innerHTML]="data?.text"></p>
+
+<div class="text-center border-top p-3" *ngIf="data?.isQuestion">
+
+    <button class="mr-3" (click)="data?.yesClickHandler()" color="primary" mat-stroked-button>
+        <span [innerHTML]="data?.yesText"></span>
+    </button>
+
+    <button (click)="data?.notClickHandler()" mat-stroked-button>
+        <span [innerHTML]="data?.notText"></span>
+    </button>
+
+</div>

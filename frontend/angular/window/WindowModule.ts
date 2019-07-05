@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { LanguageModule } from '../language';
 import { WindowService } from './WindowService';
-import { WindowDragAreaDirective } from './WindowDragAreaDirective';
+import { WindowDragAreaDirective } from '../component/window/WindowDragAreaDirective';
 @NgModule({
     imports: [MatDialogModule, LanguageModule],
     declarations: [WindowDragAreaDirective],

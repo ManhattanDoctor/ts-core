@@ -1,8 +1,8 @@
 import { DraggableOptions, InteractEvent } from '@interactjs/types/types';
-import { ViewUtil } from '../util';
-import { ResizeableWindow } from './ResizeableWindow';
+import { ViewUtil } from '../../util';
+import { WindowResizeable } from './WindowResizeable';
 
-export class DragableWindow extends ResizeableWindow {
+export class WindowDragable extends WindowResizeable {
     //--------------------------------------------------------------------------
     //
     //  Properties Methods

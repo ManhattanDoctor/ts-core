@@ -324,14 +324,14 @@ export class WindowService extends Destroyable {
 
     public info(translationId?: string, translation?: any, questionOptions?: IQuestionOptions, configOptions?: WindowConfigOptions): IQuestion {
         let text = this.language.translate(translationId, translation);
-        let config: WindowConfig<QuestionManager> = _.assign(this.factory.createConfig(true, false, 450), configOptions);
+        let config: WindowConfig<QuestionManager> = _.assign(new WindowConfig(true, false, 450), configOptions);
         config.data = new QuestionManager(_.assign(questionOptions, { mode: QuestionMode.INFO, text }));
         return this.open(this.questionComponent, config).config.data;
     }
 
     public question(translationId?: string, translation?: any, questionOptions?: IQuestionOptions, configOptions?: WindowConfigOptions): IQuestion {
         let text = this.language.translate(translationId, translation);
-        let config: WindowConfig<QuestionManager> = _.assign(this.factory.createConfig(true, false, 450), configOptions);
+        let config: WindowConfig<QuestionManager> = _.assign(new WindowConfig(true, false, 450), configOptions);
         config.data = new QuestionManager(_.assign(questionOptions, { mode: QuestionMode.QUESTION, text }));
         return this.open(this.questionComponent, config).config.data;
     }

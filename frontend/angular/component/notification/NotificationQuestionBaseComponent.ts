@@ -1,7 +1,7 @@
 import { HostListener } from '@angular/core';
+import { INotificationContent } from '../../notification';
 import { QuestionManager } from '../../question/QuestionManager';
 import { ViewUtil } from '../../util';
-import { INotificationContent } from '../INotificationContent';
 
 export abstract class NotificationQuestionBaseComponent extends INotificationContent<QuestionManager> {
     //--------------------------------------------------------------------------

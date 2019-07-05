@@ -1,12 +1,10 @@
-export * from './DragableWindow';
-export * from './Window';
 export * from './IWindow';
 export * from './IWindowContent';
-export * from './ResizeableWindow';
+export * from './Window';
 export * from './WindowBase';
 export * from './WindowConfig';
-export * from './WindowDragAreaDirective';
 export * from './WindowFactory';
 export * from './WindowModule';
 export * from './WindowProperties';
 export * from './WindowService';
+
