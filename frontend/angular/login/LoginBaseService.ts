@@ -126,9 +126,9 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
     //
     //--------------------------------------------------------------------------
 
-    public abstract login<T>(param: T): void;
+    public abstract login(param: any): void;
 
-    public abstract registration<T>(param: T): void;
+    public abstract registration(param: any): void;
 
     public tryLoginBySid(isNeedHandleError: boolean = true, isHandleLoading: boolean = false): boolean {
         if (!this.isCanLoginWithSid()) {
