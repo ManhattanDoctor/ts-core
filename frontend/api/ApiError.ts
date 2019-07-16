@@ -13,7 +13,7 @@ export class ApiError implements Error {
     public static ERROR_SPECIAL_CODES: Array<number> = [];
 
     public static CODE_FILEDS: Array<string> = ['code', 'status', 'errorCode'];
-    public static MESSAGES_FILEDS: Array<string> = ['text', 'message', 'description', 'error', 'statusText'];
+    public static MESSAGE_FILEDS: Array<string> = ['text', 'message', 'description', 'error', 'statusText'];
 
     public static DEFAULT_LANGUAGE = 'en';
 
@@ -92,7 +92,7 @@ export class ApiError implements Error {
             return null;
         }
 
-        for (let item of ApiError.MESSAGES_FILEDS) {
+        for (let item of ApiError.MESSAGE_FILEDS) {
             let value = data[item];
             if (!_.isEmpty(value)) {
                 data = value;
