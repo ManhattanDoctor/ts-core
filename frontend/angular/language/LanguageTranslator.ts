@@ -68,13 +68,12 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
             return text;
         }
 
-        let link = this.getLink(text);
-        if (!_.isNil(link)) {
-            return this.translate(link, params);
-        }
-
-        if (this.isHasTranslation(key)) {
+        if (this.locale.isHasTranslation(key)) {
             text = this.locale.translate(key, params);
+            let link = this.getLink(text);
+            if (!_.isNil(link)) {
+                return this.translate(link, params);
+            }
         } else {
             text = key;
         }
