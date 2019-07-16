@@ -3,6 +3,7 @@ import { VIModule } from '../VIModule';
 import { AssetModule } from './asset/AssetModule';
 import { CookieModule, CookieOptions } from './cookie';
 import { LanguageModule } from './language/LanguageModule';
+import { LoginGuard, LoginRedirectResolver, LoginResolver } from './login';
 import { NotificationModule } from './notification';
 import { FinancePipe, MomentDateAdaptivePipe, MomentDatePipe, MomentTimePipe, NgModelErrorPipe, SanitizePipe, TruncatePipe } from './pipe';
 import { ThemeModule } from './theme';
@@ -10,6 +11,7 @@ import { WindowModule } from './window';
 
 @NgModule({
     declarations: [NgModelErrorPipe, FinancePipe, MomentDateAdaptivePipe, MomentDatePipe, MomentTimePipe, SanitizePipe, TruncatePipe],
+    providers: [LoginResolver, LoginGuard, LoginRedirectResolver],
     exports: [
         VIModule,
         AssetModule,
