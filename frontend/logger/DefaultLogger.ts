@@ -1,6 +1,5 @@
-import * as NestJS from '@nestjs/common';
-import { LoggerWrapper } from '../../../common/logger';
-import { LoggerLevel } from '../../../common/logger/ILogger';
+import { LoggerWrapper } from '../../common/logger';
+import { LoggerLevel } from '../../common/logger/ILogger';
 
 export class DefaultLogger extends LoggerWrapper {
     //--------------------------------------------------------------------------
@@ -10,6 +9,7 @@ export class DefaultLogger extends LoggerWrapper {
     //--------------------------------------------------------------------------
 
     constructor(level: LoggerLevel) {
-        super(NestJS.Logger, null, level);
+        super(console, null, level);
+        console['verbose'] = console.log;
     }
 }

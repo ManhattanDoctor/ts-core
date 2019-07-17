@@ -1,13 +1,15 @@
 import * as _ from 'lodash';
+import { ILogger, LoggerLevel } from './ILogger';
 
-export class LoggerWrapper implements ILoggerService {
+export class LoggerWrapper implements ILogger {
     //--------------------------------------------------------------------------
     //
     //  Properties
     //
     //--------------------------------------------------------------------------
 
-    protected _logger: ILoggerService;
+    protected _level: LoggerLevel;
+    protected _logger: ILogger;
     protected context: string;
 
     //--------------------------------------------------------------------------
@@ -16,7 +18,8 @@ export class LoggerWrapper implements ILoggerService {
     //
     //--------------------------------------------------------------------------
 
-    constructor(logger?: ILoggerService, context?: string) {
+    constructor(logger?: ILogger, context?: string, level?: LoggerLevel) {
+        this._level = !_.isNil(level)? level : LoggerLevel.ALL;
         this._logger = logger;
         this.context = context || this.constructor.name;
     }
@@ -27,7 +30,19 @@ export class LoggerWrapper implements ILoggerService {
     //
     //--------------------------------------------------------------------------
 
+    protected commitLevelProperties(): void {}
+
     protected commitLoggerProperties(): void {}
+
+    private isLevelSatisfy(level: LoggerLevel): boolean {
+        if (this.level === LoggerLevel.NONE) {
+            return false;
+        }
+        if (this.level === LoggerLevel.ALL) {
+            return true;
+        }
+        return this.level <= level;
+    }
 
     //--------------------------------------------------------------------------
     //
@@ -35,11 +50,18 @@ export class LoggerWrapper implements ILoggerService {
     //
     //--------------------------------------------------------------------------
 
-    public log(message: any, context: string = this.context): any {
+    public log(message: any, context: string = this.context): void {
+        if (!this.isLevelSatisfy(LoggerLevel.LOG)) {
+            return;
+        }
         this.currentLogger.log(message, context);
     }
 
-    public error(message: any, trace?: string, context: string = this.context): any {
+    public error(message: any, trace?: string, context: string = this.context): void {
+        if (!this.isLevelSatisfy(LoggerLevel.ERROR)) {
+            return;
+        }
+
         if (_.isNil(trace) && message instanceof Error) {
             trace = message.stack;
         }
@@ -49,18 +71,28 @@ export class LoggerWrapper implements ILoggerService {
         this.currentLogger.error(message, trace, context);
     }
 
-    public warn(message: any, context: string = this.context): any {
+    public warn(message: any, context: string = this.context): void {
+        if (!this.isLevelSatisfy(LoggerLevel.WARN)) {
+            return;
+        }
+
         if (message instanceof Error) {
             message = message.toString();
         }
         this.currentLogger.warn(message, context);
     }
 
-    public debug(message: any, context: string = this.context) {
+    public debug(message: any, context: string = this.context): void {
+        if (!this.isLevelSatisfy(LoggerLevel.DEBUG)) {
+            return;
+        }
         this.currentLogger.debug(message, context);
     }
 
-    public verbose(message: any, context: string = this.context) {
+    public verbose(message: any, context: string = this.context): void {
+        if (!this.isLevelSatisfy(LoggerLevel.VERBOSE)) {
+            return;
+        }
         this.currentLogger.verbose(message, context);
     }
 
@@ -74,7 +106,7 @@ export class LoggerWrapper implements ILoggerService {
     //
     //--------------------------------------------------------------------------
 
-    protected get currentLogger(): ILoggerService {
+    protected get currentLogger(): ILogger {
         return this._logger || console;
     }
 
@@ -84,24 +116,29 @@ export class LoggerWrapper implements ILoggerService {
     //
     //--------------------------------------------------------------------------
 
-    public get logger(): ILoggerService {
+    public get logger(): ILogger {
         return this._logger;
     }
-    public set logger(value: ILoggerService) {
+    public set logger(value: ILogger) {
         if (value === this._logger) {
             return;
         }
         this._logger = value;
-        if (!_.isNil(value)) {
+        if (value) {
             this.commitLoggerProperties();
         }
     }
-}
 
-export interface ILoggerService {
-    log(message: any, context?: string): any;
-    error(message: any, trace?: string, context?: string): any;
-    warn(message: any, context?: string): any;
-    debug?(message: any, context?: string): any;
-    verbose?(message: any, context?: string): any;
+    public get level(): LoggerLevel {
+        return this._level;
+    }
+    public set level(value: LoggerLevel) {
+        if (value === this._level) {
+            return;
+        }
+        this._level = value;
+        if (!_.isNil(value)) {
+            this.commitLevelProperties();
+        }
+    }
 }

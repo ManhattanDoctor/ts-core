@@ -1,5 +1,7 @@
-import { DynamicModule, Global, Logger, Provider } from '@nestjs/common';
-import { ExtendedError } from '../../../common/error';
+import { DynamicModule, Global, Provider } from '@nestjs/common';
+import { Logger } from '../../../common/logger';
+import { LoggerLevel } from '../../../common/logger/ILogger';
+import { ILoggerSettings } from '../../settings';
 import { DefaultLogger } from './DefaultLogger';
 
 @Global()
@@ -10,19 +12,13 @@ export class LoggerModule {
     //
     //--------------------------------------------------------------------------
 
-    public static forRoot(type: LoggerType = LoggerType.DEFAULT): DynamicModule {
+    public static forRoot(settings: ILoggerSettings): DynamicModule {
         const providers: Array<Provider> = [];
 
-        switch (type) {
-            case LoggerType.DEFAULT:
-                providers.push({
-                    provide: Logger,
-                    useValue: new DefaultLogger()
-                });
-                break;
-            default:
-                throw new ExtendedError(`Unable to create logger for ${type} type`);
-        }
+        providers.push({
+            provide: Logger,
+            useValue: new DefaultLogger(settings.loggerLevel || LoggerLevel.LOG)
+        });
 
         return {
             module: LoggerModule,
@@ -39,8 +35,4 @@ export class LoggerModule {
     //--------------------------------------------------------------------------
 
     constructor() {}
-}
-
-export enum LoggerType {
-    DEFAULT = 'DEFAULT'
 }

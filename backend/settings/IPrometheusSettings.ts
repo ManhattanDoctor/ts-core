@@ -1,4 +1,4 @@
 export interface IPrometheusSettings {
-    prometheusPath: string;
-    prometheusPort: number;
+    readonly prometheusPath: string;
+    readonly prometheusPort: number;
 }

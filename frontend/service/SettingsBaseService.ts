@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { IDestroyable } from '../../common';
 import { ExtendedError } from '../../common/error';
+import { LoggerLevel } from '../../common/logger/ILogger';
 import { MapCollection } from '../../common/map';
 import { AbstractSettingsStorage } from '../../common/settings';
 import { Language } from '../language/Language';
@@ -116,6 +117,10 @@ export class SettingsBaseService extends AbstractSettingsStorage implements IDes
     //	Public Properties
     //
     //--------------------------------------------------------------------------
+
+    public get loggerLevel(): LoggerLevel {
+        return this.getValue('loggerLevel', LoggerLevel.ALL);
+    }
 
     public get apiUrl(): string {
         return SettingsBaseService.parseUrl(this.getValue('apiUrl'));
