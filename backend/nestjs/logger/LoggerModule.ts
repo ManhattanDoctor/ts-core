@@ -17,7 +17,7 @@ export class LoggerModule {
 
         providers.push({
             provide: Logger,
-            useValue: new DefaultLogger(settings.loggerLevel || LoggerLevel.LOG)
+            useValue: settings.logger || new DefaultLogger(settings.loggerLevel || LoggerLevel.LOG)
         });
 
         return {

@@ -31,7 +31,7 @@ export class TransportCommand<U, V> implements ITransportCommand<U, V> {
 
     constructor(name: string, request?: U, id?: string) {
         this._name = name;
-        this._id = id || uuid;
+        this._id = id || uuid();
 
         if (!request) {
             request = {} as any;

@@ -1,6 +1,7 @@
 import { Api, JsonRpc } from 'eosjs';
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'; // development only
 import * as fetch from 'node-fetch';
+import { TextDecoder, TextEncoder } from 'util';
 
 export class EosApi {
     //--------------------------------------------------------------------------
@@ -32,9 +33,9 @@ export class EosApi {
         this.api = new Api({
             rpc: new JsonRpc(settings.endpoint, { fetch }),
             chainId: settings.chainId,
-            signatureProvider: this.signature,
             textEncoder: new TextEncoder(),
-            textDecoder: new TextDecoder()
+            textDecoder: new TextDecoder(),
+            signatureProvider: this.signature
         });
     }
 

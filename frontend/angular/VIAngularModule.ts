@@ -38,17 +38,17 @@ export class VIAngularModule {
     //
     //--------------------------------------------------------------------------
 
-    public static forRoot(options?: IVIAngularOptions): ModuleWithProviders {
+    public static forRoot(settings?: IVIAngularSettings): ModuleWithProviders {
         return {
             ngModule: VIAngularModule,
             providers: [
-                ...CookieModule.forRoot(options).providers,
-                { provide: Logger, useValue: new DefaultLogger(options ? options.loggerLevel : LoggerLevel.ALL) }
+                ...CookieModule.forRoot(settings).providers,
+                { provide: Logger, useValue: new DefaultLogger(settings ? settings.loggerLevel : LoggerLevel.ALL) }
             ]
         };
     }
 }
 
-export interface IVIAngularOptions extends CookieOptions {
-    loggerLevel?: LoggerLevel;
+export interface IVIAngularSettings extends CookieOptions {
+    loggerLevel: LoggerLevel;
 }

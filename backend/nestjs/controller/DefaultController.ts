@@ -1,7 +1,8 @@
 import { BadRequestException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
 import { validate, ValidationError, ValidatorOptions } from 'class-validator';
 import { ExtendedError } from '../../../common/error';
-import { ILoggerService, LoggerWrapper } from '../../../common/logger';
+import { LoggerWrapper } from '../../../common/logger';
+import { ILogger } from '../../../common/logger';
 
 export abstract class DefaultController<U, V> extends LoggerWrapper {
     //--------------------------------------------------------------------------
@@ -10,7 +11,7 @@ export abstract class DefaultController<U, V> extends LoggerWrapper {
     //
     //--------------------------------------------------------------------------
 
-    protected constructor(logger: ILoggerService) {
+    protected constructor(logger: ILogger) {
         super(logger);
     }
 
@@ -20,11 +21,11 @@ export abstract class DefaultController<U, V> extends LoggerWrapper {
     //
     //--------------------------------------------------------------------------
 
-    public async execute(params: U): Promise<V> {
+    protected async execute(params: U): Promise<V> {
         throw new ExtendedError('Method must be implemented', HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public async executeExtended(...params): Promise<V> {
+    protected async executeExtended(...params): Promise<V> {
         throw new ExtendedError('Method must be implemented', HttpStatus.NOT_IMPLEMENTED);
     }
 

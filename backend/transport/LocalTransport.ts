@@ -1,9 +1,9 @@
-import { ValidatorOptions } from '@nestjs/common/interfaces/external/validator-options.interface';
 import * as _ from 'lodash';
+import * as util from 'util';
 import { Subject } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
 import { ExtendedError } from '../../common/error';
-import { ILoggerService } from '../../common/logger';
+import { ILogger } from '../../common/logger';
 import { ITransportCommand, ITransportCommandOptions, ITransportEvent } from './ITransport';
 import { Transport } from './Transport';
 
@@ -26,7 +26,7 @@ export class LocalTransport extends Transport {
     //
     //--------------------------------------------------------------------------
 
-    constructor(logger: ILoggerService, context?: string) {
+    constructor(logger: ILogger, context?: string) {
         super(logger, context);
 
         this.promises = new Map();
@@ -45,6 +45,11 @@ export class LocalTransport extends Transport {
     public send<U, V>(command: ITransportCommand<U, V>): void {
         let name = command.name;
         let listener = this.listeners.get(name);
+        this.debug(`→ ${name} (${command.id})`);
+        if (!_.isNil(command.request)) {
+            this.verbose(`${util.inspect(command.request, { showHidden: false, depth: null })}`);
+        }
+
         if (!_.isNil(listener)) {
             let timeout = setTimeout(() => {
                 listener.next(command);
@@ -57,6 +62,7 @@ export class LocalTransport extends Transport {
             this.pendingCommands.set(name, []);
         }
         this.pendingCommands.get(name).push(command);
+        this.verbose(`No listener for command "${command.name}: added to pending list"`);
     }
 
     public sendListen<U, V>(command: ITransportCommand<U, V>, options?: ITransportCommandOptions): Promise<V> {
@@ -64,6 +70,32 @@ export class LocalTransport extends Transport {
             this.promises.set(command.id, { resolve, reject });
             this.send(command);
         });
+    }
+
+    public response<U, V>(command: ITransportCommand<U, V>, result?: V | ExtendedError | Error | void): void {
+        let name = command.name;
+        this.debug(`← ${name} (${command.id})`);
+        if (!_.isNil(result)) {
+            this.verbose(`${util.inspect(result, { showHidden: false, depth: null })}`);
+        }
+
+        try {
+            command.response(result);
+        } catch (error) {
+            command.response(error);
+        }
+
+        let promise = this.promises.get(command.id);
+        if (_.isNil(promise)) {
+            return;
+        }
+
+        if (!_.isNil(command.error)) {
+            promise.reject(command.error);
+        } else {
+            promise.resolve(command.data);
+        }
+        this.promises.delete(command.id);
     }
 
     public wait<U, V>(command: ITransportCommand<U, V>): void {
@@ -88,26 +120,6 @@ export class LocalTransport extends Transport {
         return item.asObservable();
     }
 
-    public response<U, V>(command: ITransportCommand<U, V>, result?: V | ExtendedError | Error | void): void {
-        try {
-            command.response(result);
-        } catch (error) {
-            command.response(error);
-        }
-
-        let promise = this.promises.get(command.id);
-        if (_.isNil(promise)) {
-            return;
-        }
-
-        if (!_.isNil(command.error)) {
-            promise.reject(command.error);
-        } else {
-            promise.resolve(command.data);
-        }
-        this.promises.delete(command.id);
-    }
-
     public dispatch<T>(event: ITransportEvent<T>): void {
         let item = this.dispatchers.get(name);
         if (_.isNil(item)) {
@@ -123,16 +135,6 @@ export class LocalTransport extends Transport {
             this.dispatchers.set(name, item);
         }
         return item.asObservable();
-    }
-
-    //--------------------------------------------------------------------------
-    //
-    //  Private Properties
-    //
-    //--------------------------------------------------------------------------
-
-    protected get validatorOptions(): ValidatorOptions {
-        return { validationError: { target: false } };
     }
 }
 

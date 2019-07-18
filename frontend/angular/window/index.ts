@@ -7,4 +7,3 @@ export * from './WindowFactory';
 export * from './WindowModule';
 export * from './WindowProperties';
 export * from './WindowService';
-

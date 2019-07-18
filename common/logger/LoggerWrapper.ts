@@ -19,7 +19,7 @@ export class LoggerWrapper implements ILogger {
     //--------------------------------------------------------------------------
 
     constructor(logger?: ILogger, context?: string, level?: LoggerLevel) {
-        this._level = !_.isNil(level)? level : LoggerLevel.ALL;
+        this._level = !_.isNil(level) ? level : LoggerLevel.ALL;
         this._logger = logger;
         this.context = context || this.constructor.name;
     }

@@ -1,6 +1,8 @@
-import { DynamicModule, Global, Logger, Provider } from '@nestjs/common';
+import { DynamicModule, Global, Provider } from '@nestjs/common';
 import { ExtendedError } from '../../../common/error';
+import { Logger } from '../../../common/logger';
 import { LocalTransport, Transport } from '../../transport';
+import { LoggerModule } from '../logger';
 
 @Global()
 export class TransportModule {
@@ -10,9 +12,9 @@ export class TransportModule {
     //
     //--------------------------------------------------------------------------
 
-    public static forRoot(type: TransportType = TransportType.LOCAL): DynamicModule {
-        const providers: Array<Provider> = [];
-
+    public static forRoot(settings?: ITransportModuleSettings): DynamicModule {
+        let providers: Array<Provider> = [];
+        let type = settings ? settings.type : TransportType.LOCAL;
         switch (type) {
             case TransportType.LOCAL:
                 providers.push({
@@ -29,7 +31,7 @@ export class TransportModule {
 
         return {
             module: TransportModule,
-            imports: [],
+            imports: [LoggerModule],
             providers,
             exports: providers
         };
@@ -42,6 +44,10 @@ export class TransportModule {
     //--------------------------------------------------------------------------
 
     constructor() {}
+}
+
+export interface ITransportModuleSettings {
+    type: TransportType;
 }
 
 export enum TransportType {
