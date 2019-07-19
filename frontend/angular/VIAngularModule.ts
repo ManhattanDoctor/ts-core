@@ -1,7 +1,7 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { Logger } from '../../common/logger';
-import { LoggerLevel } from '../../common/logger/ILogger';
-import { DefaultLogger } from '../logger';
+import { ILogger, LoggerLevel } from '../../common/logger/ILogger';
+import { DefaultLogger } from '../logger/DefaultLogger';
 import { VIModule } from '../VIModule';
 import { AssetModule } from './asset/AssetModule';
 import { CookieModule, CookieOptions } from './cookie';
@@ -38,17 +38,25 @@ export class VIAngularModule {
     //
     //--------------------------------------------------------------------------
 
-    public static forRoot(settings?: IVIAngularSettings): ModuleWithProviders {
+    public static forRoot(settings?: VIAngularSettings): ModuleWithProviders {
         return {
             ngModule: VIAngularModule,
             providers: [
                 ...CookieModule.forRoot(settings).providers,
-                { provide: Logger, useValue: new DefaultLogger(settings ? settings.loggerLevel : LoggerLevel.ALL) }
+                { provide: VIAngularSettings, useValue: settings },
+                { provide: Logger, deps: [VIAngularSettings], useFactory: loggerFactory }
             ]
         };
     }
 }
 
-export interface IVIAngularSettings extends CookieOptions {
-    loggerLevel: LoggerLevel;
+export class VIAngularSettings implements CookieOptions {
+    loggerLevel = LoggerLevel.ALL;
+}
+
+export function loggerFactory(settings: VIAngularSettings): ILogger {
+    if (!settings) {
+        settings = new VIAngularSettings();
+    }
+    return new DefaultLogger(settings.loggerLevel);
 }
