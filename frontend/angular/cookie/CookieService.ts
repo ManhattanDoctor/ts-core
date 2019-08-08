@@ -4,11 +4,11 @@ import { CookieOptionsProvider } from 'ngx-cookie';
 import { CookieOptions } from './CookieOptions';
 
 export class CookieService extends Cookie.CookieService {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(options?: CookieOptions) {
         options = _.assign(

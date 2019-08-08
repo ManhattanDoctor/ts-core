@@ -16,11 +16,11 @@ import { NotificationFactory } from './NotificationFactory';
 
 @Injectable()
 export class NotificationService {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public factory: NotificationFactory<INotification>;
     public questionComponent: ComponentType<INotificationContent<any>>;
@@ -46,11 +46,11 @@ export class NotificationService {
 
     public defaultCloseDuration: number = 3000;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(dialog: MatDialog, language: LanguageService) {
         this._configs = [];
@@ -62,11 +62,11 @@ export class NotificationService {
         this.observer = new Subject();
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public open<T>(component: ComponentType<INotificationContent<T>>, config: NotificationConfig): INotificationContent<T> {
         let notification = null;
@@ -106,11 +106,11 @@ export class NotificationService {
         return notification.content;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private getById(id: string): INotification {
         let result = null;
@@ -176,11 +176,11 @@ export class NotificationService {
         }
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Setters Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private add<T>(config: NotificationConfig, content: INotificationContent<T>): void {
         this._configs.push(config);
@@ -190,11 +190,11 @@ export class NotificationService {
         this.observer.next(new ObservableData(NotificationServiceEvent.OPENED, content.notification));
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Help Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public remove(config: NotificationConfig): void {
         this.close(config);
@@ -235,11 +235,11 @@ export class NotificationService {
         return this.open(this.questionComponent, config).config.data;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get events(): Observable<ObservableData<NotificationServiceEvent, NotificationConfig | INotification>> {
         return this.observer.asObservable();

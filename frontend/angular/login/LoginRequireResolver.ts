@@ -2,19 +2,19 @@ import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/r
 import { LoginBaseService, LoginBaseServiceEvent } from './LoginBaseService';
 
 export class LoginRequireResolver implements Resolve<void> {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(protected login: LoginBaseService) {}
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<void> {
         if (this.login.isLoggedIn) {

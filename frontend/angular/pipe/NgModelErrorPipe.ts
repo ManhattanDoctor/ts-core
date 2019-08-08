@@ -7,11 +7,11 @@ import { LanguageService } from '../language';
     name: 'viNgModelError'
 })
 export class NgModelErrorPipe implements PipeTransform {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public transform(value: ValidationErrors): string {
         if (_.isNil(value)) {
@@ -29,11 +29,11 @@ export class NgModelErrorPipe implements PipeTransform {
         return this.language.translate('error.form.' + key, value);
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(private language: LanguageService) {}
 }

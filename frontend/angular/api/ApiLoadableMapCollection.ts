@@ -5,22 +5,22 @@ import { ApiMethod, ApiResponse } from '../../api';
 import { ApiBaseService } from '../../api/ApiBaseService';
 
 export abstract class ApiLoadableMapCollection<U, V> extends LoadableMapCollection<U, ApiResponse<V>> {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected api: ApiBaseService;
 
     protected requestName: string;
     protected requestMethod: ApiMethod;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected constructor(api: ApiBaseService, requestName: string, requestMethod: ApiMethod, uidPropertyName: keyof U) {
         super(uidPropertyName);
@@ -30,11 +30,11 @@ export abstract class ApiLoadableMapCollection<U, V> extends LoadableMapCollecti
         this.requestMethod = requestMethod;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Protected Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected makeRequest(): Observable<ApiResponse<V>> {
         return this.api.call({ name: this.requestName, method: this.requestMethod, data: this.getParamsForRequest() });
@@ -72,11 +72,11 @@ export abstract class ApiLoadableMapCollection<U, V> extends LoadableMapCollecti
     }
     protected parseErrorResponse(response: ApiResponse<V>): void {}
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public destroy(): void {
         super.destroy();

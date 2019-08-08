@@ -7,22 +7,22 @@ import { WindowQuestionBaseComponent } from '../WindowQuestionBaseComponent';
     templateUrl: 'question.component.html'
 })
 export class QuestionComponent extends WindowQuestionBaseComponent {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(container: ViewContainerRef, protected language: LanguageService) {
         super(container);
         ViewUtil.addClasses(container.element, 'd-block');
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected commitConfigProperties(): void {
         super.commitConfigProperties();

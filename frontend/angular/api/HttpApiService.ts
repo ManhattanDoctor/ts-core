@@ -9,22 +9,22 @@ import { ApiRequest } from '../../api/ApiRequest';
 import { ApiResponse } from '../../api/ApiResponse';
 
 export abstract class HttpApiService extends ApiBaseService {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(protected http: HttpClient) {
         super();
         this.idleTimeout = 2 * ApiBaseService.IDLE_TIMEOUT;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Protected Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected makeRequest(url: string, method: ApiMethod, params: HttpParams, headers: HttpHeaders, idleTimeout: number, responseType: any): Observable<any> {
         let observable: Observable<any> = null;

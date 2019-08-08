@@ -11,11 +11,11 @@ import { ThemeService, ThemeServiceEvent } from './ThemeService';
     selector: '[vi-theme-asset]'
 })
 export class ThemeAssetDirective extends Destroyable implements OnInit {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     @Input()
     public isImage: boolean = false;
@@ -33,22 +33,22 @@ export class ThemeAssetDirective extends Destroyable implements OnInit {
     private isTriedThemeDefault: boolean;
     private subscription: Subscription;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(element: ElementRef, protected theme: ThemeService) {
         super();
         this.element = ViewUtil.parseElement(element.nativeElement);
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected getSource(id: string): string {
         if (!id) {
@@ -63,11 +63,11 @@ export class ThemeAssetDirective extends Destroyable implements OnInit {
         return Assets.getIcon(id, this.extension);
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Event Handlers
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     @HostListener('error', ['$event'])
     private errorLoadingHandler(event: ErrorEvent): void {
@@ -83,11 +83,11 @@ export class ThemeAssetDirective extends Destroyable implements OnInit {
         this.commitSourceProperties();
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Protected Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected updateSourceProperties(): void {
         this.source = this.getSource(this.getSourceId(this.theme.theme));
@@ -106,11 +106,11 @@ export class ThemeAssetDirective extends Destroyable implements OnInit {
 
     protected commitSourceProperties(): void {}
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public ngOnInit(): void {
         if (this.theme.theme) {

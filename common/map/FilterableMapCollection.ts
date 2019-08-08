@@ -4,20 +4,20 @@ import { DestroyableMapCollection } from './DestroyableMapCollection';
 import { ArrayUtil } from '../util';
 
 export class FilterableMapCollection<U extends Destroyable> extends DestroyableMapCollection<U> {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected _filters: Array<(U) => boolean>;
     protected _filtered: Array<U>;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(uidPropertyName: keyof U) {
         super(uidPropertyName);
@@ -25,11 +25,11 @@ export class FilterableMapCollection<U extends Destroyable> extends DestroyableM
         this._filtered = [];
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected filter(item: U): boolean {
         if (_.isEmpty(this._filters)) {
@@ -38,11 +38,11 @@ export class FilterableMapCollection<U extends Destroyable> extends DestroyableM
         return this._filters.every(filter => filter(item));
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public clear(): void {
         ArrayUtil.clear(this._filtered);
@@ -85,11 +85,11 @@ export class FilterableMapCollection<U extends Destroyable> extends DestroyableM
         this._filtered = null;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get filtered(): Array<U> {
         return this._filtered;

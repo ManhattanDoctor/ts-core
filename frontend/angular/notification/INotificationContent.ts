@@ -6,31 +6,31 @@ import { INotification } from './INotification';
 import { NotificationConfig } from './NotificationConfig';
 
 export abstract class INotificationContent<T = any> extends DestroyableContainer implements AfterViewInit {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected timer: any;
     protected _config: NotificationConfig<T>;
     protected _notification: INotification<T>;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(public container: ViewContainerRef) {
         super();
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected commitNotificationProperties(): void {
         this.config = this.notification.config;
@@ -54,11 +54,11 @@ export abstract class INotificationContent<T = any> extends DestroyableContainer
         this.handleCloseClick();
     };
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public close(): void {
         if (this.notification) {
@@ -85,11 +85,11 @@ export abstract class INotificationContent<T = any> extends DestroyableContainer
         this.notification = null;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Event Handlers
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public ngAfterViewInit(): void {
         this.emit(WindowEvent.CONTENT_READY);
@@ -104,11 +104,11 @@ export abstract class INotificationContent<T = any> extends DestroyableContainer
         }
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Proxy Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get data(): T {
         return this.config ? this.config.data : null;
@@ -118,11 +118,11 @@ export abstract class INotificationContent<T = any> extends DestroyableContainer
         return this.notification ? this.notification.events : null;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get notification(): INotification {
         return this._notification;

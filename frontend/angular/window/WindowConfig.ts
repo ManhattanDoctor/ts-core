@@ -4,11 +4,11 @@ import { destroyIfCan, IDestroyable } from '../../../common';
 import { ViewUtil } from '../util';
 
 export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestroyable {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public id: string;
     public isResizeable: boolean = false;
@@ -52,11 +52,11 @@ export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestro
     protected _elementMinHeight: number = NaN;
     protected _elementMaxHeight: number = NaN;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(isModal: boolean = false, isResizeable: boolean = false, width: number = NaN, height: number = NaN) {
         super();
@@ -73,11 +73,11 @@ export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestro
         }
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public setDefaultProperties(): void {
         this.width = this.elementWidth;
@@ -118,11 +118,11 @@ export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestro
         this.data = null;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get isModal(): boolean {
         return this._isModal;

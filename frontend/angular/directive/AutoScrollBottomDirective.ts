@@ -4,11 +4,11 @@ import { InfiniteScrollDirective } from './InfiniteScrollDirective';
     selector: '[vi-auto-scroll-bottom]'
 })
 export class AutoScrollBottomDirective extends InfiniteScrollDirective {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     @Output()
     public triggerChanged: EventEmitter<void> = new EventEmitter<void>();
@@ -23,11 +23,11 @@ export class AutoScrollBottomDirective extends InfiniteScrollDirective {
     private isNeedScroll: boolean = true;
     private isNeedRemainScroll: boolean = false;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected initialize(): void {
         if (!this._scrollValue) this._scrollValue = this.scrollHeight;
@@ -55,11 +55,11 @@ export class AutoScrollBottomDirective extends InfiniteScrollDirective {
         this.scrollTo(this.scrollHeight);
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Event Handlers
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected scrollChangedHandler() {
         super.scrollChangedHandler();
@@ -74,11 +74,11 @@ export class AutoScrollBottomDirective extends InfiniteScrollDirective {
         if (this.isNeedRemainScroll) this.lastScrollHeight = this.scrollHeight;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public destroy(): void {
         super.destroy();
@@ -88,11 +88,11 @@ export class AutoScrollBottomDirective extends InfiniteScrollDirective {
         this.trigger = null;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     @Input('vi-auto-bottom-scroll')
     public set trigger(value: number) {

@@ -4,11 +4,11 @@ import { Destroyable } from '../../Destroyable';
 import { IQuestion, IQuestionOptions, QuestionMode } from './IQuestion';
 
 export class QuestionManager extends Destroyable implements IQuestion {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public text: string;
     public mode: QuestionMode;
@@ -24,11 +24,11 @@ export class QuestionManager extends Destroyable implements IQuestion {
     protected _closePromise: PromiseHandler<void, void>;
     protected _yesNotPromise: PromiseHandler<void, void>;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(options?: IQuestionOptions) {
         super();
@@ -49,11 +49,11 @@ export class QuestionManager extends Destroyable implements IQuestion {
         this.mode = this.options.mode;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Event Handlers
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public closeClickHandler(): void {
         this._closePromise.resolve();
@@ -69,11 +69,11 @@ export class QuestionManager extends Destroyable implements IQuestion {
         this.closeClickHandler();
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public destroy(): void {
         this.notClickHandler();
@@ -81,11 +81,11 @@ export class QuestionManager extends Destroyable implements IQuestion {
         this._closePromise = null;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Interface Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get yesNotPromise(): Promise<void> {
         return this._yesNotPromise.promise;
@@ -95,11 +95,11 @@ export class QuestionManager extends Destroyable implements IQuestion {
         return this._closePromise.promise;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get isInfo(): boolean {
         return this.mode === QuestionMode.INFO;

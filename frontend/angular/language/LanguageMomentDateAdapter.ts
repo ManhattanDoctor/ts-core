@@ -3,11 +3,11 @@ import { LoadableEvent } from '../../../common';
 import { LanguageService } from './LanguageService';
 
 export class LanguageMomentDateAdapter extends MomentDateAdapter {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(language: LanguageService) {
         super(language.locale);

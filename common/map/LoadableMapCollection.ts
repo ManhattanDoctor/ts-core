@@ -4,11 +4,11 @@ import { ObservableData } from '../observer';
 import { DestroyableMapCollection } from './DestroyableMapCollection';
 
 export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollection<U> {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected _isDirty: boolean = false;
     protected _isLoading: boolean = false;
@@ -21,11 +21,11 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
     protected subscription: Subscription;
     protected observer: Subject<ObservableData<LoadableEvent | LoadableMapCollectionEvent, V>>;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(uidPropertyName: keyof U) {
         super(uidPropertyName);
@@ -33,11 +33,11 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
         this.reloadHandler = this.reload.bind(this);
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Protected Abstract Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected abstract parseItem(item: any): U;
 
@@ -61,11 +61,11 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
         this.observer.next(new ObservableData(LoadableMapCollectionEvent.MAP_LENGTH_CHANGED));
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public reload(): void {
         if (this.reloadTimer) {
@@ -129,11 +129,11 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
         this.observer = null;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get events(): Observable<ObservableData<LoadableEvent | LoadableMapCollectionEvent, V>> {
         return this.observer.asObservable();

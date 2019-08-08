@@ -4,11 +4,11 @@ import { QuestionManager } from '../../question/QuestionManager';
 import { ViewUtil } from '../../util';
 
 export abstract class NotificationQuestionBaseComponent extends INotificationContent<QuestionManager> {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Protected Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected commitConfigProperties(): void {
         super.commitConfigProperties();
@@ -24,11 +24,11 @@ export abstract class NotificationQuestionBaseComponent extends INotificationCon
         });
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Event Handlers
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     @HostListener('click')
     public clickHandler(): void {
@@ -37,11 +37,11 @@ export abstract class NotificationQuestionBaseComponent extends INotificationCon
         }
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Protected Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected get isInfo(): boolean {
         return this.data ? this.data.isInfo : false;

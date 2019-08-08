@@ -8,11 +8,11 @@ import { ObjectUtil } from '../../../common/util';
 import { ILanguageTranslator, LanguageTranslatorEvent } from './ILanguageTranslator';
 
 export class LanguageTranslator extends DestroyableContainer implements ILanguageTranslator {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private linkSymbol: string = '⇛';
     private locale: LocaleContainer;
@@ -20,11 +20,11 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
 
     private observer: Subject<ObservableData<LanguageTranslatorEvent, ExtendedError>>;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor() {
         super();
@@ -33,11 +33,11 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
         this.addDestroyable(this.locales);
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private getLink(text: string): string {
         if (_.isNil(text) || _.isNil(this.linkSymbol) || text.indexOf(this.linkSymbol) !== 0) {
@@ -50,11 +50,11 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
         return !_.isNil(params) ? key + '_' + JSON.stringify(ObjectUtil.sortKeys(params)) : key;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public translate(key: string, params?: any): string {
         if (_.isNil(key)) {
@@ -105,11 +105,11 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
         return this.locale.isHasTranslation(key);
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get events(): Observable<ObservableData<LanguageTranslatorEvent, Error>> {
         return this.observer.asObservable();
@@ -117,20 +117,20 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
 }
 
 export class LocaleContainer extends IDestroyable {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private formatter: any;
     public translations: Map<string, string>;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(public locale: string, public rawTranslation: any) {
         super();
@@ -138,11 +138,11 @@ export class LocaleContainer extends IDestroyable {
         this.translations = new Map();
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public translate(key: string, params?: any): string {
         return this.compile(_.get(this.rawTranslation, key), params);

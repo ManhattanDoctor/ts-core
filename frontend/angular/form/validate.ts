@@ -2,11 +2,11 @@ import { AbstractControl, AsyncValidatorFn, Validator, ValidatorFn, Validators }
 import * as _ from 'lodash';
 import { of } from 'rxjs';
 
-//--------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 //
 //  Export Properties
 //
-//--------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 
 export type ValidationResult = { [validator: string]: string | boolean };
 export type ValidatorArray = Array<Validator | ValidatorFn>;

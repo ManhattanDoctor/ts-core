@@ -7,11 +7,11 @@ import { DateUtil } from '../../../common/util';
     name: 'viMomentTime'
 })
 export class MomentTimePipe implements PipeTransform {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public transform(time: number, isDigital?: boolean): string {
         return isDigital ? this.transformDigitalTime(time) : this.transformTime(time);
@@ -28,11 +28,11 @@ export class MomentTimePipe implements PipeTransform {
         return numeral(seconds).format('00:00:00');
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor() {}
 }

@@ -17,11 +17,11 @@ import { WindowFactory } from './WindowFactory';
 
 @Injectable()
 export class WindowService extends Destroyable {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public factory: WindowFactory<IWindow>;
     public questionComponent: ComponentType<IWindowContent>;
@@ -51,11 +51,11 @@ export class WindowService extends Destroyable {
 
     public topZIndex: number = 999;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(dialog: MatDialog, language: LanguageService, cookies: CookieService) {
         super();
@@ -76,11 +76,11 @@ export class WindowService extends Destroyable {
         */
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private sortFunction(first: IWindow, second: IWindow): number {
         let firstIndex = first.container ? parseInt(ViewUtil.getStyle(first.container.parentElement, 'zIndex'), 10) : -1;
@@ -145,11 +145,11 @@ export class WindowService extends Destroyable {
         return result;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Setters Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private add(config: WindowConfig, content: IWindowContent): void {
         this._windows.set(config, content);
@@ -213,11 +213,11 @@ export class WindowService extends Destroyable {
         config.setDefaultProperties();
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public open(component: ComponentType<IWindowContent>, config: WindowConfig): IWindowContent {
         let window = null;
@@ -316,11 +316,11 @@ export class WindowService extends Destroyable {
         this._windows = null;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Additional Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public info(translationId?: string, translation?: any, questionOptions?: IQuestionOptions, configOptions?: WindowConfigOptions): IQuestion {
         let text = this.language.translate(translationId, translation);
@@ -336,21 +336,21 @@ export class WindowService extends Destroyable {
         return this.open(this.questionComponent, config).config.data;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Private Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private get windowsArray(): Array<IWindow> {
         return Array.from(this.windows.values()).map(item => item.window);
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get events(): Observable<ObservableData<WindowServiceEvent, IWindow>> {
         return this.observer.asObservable();
@@ -362,21 +362,21 @@ export class WindowService extends Destroyable {
 }
 
 export class PropertiesManager extends Destroyable {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(private cookies: CookieService) {
         super();
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public load(name: string, config: WindowConfig): void {
         let item = this.cookies.getObject(name + 'Window') as any;

@@ -6,11 +6,11 @@ import { LanguageService } from './LanguageService';
 
 @Injectable()
 export class LanguageMatPaginatorIntl extends MatPaginatorIntl {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public lastPageLabel: string;
     public nextPageLabel: string;
@@ -20,11 +20,11 @@ export class LanguageMatPaginatorIntl extends MatPaginatorIntl {
 
     private subscription: Subscription;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(private language: LanguageService) {
         super();
@@ -37,11 +37,11 @@ export class LanguageMatPaginatorIntl extends MatPaginatorIntl {
         });
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private commitLanguageProperties(): void {
         this.lastPageLabel = this.language.translate('general.lastPage');
@@ -51,11 +51,11 @@ export class LanguageMatPaginatorIntl extends MatPaginatorIntl {
         this.itemsPerPageLabel = this.language.translate('general.itemsPerPage');
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public ngOnDestroy(): void {
         if (this.subscription) {

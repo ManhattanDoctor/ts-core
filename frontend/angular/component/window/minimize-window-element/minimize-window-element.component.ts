@@ -9,42 +9,42 @@ import { WindowElement } from '../WindowElement';
     template: ''
 })
 export class MinimizeWindowElementComponent extends WindowElement {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constants
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public static ICON_CLASS: string;
     public static ICON_MINIMIZE_VALUE: string;
     public static ICON_MAXIMIZE_VALUE: string;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(element: ElementRef) {
         super(element);
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private commitIconProperties = (): void => {
         let icon = this.window.isMinimized ? MinimizeWindowElementComponent.ICON_MAXIMIZE_VALUE : MinimizeWindowElementComponent.ICON_MINIMIZE_VALUE;
         ViewUtil.setProperty(this.nativeElement, 'innerHTML', icon);
     };
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Protected Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected commitWindowProperties(): void {
         super.commitWindowProperties();
@@ -77,11 +77,11 @@ export class MinimizeWindowElementComponent extends WindowElement {
         this.nativeElement.removeEventListener('click', this.mouseClickHandler, true);
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Event Handlers
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private mouseClickHandler = (event: MouseEvent): void => {
         event.stopPropagation();

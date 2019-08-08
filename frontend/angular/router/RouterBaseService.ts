@@ -6,11 +6,11 @@ import { ObservableData } from '../../../common/observer';
 import { NativeWindowService } from '../../service/NativeWindowService';
 
 export class RouterBaseService extends DestroyableContainer {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected map: Map<string, string>;
     protected observer: Subject<ObservableData<RouterBaseServiceEvent, void>>;
@@ -20,11 +20,11 @@ export class RouterBaseService extends DestroyableContainer {
 
     protected _isLoading: boolean = false;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(protected router: Router, protected window: NativeWindowService) {
         super();
@@ -35,11 +35,11 @@ export class RouterBaseService extends DestroyableContainer {
         this.initializeObservers();
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected initializeObservers(): void {
         this.addSubscription(
@@ -86,11 +86,11 @@ export class RouterBaseService extends DestroyableContainer {
         }
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public navigate(url: string, extras?: NavigationExtras): void {
         let params = {} as NavigationExtras;
@@ -119,11 +119,11 @@ export class RouterBaseService extends DestroyableContainer {
         location.reload();
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Param Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public getParams(): any {
         let params = {} as any;
@@ -172,11 +172,11 @@ export class RouterBaseService extends DestroyableContainer {
         return this.map.size > 0;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Url Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get url(): string {
         return this.router.url;

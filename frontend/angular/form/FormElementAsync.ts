@@ -5,19 +5,19 @@ import { AsyncValidatorArray, message, validate, ValidationResult, ValidatorArra
 import { ValueAccessor } from './ValueAccessor';
 
 export abstract class FormElementAsync<T> extends ValueAccessor<T> {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected abstract model: NgModel;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(private validators: ValidatorArray, private asyncValidators: AsyncValidatorArray) {
         super();

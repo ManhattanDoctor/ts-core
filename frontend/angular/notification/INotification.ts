@@ -3,11 +3,11 @@ import { INotificationContent } from './INotificationContent';
 import { NotificationConfig } from './NotificationConfig';
 
 export abstract class INotification<T = any> {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     abstract getX(): number;
     abstract getY(): number;
@@ -27,11 +27,11 @@ export abstract class INotification<T = any> {
 
     abstract emit(event: string): void;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Interface Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     readonly events: Observable<string>;
     readonly container: HTMLElement;

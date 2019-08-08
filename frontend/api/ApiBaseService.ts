@@ -10,19 +10,19 @@ import { ApiResponse } from './ApiResponse';
 import { IApiRequestConfig } from './IApiRequestConfig';
 
 export abstract class ApiBaseService extends Destroyable {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Static Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public static IDLE_TIMEOUT = 30000;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Private Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public sid: string;
 
@@ -33,22 +33,22 @@ export abstract class ApiBaseService extends Destroyable {
     protected defaultMethod: ApiMethod = ApiMethod.POST;
     protected observer: Subject<ObservableData<LoadableEvent, ApiRequest | ApiResponse>>;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected constructor() {
         super();
         this.observer = new Subject();
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Protected Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected sendRequest(request: ApiRequest, resolve?: any, reject?: any, observer?: any): void {
         this._isLoading = true;
@@ -129,11 +129,11 @@ export abstract class ApiBaseService extends Destroyable {
         return value;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Create Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected abstract createUrlForRequest(request: ApiRequest, method: ApiMethod): string;
 
@@ -141,21 +141,21 @@ export abstract class ApiBaseService extends Destroyable {
 
     protected abstract createHeadersForRequest(request: ApiRequest, method: ApiMethod, body: HttpParams): HttpHeaders;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Parse Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected abstract parseResponse<T>(data: any, request: ApiRequest): ApiResponse<T>;
 
     protected abstract parseErrorResponse<T>(error: HttpErrorResponse, request: ApiRequest): ApiResponse<T>;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public async send<T>(param: IApiRequestConfig): Promise<ApiResponse<T>> {
         if (_.isNil(param.isHandleLoading)) {
@@ -187,11 +187,11 @@ export abstract class ApiBaseService extends Destroyable {
         this.observer = null;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get isLoading(): boolean {
         return this._isLoading;

@@ -5,21 +5,21 @@ import { LoggerWrapper } from '../../../common/logger';
 import { ILogger } from '../../../common/logger';
 
 export abstract class DefaultController<U, V> extends LoggerWrapper {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected constructor(logger: ILogger) {
         super(logger);
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected async execute(params: U): Promise<V> {
         throw new ExtendedError('Method must be implemented', HttpStatus.NOT_IMPLEMENTED);
@@ -29,11 +29,11 @@ export abstract class DefaultController<U, V> extends LoggerWrapper {
         throw new ExtendedError('Method must be implemented', HttpStatus.NOT_IMPLEMENTED);
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Protected Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected async validateRequest(value: U): Promise<U> {
         let errors: Array<ValidationError> = await validate(value, this.validatorOptions);

@@ -15,11 +15,11 @@ import { LanguageTranslator } from './LanguageTranslator';
 
 @Injectable()
 export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private url: string;
     private isInitialized: boolean;
@@ -32,11 +32,11 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     public filePrefixes: Array<string> = ['.json', 'Custom.json'];
     public cookieStorageName: string = 'vi-language';
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(private http: HttpClient, private cookies: CookieService) {
         super();
@@ -51,11 +51,11 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
         */
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private load(locale?: string | Language): void {
         if (locale instanceof Language) {
@@ -104,11 +104,11 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
         this.observer.next(new ObservableData(LoadableEvent.FINISHED, language));
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public initialize(url: string, languages: MapCollection<Language>): void {
         if (this.isInitialized) {
@@ -153,11 +153,11 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
         this._rawTranslation = null;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get translator(): ILanguageTranslator {
         return this._translator;

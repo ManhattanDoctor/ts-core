@@ -8,19 +8,19 @@ import { ViewUtil } from '../util';
     selector: '[vi-aspect-ratio]'
 })
 export class AspectRatioResizeDirective extends DestroyableContainer implements AfterViewInit {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Static Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected static UPDATE_DELAY: number = 100;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private _ratio: number = NaN;
     private _direction: Direction;
@@ -28,22 +28,22 @@ export class AspectRatioResizeDirective extends DestroyableContainer implements 
     private sensor: ResizeManager;
     private element: HTMLElement;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(element: ElementRef) {
         super();
         this.element = ViewUtil.parseElement(element.nativeElement);
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private commitResizeProperties = (): void => {
         switch (this.direction) {
@@ -56,11 +56,11 @@ export class AspectRatioResizeDirective extends DestroyableContainer implements 
         }
     };
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public ngAfterViewInit(): void {
         this.sensor = new ResizeManager(this.element, this.commitResizeProperties, AspectRatioResizeDirective.UPDATE_DELAY);
@@ -83,11 +83,11 @@ export class AspectRatioResizeDirective extends DestroyableContainer implements 
         }
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Private Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     private get width(): number {
         return ViewUtil.getWidth(this.element);
@@ -105,11 +105,11 @@ export class AspectRatioResizeDirective extends DestroyableContainer implements 
         ViewUtil.setHeight(this.element, value, true);
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     @Input('vi-aspect-ratio')
     public set direction(value: Direction) {

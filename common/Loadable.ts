@@ -3,22 +3,22 @@ import { DestroyableContainer } from './DestroyableContainer';
 import { ObservableData } from './observer';
 
 export abstract class Loadable<U, V> extends DestroyableContainer {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected _status: LoadableStatus;
     protected observer: Subject<ObservableData<U | LoadableEvent, V>>;
 
     protected isDestroyed: boolean;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected constructor() {
         super();
@@ -26,32 +26,32 @@ export abstract class Loadable<U, V> extends DestroyableContainer {
         this.observer = new Subject();
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected commitStatusChangedProperties(oldStatus: LoadableStatus, newStatus: LoadableStatus): void {
         this.observer.next(new ObservableData(LoadableEvent.STATUS_CHANGED));
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public destroy(): void {
         this.observer = null;
         this.isDestroyed = true;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Private Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected get status(): LoadableStatus {
         return this._status;
@@ -64,11 +64,11 @@ export abstract class Loadable<U, V> extends DestroyableContainer {
         this._status = value;
         this.commitStatusChangedProperties(oldValue, value);
     }
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get events(): Observable<ObservableData<U | LoadableEvent, V>> {
         return this.observer.asObservable();
