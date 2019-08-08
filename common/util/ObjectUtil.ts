@@ -16,6 +16,9 @@ export class ObjectUtil {
     }
 
     public static hasOwnProperties<T = any>(data: T, properties: Array<keyof T | string>): boolean {
+        if (_.isNil(data)) {
+            return false;
+        }
         let existProperties = ObjectUtil.getProperties(data);
         return _.every(properties, property => existProperties.includes(property));
     }

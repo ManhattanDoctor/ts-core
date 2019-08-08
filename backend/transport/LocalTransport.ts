@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
-import * as util from 'util';
 import { Subject } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
+import * as util from 'util';
 import { ExtendedError } from '../../common/error';
 import { ILogger } from '../../common/logger';
 import { ITransportCommand, ITransportCommandOptions, ITransportEvent } from './ITransport';
@@ -38,6 +38,14 @@ export class LocalTransport extends Transport {
 
     //--------------------------------------------------------------------------
     //
+    //  Private Methods
+    //
+    //--------------------------------------------------------------------------
+
+    private 
+
+    //--------------------------------------------------------------------------
+    //
     //  Public Methods
     //
     //--------------------------------------------------------------------------
@@ -47,7 +55,7 @@ export class LocalTransport extends Transport {
         let listener = this.listeners.get(name);
         this.debug(`→ ${name} (${command.id})`);
         if (!_.isNil(command.request)) {
-            this.verbose(`${util.inspect(command.request, { showHidden: false, depth: null })}`);
+            this.verbose(`→ ${util.inspect(command.request, { showHidden: false, depth: null })}`);
         }
 
         if (!_.isNil(listener)) {
@@ -75,9 +83,7 @@ export class LocalTransport extends Transport {
     public response<U, V>(command: ITransportCommand<U, V>, result?: V | ExtendedError | Error | void): void {
         let name = command.name;
         this.debug(`← ${name} (${command.id})`);
-        if (!_.isNil(result)) {
-            this.verbose(`${util.inspect(result, { showHidden: false, depth: null })}`);
-        }
+        this.verbose(`← ${!_.isNil(result) ? util.inspect(result, { showHidden: false, depth: null }) : 'Nil'}`);
 
         try {
             command.response(result);

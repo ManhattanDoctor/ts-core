@@ -27,10 +27,6 @@ export class SettingsBaseService extends AbstractSettingsStorage implements IDes
         return UrlUtil.parseUrl(value);
     }
 
-    public static parseBoolean(value: any): boolean {
-        return value === 'true' || value === true;
-    }
-
     //--------------------------------------------------------------------------
     //
     //	Private Properties

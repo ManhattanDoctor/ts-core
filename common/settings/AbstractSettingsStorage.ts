@@ -8,6 +8,10 @@ export abstract class AbstractSettingsStorage {
     //
     //--------------------------------------------------------------------------
 
+    public static parseBoolean(value: any): boolean {
+        return value === true || value === 'true' || value === 'TRUE' || value === 1 || value === '1';
+    }
+
     private static parseValue<T>(value: any, defaultValue: T): T {
         if (!_.isNil(value) && _.isNumber(defaultValue)) {
             return parseFloat(value.toString()) as any;
