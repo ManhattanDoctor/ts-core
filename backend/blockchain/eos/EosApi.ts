@@ -23,8 +23,6 @@ export class EosApi {
     constructor(settings: IEosApiSettings) {
         this.signature = new JsSignatureProvider(settings.privateKeys || []);
 
-        console.log(settings);
-        
         this.api = new Api({
             rpc: new JsonRpc(settings.endpoint, { fetch }),
             chainId: settings.chainId,
@@ -63,6 +61,7 @@ export interface IEosApiTransactionOptions {
     blocksBehind?: number;
     expireSeconds?: number;
 }
+
 export interface IEosApiSettings {
     endpoint: string;
     chainId?: string;

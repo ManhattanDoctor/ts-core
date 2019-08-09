@@ -1,7 +1,7 @@
 import { DynamicModule, Global, Provider } from '@nestjs/common';
 import { ExtendedError } from '../../../common/error';
 import { Logger } from '../../../common/logger';
-import { LocalTransport, Transport } from '../../transport';
+import { LocalTransport, Transport } from '../../../common/transport';
 import { LoggerModule } from '../logger';
 
 @Global()

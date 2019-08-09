@@ -1,23 +1,25 @@
-import { Observable } from 'rxjs/internal/Observable';
-import { ExtendedError } from '../../common/error';
+import { Observable } from 'rxjs';
+import { ExtendedError } from '../error';
 
 export interface ITransport {
-    send<U, V>(command: ITransportCommand<U, V>): void;
-    sendListen<U, V>(command: ITransportCommand<U, V>, options?: ITransportCommandOptions): Promise<V>;
+    send<U>(command: ITransportCommand<U>): void;
+    sendListen<U, V>(command: ITransportAsyncCommand<U, V>, options?: ITransportCommandOptions): Promise<V>;
 
-    wait<U, V>(command: ITransportCommand<U, V>): void;
+    wait<U>(command: ITransportCommand<U>): void;
     listen<U>(name: string): Observable<U>;
-    response<U, V>(command: ITransportCommand<U, V>, result?: V | ExtendedError | Error | void): void;
+    complete<U, V>(command: ITransportCommand<U>, result?: V | ExtendedError): void;
 
     dispatch<T>(event: ITransportEvent<T>): void;
     getDispatcher<T>(name: string): Observable<T>;
 }
 
-export interface ITransportCommand<U, V> {
+export interface ITransportCommand<U> {
     readonly id: string;
     readonly name: string;
     readonly request?: U;
+}
 
+export interface ITransportAsyncCommand<U, V> extends ITransportCommand<U> {
     readonly data: V;
     readonly error?: ExtendedError;
     response(value: V | ExtendedError | Error | void): void;

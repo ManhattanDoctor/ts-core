@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
-import { Subject } from 'rxjs';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable, Subject } from 'rxjs';
 import * as util from 'util';
-import { ExtendedError } from '../../common/error';
-import { ILogger } from '../../common/logger';
-import { ITransportCommand, ITransportCommandOptions, ITransportEvent } from './ITransport';
+import { ExtendedError } from '../error';
+import { ILogger } from '../logger';
+import { ObjectUtil } from '../util';
+import { ITransportAsyncCommand, ITransportCommand, ITransportCommandOptions, ITransportEvent } from './ITransport';
 import { Transport } from './Transport';
 
 export class LocalTransport extends Transport {
@@ -18,7 +18,7 @@ export class LocalTransport extends Transport {
     private dispatchers: Map<string, Subject<any>>;
 
     private promises: Map<string, IPromise>;
-    private pendingCommands: Map<string, Array<ITransportCommand<any, any>>>;
+    private pendingCommands: Map<string, Array<ITransportCommand<any>>>;
 
     // --------------------------------------------------------------------------
     //
@@ -38,19 +38,11 @@ export class LocalTransport extends Transport {
 
     // --------------------------------------------------------------------------
     //
-    //  Private Methods
-    //
-    // --------------------------------------------------------------------------
-
-    private 
-
-    // --------------------------------------------------------------------------
-    //
     //  Public Methods
     //
     // --------------------------------------------------------------------------
 
-    public send<U, V>(command: ITransportCommand<U, V>): void {
+    public send<U>(command: ITransportCommand<U>): void {
         let name = command.name;
         let listener = this.listeners.get(name);
         this.debug(`→ ${name} (${command.id})`);
@@ -70,47 +62,48 @@ export class LocalTransport extends Transport {
             this.pendingCommands.set(name, []);
         }
         this.pendingCommands.get(name).push(command);
-        this.verbose(`No listener for command "${command.name}: added to pending list"`);
+        this.verbose(`No listener for command ${command.name}: added to pending list`);
     }
 
-    public sendListen<U, V>(command: ITransportCommand<U, V>, options?: ITransportCommandOptions): Promise<V> {
+    public sendListen<U, V>(command: ITransportAsyncCommand<U, V>, options?: ITransportCommandOptions): Promise<V> {
         return new Promise<V>((resolve, reject) => {
             this.promises.set(command.id, { resolve, reject });
             this.send(command);
         });
     }
 
-    public response<U, V>(command: ITransportCommand<U, V>, result?: V | ExtendedError | Error | void): void {
+    public complete<U, V>(command: ITransportCommand<U>, result?: V | ExtendedError | Error): void {
+        if (!ObjectUtil.instanceOf(command, ['response'])) {
+            return;
+        }
+
         let name = command.name;
+        let async = command as ITransportAsyncCommand<any, any>;
+
         this.debug(`← ${name} (${command.id})`);
         this.verbose(`← ${!_.isNil(result) ? util.inspect(result, { showHidden: false, depth: null }) : 'Nil'}`);
 
-        try {
-            command.response(result);
-        } catch (error) {
-            command.response(error);
-        }
-
+        async.response(result);
         let promise = this.promises.get(command.id);
         if (_.isNil(promise)) {
             return;
         }
 
-        if (!_.isNil(command.error)) {
-            promise.reject(command.error);
+        if (!_.isNil(async.error)) {
+            promise.reject(async.error);
         } else {
-            promise.resolve(command.data);
+            promise.resolve(async.data);
         }
-        this.promises.delete(command.id);
+        this.promises.delete(async.id);
     }
 
-    public wait<U, V>(command: ITransportCommand<U, V>): void {
+    public wait<U, V>(command: ITransportCommand<U>): void {
         throw new ExtendedError(`Method doesn't implemented`);
     }
 
     public listen<U>(name: string): Observable<U> {
         if (this.listeners.has(name)) {
-            throw new ExtendedError(`Command "${name}" already listening`);
+            throw new ExtendedError(`Command ${name} already listening`);
         }
         let item = new Subject<U>();
         this.listeners.set(name, item);
@@ -122,7 +115,7 @@ export class LocalTransport extends Transport {
                 clearTimeout(timeout);
             });
         }
-        this.debug(`Start listening "${name}" command`);
+        this.debug(`Start listening ${name} command`);
         return item.asObservable();
     }
 

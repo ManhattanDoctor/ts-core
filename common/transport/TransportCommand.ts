@@ -1,10 +1,10 @@
 import { Exclude, Expose } from 'class-transformer';
 import * as uuid from 'uuid';
-import { ExtendedError } from '../../common/error';
-import { ObjectUtil } from '../../common/util';
-import { ITransportCommand } from './ITransport';
+import { ExtendedError } from '../error';
+import { ObjectUtil } from '../util';
+import { ITransportAsyncCommand } from './ITransport';
 
-export class TransportCommand<U, V> implements ITransportCommand<U, V> {
+export class TransportCommand<U, V> implements ITransportAsyncCommand<U, V> {
     // --------------------------------------------------------------------------
     //
     //  Properties

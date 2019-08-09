@@ -15,6 +15,7 @@
         "@types/node": "12.0.3",
         "dotenv": "8.0.0",
         "eosjs": "20.0.0",
+        "web3": "1.0.0-beta.37",
         "node-fetch": "2.6.0",
         "typeorm": "0.2.17",
         "util": "0.12.0"

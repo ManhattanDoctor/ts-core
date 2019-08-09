@@ -1,7 +1,8 @@
 import * as _ from 'lodash';
+import { IDestroyable } from '../IDestroyable';
 import { ILogger, LoggerLevel } from './ILogger';
 
-export class LoggerWrapper implements ILogger {
+export class LoggerWrapper implements ILogger, IDestroyable {
     // --------------------------------------------------------------------------
     //
     //  Properties
