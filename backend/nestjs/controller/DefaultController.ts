@@ -1,8 +1,8 @@
-import { BadRequestException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
 import { validate, ValidationError, ValidatorOptions } from 'class-validator';
+import * as _ from 'lodash';
 import { ExtendedError } from '../../../common/error';
-import { LoggerWrapper } from '../../../common/logger';
-import { ILogger } from '../../../common/logger';
+import { ILogger, LoggerWrapper } from '../../../common/logger';
 
 export abstract class DefaultController<U, V> extends LoggerWrapper {
     // --------------------------------------------------------------------------
@@ -36,10 +36,9 @@ export abstract class DefaultController<U, V> extends LoggerWrapper {
     // --------------------------------------------------------------------------
 
     protected async validateRequest(value: U): Promise<U> {
-        let errors: Array<ValidationError> = await validate(value, this.validatorOptions);
-        if (errors && errors.length > 0) {
-            this.error(`Unable to make request`, errors.toString());
-            throw new BadRequestException(errors.toString());
+        let items: Array<ValidationError> = await validate(value, this.validatorOptions);
+        if (!_.isEmpty(items)) {
+            throw new ExtendedError(items.toString(), HttpStatus.BAD_REQUEST, items);
         }
         return value;
     }
@@ -48,14 +47,10 @@ export abstract class DefaultController<U, V> extends LoggerWrapper {
         return { validationError: { target: false } };
     }
 
-    protected async validateResponse(value: V, logMessage?: string): Promise<V> {
-        let errors: Array<ValidationError> = await validate(value, this.validatorOptions);
-        if (errors && errors.length > 0) {
-            this.error(`Unable to make response`, errors.toString());
-            throw new InternalServerErrorException(errors.toString());
-        }
-        if (logMessage) {
-            this.log(logMessage);
+    protected async validateResponse(value: V): Promise<V> {
+        let items: Array<ValidationError> = await validate(value, this.validatorOptions);
+        if (!_.isEmpty(items)) {
+            throw new ExtendedError(items.toString(), HttpStatus.INTERNAL_SERVER_ERROR, items);
         }
         return value;
     }

@@ -3,8 +3,9 @@ import { Observable, Subject } from 'rxjs';
 import * as util from 'util';
 import { ExtendedError } from '../error';
 import { ILogger } from '../logger';
+import { PromiseHandler } from '../promise';
 import { ObjectUtil } from '../util';
-import { ITransportAsyncCommand, ITransportCommand, ITransportCommandOptions, ITransportEvent } from './ITransport';
+import { ITransportCommandAsync, ITransportCommand, ITransportCommandOptions, ITransportEvent } from './ITransport';
 import { Transport } from './Transport';
 
 export class LocalTransport extends Transport {
@@ -17,8 +18,7 @@ export class LocalTransport extends Transport {
     private listeners: Map<string, Subject<any>>;
     private dispatchers: Map<string, Subject<any>>;
 
-    private promises: Map<string, IPromise>;
-    private pendingCommands: Map<string, Array<ITransportCommand<any>>>;
+    private promises: Map<string, PromiseHandler>;
 
     // --------------------------------------------------------------------------
     //
@@ -30,7 +30,6 @@ export class LocalTransport extends Transport {
         super(logger, context);
 
         this.promises = new Map();
-        this.pendingCommands = new Map();
 
         this.listeners = new Map();
         this.dispatchers = new Map();
@@ -50,26 +49,20 @@ export class LocalTransport extends Transport {
             this.verbose(`→ ${util.inspect(command.request, { showHidden: false, depth: null })}`);
         }
 
-        if (!_.isNil(listener)) {
-            let timeout = setTimeout(() => {
-                listener.next(command);
-                clearTimeout(timeout);
-            });
-            return;
+        if (_.isNil(listener)) {
+            throw new ExtendedError(`No listener for command ${command.name}`);
         }
-
-        if (!this.pendingCommands.has(name)) {
-            this.pendingCommands.set(name, []);
-        }
-        this.pendingCommands.get(name).push(command);
-        this.verbose(`No listener for command ${command.name}: added to pending list`);
+        listener.next(command);
     }
 
-    public sendListen<U, V>(command: ITransportAsyncCommand<U, V>, options?: ITransportCommandOptions): Promise<V> {
-        return new Promise<V>((resolve, reject) => {
-            this.promises.set(command.id, { resolve, reject });
+    public sendListen<U, V>(command: ITransportCommandAsync<U, V>, options?: ITransportCommandOptions): Promise<V> {
+        let item = this.promises.get(command.id);
+        if (!item) {
+            item = PromiseHandler.create();
+            this.promises.set(command.id, item);
             this.send(command);
-        });
+        }
+        return item.promise;
     }
 
     public complete<U, V>(command: ITransportCommand<U>, result?: V | ExtendedError | Error): void {
@@ -78,7 +71,7 @@ export class LocalTransport extends Transport {
         }
 
         let name = command.name;
-        let async = command as ITransportAsyncCommand<any, any>;
+        let async = command as ITransportCommandAsync<any, any>;
 
         this.debug(`← ${name} (${command.id})`);
         this.verbose(`← ${!_.isNil(result) ? util.inspect(result, { showHidden: false, depth: null }) : 'Nil'}`);
@@ -97,7 +90,7 @@ export class LocalTransport extends Transport {
         this.promises.delete(async.id);
     }
 
-    public wait<U, V>(command: ITransportCommand<U>): void {
+    public wait<U>(command: ITransportCommand<U>): void {
         throw new ExtendedError(`Method doesn't implemented`);
     }
 
@@ -108,13 +101,6 @@ export class LocalTransport extends Transport {
         let item = new Subject<U>();
         this.listeners.set(name, item);
 
-        let commands = this.pendingCommands.get(name);
-        if (!_.isEmpty(commands)) {
-            let timeout = setTimeout(() => {
-                _.forEach(commands, command => this.send(command));
-                clearTimeout(timeout);
-            });
-        }
         this.debug(`Start listening ${name} command`);
         return item.asObservable();
     }
@@ -135,9 +121,4 @@ export class LocalTransport extends Transport {
         }
         return item.asObservable();
     }
-}
-
-export interface IPromise {
-    readonly resolve: (result?: any) => void;
-    readonly reject: (error?: Error | string) => void;
 }

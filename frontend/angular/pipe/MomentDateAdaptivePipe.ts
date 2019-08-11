@@ -45,12 +45,4 @@ export class MomentDateAdaptivePipe implements PipeTransform {
         }
         return item.format(format);
     }
-
-    // --------------------------------------------------------------------------
-    //
-    //	Constructor
-    //
-    // --------------------------------------------------------------------------
-
-    constructor() {}
 }

@@ -49,7 +49,7 @@ export class ObjectUtil {
             return false;
         }
         for (let name of properties) {
-            if (!(name in data)) {
+            if (_.isUndefined(data[name])) {
                 return false;
             }
         }

@@ -3,7 +3,7 @@ import { ExtendedError } from '../error';
 
 export interface ITransport {
     send<U>(command: ITransportCommand<U>): void;
-    sendListen<U, V>(command: ITransportAsyncCommand<U, V>, options?: ITransportCommandOptions): Promise<V>;
+    sendListen<U, V>(command: ITransportCommandAsync<U, V>, options?: ITransportCommandOptions): Promise<V>;
 
     wait<U>(command: ITransportCommand<U>): void;
     listen<U>(name: string): Observable<U>;
@@ -19,10 +19,10 @@ export interface ITransportCommand<U> {
     readonly request?: U;
 }
 
-export interface ITransportAsyncCommand<U, V> extends ITransportCommand<U> {
+export interface ITransportCommandAsync<U, V> extends ITransportCommand<U> {
     readonly data: V;
     readonly error?: ExtendedError;
-    response(value: V | ExtendedError | Error | void): void;
+    response(value: V | ExtendedError | Error): void;
 }
 
 export interface ITransportCommandOptions {

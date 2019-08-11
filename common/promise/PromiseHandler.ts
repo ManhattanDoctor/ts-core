@@ -1,6 +1,6 @@
 import { IDestroyable } from '../IDestroyable';
 
-export class PromiseHandler<U = any, V = string> implements IDestroyable {
+export class PromiseHandler<U = any, V = any> implements IDestroyable {
     // --------------------------------------------------------------------------
     //
     // 	Static Methods

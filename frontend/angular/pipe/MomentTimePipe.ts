@@ -27,12 +27,4 @@ export class MomentTimePipe implements PipeTransform {
         let seconds = time / DateUtil.MILISECONDS_SECOND;
         return numeral(seconds).format('00:00:00');
     }
-
-    // --------------------------------------------------------------------------
-    //
-    //	Constructor
-    //
-    // --------------------------------------------------------------------------
-
-    constructor() {}
 }

@@ -2,7 +2,6 @@ import { DynamicModule, Global, Provider } from '@nestjs/common';
 import { ExtendedError } from '../../../common/error';
 import { Logger } from '../../../common/logger';
 import { LocalTransport, Transport } from '../../../common/transport';
-import { LoggerModule } from '../logger';
 
 @Global()
 export class TransportModule {
@@ -31,19 +30,11 @@ export class TransportModule {
 
         return {
             module: TransportModule,
-            imports: [LoggerModule],
+            imports: [],
             providers,
             exports: providers
         };
     }
-
-    // --------------------------------------------------------------------------
-    //
-    //  Constructor
-    //
-    // --------------------------------------------------------------------------
-
-    constructor() {}
 }
 
 export interface ITransportModuleSettings {

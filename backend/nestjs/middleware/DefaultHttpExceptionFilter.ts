@@ -1,4 +1,4 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, InternalServerErrorException } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
 import * as _ from 'lodash';
 import { ObjectUtil } from '../../../common/util';
 

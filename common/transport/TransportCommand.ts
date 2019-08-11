@@ -1,10 +1,8 @@
 import { Exclude, Expose } from 'class-transformer';
 import * as uuid from 'uuid';
-import { ExtendedError } from '../error';
-import { ObjectUtil } from '../util';
-import { ITransportAsyncCommand } from './ITransport';
+import { ITransportCommand } from './ITransport';
 
-export class TransportCommand<U, V> implements ITransportAsyncCommand<U, V> {
+export class TransportCommand<U> implements ITransportCommand<U> {
     // --------------------------------------------------------------------------
     //
     //  Properties
@@ -17,11 +15,6 @@ export class TransportCommand<U, V> implements ITransportAsyncCommand<U, V> {
     protected _name: string;
     @Exclude()
     protected _request: U;
-
-    @Exclude()
-    protected _data: V;
-    @Exclude()
-    protected _error: ExtendedError;
 
     // --------------------------------------------------------------------------
     //
@@ -43,40 +36,11 @@ export class TransportCommand<U, V> implements ITransportAsyncCommand<U, V> {
 
     // --------------------------------------------------------------------------
     //
-    //  Public Methods
-    //
-    // --------------------------------------------------------------------------
-
-    public response(value: V | ExtendedError | Error): void {
-        if (value instanceof ExtendedError || ObjectUtil.hasOwnProperties(value, ['code', 'message', 'details'])) {
-            this._error = value as ExtendedError;
-            return;
-        }
-
-        if (value instanceof Error) {
-            this._error = ExtendedError.create(value);
-            return;
-        }
-
-        try {
-            this.validateResponse(value);
-            this._error = null;
-            this._data = value;
-        } catch (error) {
-            this._error = ExtendedError.create(error);
-            this._data = null;
-        }
-    }
-
-    // --------------------------------------------------------------------------
-    //
     //  Protected Properties
     //
     // --------------------------------------------------------------------------
 
     protected validateRequest(value: U): void {}
-
-    protected validateResponse(value: V): void {}
 
     // --------------------------------------------------------------------------
     //
@@ -97,15 +61,5 @@ export class TransportCommand<U, V> implements ITransportAsyncCommand<U, V> {
     @Expose()
     public get request(): U {
         return this._request;
-    }
-
-    @Expose()
-    public get data(): V {
-        return this._data;
-    }
-
-    @Expose()
-    public get error(): ExtendedError {
-        return this._error;
     }
 }
