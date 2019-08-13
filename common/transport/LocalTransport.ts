@@ -5,7 +5,7 @@ import { ExtendedError } from '../error';
 import { ILogger } from '../logger';
 import { PromiseHandler } from '../promise';
 import { ObjectUtil } from '../util';
-import { ITransportCommandAsync, ITransportCommand, ITransportCommandOptions, ITransportEvent } from './ITransport';
+import { ITransportCommand, ITransportCommandAsync, ITransportCommandOptions, ITransportEvent } from './ITransport';
 import { Transport } from './Transport';
 
 export class LocalTransport extends Transport {
@@ -37,6 +37,16 @@ export class LocalTransport extends Transport {
 
     // --------------------------------------------------------------------------
     //
+    //  Private Methods
+    //
+    // --------------------------------------------------------------------------
+
+    private isCommandAsync<U>(command: ITransportCommand<U>): boolean {
+        return ObjectUtil.instanceOf(command, ['response']);
+    }
+
+    // --------------------------------------------------------------------------
+    //
     //  Public Methods
     //
     // --------------------------------------------------------------------------
@@ -44,7 +54,13 @@ export class LocalTransport extends Transport {
     public send<U>(command: ITransportCommand<U>): void {
         let name = command.name;
         let listener = this.listeners.get(name);
-        this.debug(`→ ${name} (${command.id})`);
+
+        if (this.isCommandAsync(command)) {
+            this.debug(`→ ${name} (${command.id})`);
+        } else {
+            this.debug(`↮ ${name}`);
+        }
+
         if (!_.isNil(command.request)) {
             this.verbose(`→ ${util.inspect(command.request, { showHidden: false, depth: null })}`);
         }
@@ -66,7 +82,7 @@ export class LocalTransport extends Transport {
     }
 
     public complete<U, V>(command: ITransportCommand<U>, result?: V | ExtendedError | Error): void {
-        if (!ObjectUtil.instanceOf(command, ['response'])) {
+        if (!this.isCommandAsync(command)) {
             return;
         }
 
