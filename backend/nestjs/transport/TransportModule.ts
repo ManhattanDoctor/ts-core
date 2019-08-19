@@ -1,7 +1,7 @@
 import { DynamicModule, Global, Provider } from '@nestjs/common';
 import { ExtendedError } from '../../../common/error';
 import { Logger } from '../../../common/logger';
-import { LocalTransport, Transport } from '../../../common/transport';
+import { Transport, TransportLocal } from '../../../common/transport';
 
 @Global()
 export class TransportModule {
@@ -20,7 +20,7 @@ export class TransportModule {
                     provide: Transport,
                     inject: [Logger],
                     useFactory: (logger: Logger) => {
-                        return new LocalTransport(logger);
+                        return new TransportLocal(logger);
                     }
                 });
                 break;

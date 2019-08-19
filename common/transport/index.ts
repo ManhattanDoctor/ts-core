@@ -1,5 +1,5 @@
 export * from './ITransport';
-export * from './LocalTransport';
+export * from './TransportLocal';
 export * from './Transport';
 export * from './TransportCommandAsync';
 export * from './TransportCommand';

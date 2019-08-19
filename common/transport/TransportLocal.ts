@@ -8,7 +8,7 @@ import { ObjectUtil } from '../util';
 import { ITransportCommand, ITransportCommandAsync, ITransportCommandOptions, ITransportEvent } from './ITransport';
 import { Transport } from './Transport';
 
-export class LocalTransport extends Transport {
+export class TransportLocal extends Transport {
     // --------------------------------------------------------------------------
     //
     //  Properties

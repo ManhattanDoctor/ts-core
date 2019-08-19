@@ -1,6 +1,7 @@
+import { IBlock } from '@monitor/core/block';
 import { IEthTransaction } from './IEthTransaction';
 
-export interface IEthBlock {
+export interface IEthBlock extends IBlock<IEthTransaction> {
     difficulty: string;
     extraData: string;
     gasLimit: number;
