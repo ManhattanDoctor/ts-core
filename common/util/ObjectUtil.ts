@@ -23,7 +23,7 @@ export class ObjectUtil {
         return _.every(properties, property => existProperties.includes(property));
     }
 
-    public static sortKeys(data: any): any {
+    public static sortKeys<T>(data: T): any {
         if (_.isNil(data)) {
             return null;
         }
@@ -56,11 +56,22 @@ export class ObjectUtil {
         return true;
     }
 
-    public static clear(data: any): void {
+    public static clear<U, V extends keyof U>(data: U, excludeKeys?: Array<V>): void {
         if (!_.isObject(data)) {
             return;
         }
-        for (let key of ObjectUtil.keys(data)) {
+        let keys = ObjectUtil.keys(data) as Array<V>;
+        if (!_.isEmpty(excludeKeys)) {
+            keys = keys.filter(item => !excludeKeys.includes(item));
+        }
+        ObjectUtil.clearKeys(data, keys);
+    }
+
+    public static clearKeys<U, V extends keyof U>(data: U, keys: Array<V>): void {
+        if (!_.isObject(data)) {
+            return;
+        }
+        for (let key of keys) {
             delete data[key];
         }
     }
@@ -74,14 +85,14 @@ export class ObjectUtil {
             return null;
         }
 
-        if (!includeKeys || includeKeys.length === 0) {
+        if (_.isEmpty(includeKeys)) {
             includeKeys = ObjectUtil.keys(from);
+        }
+        if (!_.isEmpty(excludeKeys)) {
+            includeKeys = includeKeys.filter(key => !excludeKeys.includes(key));
         }
 
         for (let key of includeKeys) {
-            if (excludeKeys && excludeKeys.length > 0 && excludeKeys.includes(key)) {
-                continue;
-            }
             try {
                 to[key] = from[key];
             } catch (error) {}

@@ -6,7 +6,7 @@ import { ArrayUtil } from './util';
 export class DestroyableContainer extends IDestroyable {
     // --------------------------------------------------------------------------
     //
-    //	Properties
+    //  Properties
     //
     // --------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ export class DestroyableContainer extends IDestroyable {
 
     // --------------------------------------------------------------------------
     //
-    //	Constructor
+    //  Constructor
     //
     // --------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ export class DestroyableContainer extends IDestroyable {
 
     // --------------------------------------------------------------------------
     //
-    //	Private Methods
+    //  Private Methods
     //
     // --------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ export class DestroyableContainer extends IDestroyable {
 
     // --------------------------------------------------------------------------
     //
-    //	Public Methods
+    //  Public Methods
     //
     // --------------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ export class DestroyableContainer extends IDestroyable {
 
     // --------------------------------------------------------------------------
     //
-    //	Interface Methods
+    //  Interface Methods
     //
     // --------------------------------------------------------------------------
 

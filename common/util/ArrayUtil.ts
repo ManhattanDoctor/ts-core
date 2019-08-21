@@ -17,23 +17,19 @@ export class ArrayUtil {
         if (!first && !second) {
             return 0;
         }
-
         if (first && !second) {
             return -1;
         }
-
         if (!first && second) {
             return 1;
         }
-
-        if (first.sortIndex == second.sortIndex) {
+        if (first.sortIndex === second.sortIndex) {
             return 0;
         }
-
         return first.sortIndex < second.sortIndex ? -1 : 1;
     }
 
-    public static move(array: Array<any>, oldIndex: number, newIndex: number): void {
+    public static move<T>(array: Array<T>, oldIndex: number, newIndex: number): void {
         if (_.isEmpty(array) || oldIndex === newIndex) {
             return;
         }
@@ -42,14 +38,14 @@ export class ArrayUtil {
         }
     }
 
-    public static clear(array: Array<any>): void {
+    public static clear<T>(array: Array<T>): void {
         if (_.isEmpty(array)) {
             return;
         }
         array.splice(0, array.length);
     }
 
-    public static remove(array: Array<any>, item: any): boolean {
+    public static remove<T>(array: Array<T>, item: T): boolean {
         if (_.isEmpty(array)) {
             return false;
         }
@@ -58,5 +54,16 @@ export class ArrayUtil {
             array.splice(index, 1);
         }
         return index > -1;
+    }
+
+    public static chunk<T>(array: Array<T>, size: number): Array<Array<T>> {
+        if (_.isEmpty(array)) {
+            return [];
+        }
+        let items = [];
+        while (array.length) {
+            items.push(array.splice(0, size));
+        }
+        return items;
     }
 }

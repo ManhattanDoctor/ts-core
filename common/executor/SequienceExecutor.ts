@@ -1,11 +1,13 @@
+import * as _ from 'lodash';
 import { Loadable, LoadableEvent, LoadableStatus } from '../Loadable';
 import { ObservableData } from '../observer';
+import { PromiseHandler } from '../promise';
 import { ArrayUtil } from '../util';
 
 export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, SequienceExecutorData<U, V>> {
     // --------------------------------------------------------------------------
     //
-    //	Properties
+    //  Properties
     //
     // --------------------------------------------------------------------------
 
@@ -13,13 +15,15 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
     protected isDestroyed: boolean;
     protected delayTimeout: number = 1000;
 
+    private index: number = NaN;
+
     private _progress: number = NaN;
+    private _totalIndex: number = NaN;
     private _totalLength: number = NaN;
-    private _currentIndex: number = NaN;
 
     // --------------------------------------------------------------------------
     //
-    //	Constructor
+    //  Constructor
     //
     // --------------------------------------------------------------------------
 
@@ -30,7 +34,7 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
 
     // --------------------------------------------------------------------------
     //
-    //	Event Handlers
+    //  Event Handlers
     //
     // --------------------------------------------------------------------------
 
@@ -41,11 +45,12 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
         let index = this.inputs.indexOf(input);
         this.inputs.splice(index, 1);
 
-        if (this.inputs.length == 0) {
+        if (this.inputs.length === 0) {
             this.makeFinished();
             return;
         }
 
+        this.totalIndex++;
         this.nextIndex();
         this.nextInput();
     }
@@ -59,8 +64,8 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
     }
 
     protected checkProgress(): void {
-        let value = (100 * this.currentIndex) / this.totalLength;
-        if (value == this._progress || isNaN(value) || !isFinite(value)) {
+        let value = (100 * this.totalIndex) / this.totalLength;
+        if (value === this._progress || _.isNaN(value) || !_.isFinite(value)) {
             return;
         }
         this._progress = value;
@@ -70,50 +75,57 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
         this.status = LoadableStatus.LOADING;
         this.observer.next(new ObservableData(LoadableEvent.STARTED));
 
-        this.currentIndex = 0;
+        this.index = 0;
         this.nextInput();
     }
 
     protected makeFinished(): void {
+        this.index = 0;
+        this.totalIndex = 0;
         this.totalLength = 0;
-        this.currentIndex = 0;
         this.status = LoadableStatus.LOADED;
 
         ArrayUtil.clear(this.inputs);
         this.observer.next(new ObservableData(LoadableEvent.FINISHED));
     }
 
-    protected delay(timeout: number = NaN): Promise<void> {
-        let delay: number = isNaN(timeout) ? this.delayTimeout : timeout;
-        return new Promise(resolve => setTimeout(resolve, delay));
+    protected async delay(timeout: number = NaN): Promise<void> {
+        let promise = PromiseHandler.create();
+        let timer = setTimeout(
+            () => {
+                clearTimeout(timer);
+                promise.resolve();
+            },
+            _.isNaN(timeout) ? this.delayTimeout : timeout
+        );
+        return promise.promise;
     }
 
     // --------------------------------------------------------------------------
     //
-    //	Private Methods
+    //  Private Methods
     //
     // --------------------------------------------------------------------------
 
     protected nextIndex(): void {
-        let index = this.currentIndex + 1;
-        if (index > this.inputs.length - 1) {
-            index = 0;
+        this.index++;
+        if (this.index > this.inputs.length - 1) {
+            this.index = 0;
         }
-        this.currentIndex = index;
     }
 
     protected nextInput(): void {
-        let input = this.inputs[this.currentIndex];
+        let input = this.inputs[this.index];
         this.executeInput(input).then(
             data => {
-                this.observer.next(new ObservableData(LoadableEvent.COMPLETE, { input: input, output: data }));
+                this.observer.next(new ObservableData(LoadableEvent.COMPLETE, { input, output: data }));
                 this.finishedInput(input);
             },
             error => {
                 if (error === SequienceExecutorError.SKIP) {
                     this.skipInput(input);
                 } else {
-                    this.observer.next(new ObservableData(LoadableEvent.ERROR, { input: input, error: error }));
+                    this.observer.next(new ObservableData(LoadableEvent.ERROR, { input, error }));
                     this.finishedInput(input);
                 }
             }
@@ -134,18 +146,18 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
 
     // --------------------------------------------------------------------------
     //
-    //	Private Properties
+    //  Private Properties
     //
     // --------------------------------------------------------------------------
 
-    private get currentIndex(): number {
-        return this._currentIndex;
+    private get totalIndex(): number {
+        return this._totalIndex;
     }
-    private set currentIndex(value: number) {
-        if (value == this._currentIndex) {
+    private set totalIndex(value: number) {
+        if (value === this._totalIndex) {
             return;
         }
-        this._currentIndex = value;
+        this._totalIndex = value;
         this.checkProgress();
     }
 
@@ -153,7 +165,7 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
         return this._totalLength;
     }
     private set totalLength(value: number) {
-        if (value == this._totalLength) {
+        if (value === this._totalLength) {
             return;
         }
         this._totalLength = value;
@@ -162,7 +174,7 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
 
     // --------------------------------------------------------------------------
     //
-    //	Public Methods
+    //  Public Methods
     //
     // --------------------------------------------------------------------------
 
@@ -170,7 +182,9 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
         if (this.isLoading) {
             return;
         }
-        this.currentIndex = 0;
+
+        this.index = 0;
+        this.totalIndex = 0;
         this.totalLength = inputs.length;
         for (let input of inputs) {
             this.addInput(input);
@@ -184,17 +198,19 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
     }
 
     public destroy(): void {
+        this.stop();
         this.inputs = null;
         this.observer = null;
         this.isDestroyed = true;
 
+        this.index = NaN;
+        this._totalIndex = NaN;
         this._totalLength = NaN;
-        this._currentIndex = NaN;
     }
 
     // --------------------------------------------------------------------------
     //
-    //	Public Properties
+    //  Public Properties
     //
     // --------------------------------------------------------------------------
 
