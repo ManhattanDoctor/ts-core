@@ -1,5 +1,5 @@
 import { SequienceExecutor } from '../../../common/executor';
-import { PromiseHandler, PromiseReflector } from '../../../common/promise';
+import { PromiseReflector } from '../../../common/promise';
 import { BtcApi } from './BtcApi';
 import { IBtcTransaction } from './IBtcTransaction';
 
@@ -21,14 +21,8 @@ export class BtcApiTransactionsLoader extends SequienceExecutor<Array<string>, A
     // --------------------------------------------------------------------------
 
     protected async executeInput(value: Array<string>): Promise<Array<IBtcTransaction | Error>> {
-        let promise = PromiseHandler.create<Array<IBtcTransaction | Error>>();
-
-        let promises = value.map(id => PromiseReflector.create<IBtcTransaction, Error>(this.api.getTransaction(id), id));
-        Promise.all(promises).then(items => {
-            promise.resolve(items.map(item => (item.isComplete ? item.value : item.error)));
-        });
-
-        return promise.promise;
+        let promises = value.map(id => PromiseReflector.create<IBtcTransaction, Error>(this.api.getTransaction(id)));
+        return (await Promise.all(promises)).map(item => (item.isComplete ? item.value : item.error));
     }
 
     // --------------------------------------------------------------------------

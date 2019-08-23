@@ -18,16 +18,6 @@ export class BtcApiInputsTransactionLoader extends SequienceExecutor<Array<IBtcI
 
     // --------------------------------------------------------------------------
     //
-    //  Private Methods
-    //
-    // --------------------------------------------------------------------------
-
-    private getInputUnuqId(input: IBtcInput): string {
-        return input.tx + '_' + input.vout;
-    }
-
-    // --------------------------------------------------------------------------
-    //
     //  Protected Methods
     //
     // --------------------------------------------------------------------------
@@ -35,7 +25,7 @@ export class BtcApiInputsTransactionLoader extends SequienceExecutor<Array<IBtcI
     protected async executeInput(inputs: Array<IBtcInput>): Promise<void> {
         let ids: Array<string> = _.uniq(_.compact(inputs.map(input => input.txid)));
 
-        let promises = ids.map(id => PromiseReflector.create(this.api.getTransaction(id), id));
+        let promises = ids.map(id => PromiseReflector.create(this.api.getTransaction(id)));
         for (let item of await Promise.all(promises)) {
             if (item.isError) {
                 throw item.error;

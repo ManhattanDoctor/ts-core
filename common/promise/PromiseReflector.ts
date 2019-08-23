@@ -7,13 +7,13 @@ export class PromiseReflector<U = any, V = string> implements IDestroyable {
     //
     // --------------------------------------------------------------------------
 
-    public static create<U = any, V = string>(promise: Promise<U>, id?: string): Promise<PromiseReflector<U, V>> {
+    public static create<U = any, V = string>(promise: Promise<U>): Promise<PromiseReflector<U, V>> {
         return promise.then(
             value => {
-                return new PromiseReflector<U, V>(id, promise, PromiseStatus.COMPLETE, value);
+                return new PromiseReflector<U, V>(promise, PromiseStatus.COMPLETE, value);
             },
             error => {
-                return new PromiseReflector<U, V>(id, promise, PromiseStatus.ERROR, null, error);
+                return new PromiseReflector<U, V>(promise, PromiseStatus.ERROR, null, error);
             }
         );
     }
@@ -24,7 +24,7 @@ export class PromiseReflector<U = any, V = string> implements IDestroyable {
     //
     // --------------------------------------------------------------------------
 
-    constructor(private _id: string, private _promise: Promise<U>, private _status: PromiseStatus, private _value?: U, private _error?: V) {}
+    constructor(private _promise: Promise<U>, private _status: PromiseStatus, private _value?: U, private _error?: V) {}
 
     // --------------------------------------------------------------------------
     //
@@ -33,7 +33,6 @@ export class PromiseReflector<U = any, V = string> implements IDestroyable {
     // --------------------------------------------------------------------------
 
     public destroy(): void {
-        this._id = null;
         this._value = null;
         this._error = null;
         this._status = null;
@@ -45,10 +44,6 @@ export class PromiseReflector<U = any, V = string> implements IDestroyable {
     // 	Public Properties
     //
     // --------------------------------------------------------------------------
-
-    public get id(): string {
-        return this._id;
-    }
 
     public get value(): U {
         return this._value;
