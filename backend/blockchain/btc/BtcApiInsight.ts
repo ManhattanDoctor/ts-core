@@ -1,3 +1,4 @@
+/*
 import axios, { AxiosInstance } from 'axios';
 import * as _ from 'lodash';
 import { IBtcApiSettingsInsight } from './BtcApiInsight';
@@ -75,10 +76,11 @@ export interface IBtcBlockInsight {
 
 export interface IBtcTransactionInsight {
     txid: string;
-    inputs: Array<IBtcTransactionInputInsight>;
-    outputs: Array<IBtcTransactionOutputInsight>;
+    inputs: Array<IBtcInputInsight>;
+    outputs: Array<IBtcOutputInsight>;
 }
 
-export interface IBtcTransactionInputInsight {}
+export interface IBtcInputInsight {}
 
-export interface IBtcTransactionOutputInsight {}
+export interface IBtcOutputInsight {}
+*/
