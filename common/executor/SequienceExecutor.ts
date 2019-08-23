@@ -17,6 +17,7 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
 
     private index: number = NaN;
 
+    private _promise: PromiseHandler<void>;
     private _progress: number = NaN;
     private _totalIndex: number = NaN;
     private _totalLength: number = NaN;
@@ -79,7 +80,7 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
         this.nextInput();
     }
 
-    protected makeFinished(): void {
+    protected makeFinished(error?: string): void {
         this.index = 0;
         this.totalIndex = 0;
         this.totalLength = 0;
@@ -87,6 +88,13 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
 
         ArrayUtil.clear(this.inputs);
         this.observer.next(new ObservableData(LoadableEvent.FINISHED));
+
+        if (error) {
+            this.promise.reject(error);
+        } else {
+            this.promise.resolve();
+        }
+        this.promise = null;
     }
 
     protected async delay(timeout: number = NaN): Promise<void> {
@@ -178,10 +186,12 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
     //
     // --------------------------------------------------------------------------
 
-    public start(inputs: Array<U>): void {
+    public start(inputs: Array<U>): Promise<void> {
         if (this.isLoading) {
-            return;
+            return this.promise.promise;
         }
+
+        this.promise = PromiseHandler.create();
 
         this.index = 0;
         this.totalIndex = 0;
@@ -189,11 +199,13 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
         for (let input of inputs) {
             this.addInput(input);
         }
+
+        return this.promise.promise;
     }
 
     public stop(): void {
         if (this.isLoading) {
-            this.makeFinished();
+            this.makeFinished(`SequienceExecutor manually stopped`);
         }
     }
 
@@ -206,6 +218,25 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
         this.index = NaN;
         this._totalIndex = NaN;
         this._totalLength = NaN;
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    //  Private Properties
+    //
+    // --------------------------------------------------------------------------
+
+    private get promise(): PromiseHandler<void> {
+        return this._promise;
+    }
+    private set promise(value: PromiseHandler<void>) {
+        if (value === this._promise) {
+            return;
+        }
+        if (this._promise) {
+            this._promise.reject();
+        }
+        this._promise = value;
     }
 
     // --------------------------------------------------------------------------

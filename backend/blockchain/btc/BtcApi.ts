@@ -46,8 +46,6 @@ export class BtcApi extends LoggerWrapper {
             console.log(item.tx);
             process.exit(0);
         }
-
-        // BtcApi.parseTransaction(item.tx);
     }
 
     private static parseOutput(item: IBtcOutput): void {
@@ -123,7 +121,7 @@ export class BtcApi extends LoggerWrapper {
         return promise.promise;
     }
 
-    private async loadInputs(inputs: Array<IBtcInput>): Promise<void> {
+    private loadInputs(inputs: Array<IBtcInput>): Promise<void> {
         if (_.isEmpty(inputs)) {
             return;
         }
@@ -171,7 +169,7 @@ export class BtcApi extends LoggerWrapper {
             await this.loadInputs(this.getInputs(item));
         }
 
-        // BtcApi.parseBlock(item);
+        BtcApi.parseBlock(item);
         return item;
     }
 
