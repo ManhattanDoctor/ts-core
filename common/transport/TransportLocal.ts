@@ -18,7 +18,7 @@ export class TransportLocal extends Transport {
     private listeners: Map<string, Subject<any>>;
     private dispatchers: Map<string, Subject<any>>;
 
-    private promises: Map<string, PromiseHandler>;
+    private promises: Map<string, PromiseHandler<any, ExtendedError>>;
 
     // --------------------------------------------------------------------------
     //

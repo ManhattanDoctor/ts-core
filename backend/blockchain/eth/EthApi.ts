@@ -1,6 +1,9 @@
 import * as Web3 from 'web3';
+import { PromiseHandler } from '../../../common/promise';
+import { IEthBlock } from './IEthBlock';
+import { IEthTransaction } from './IEthTransaction';
 
-export class EthApiGeth {
+export class EthApi {
     // --------------------------------------------------------------------------
     //
     // 	Static Properties
@@ -15,7 +18,7 @@ export class EthApiGeth {
     //
     // --------------------------------------------------------------------------
 
-    private client: Web3;
+    protected client: Web3;
 
     // --------------------------------------------------------------------------
     //
@@ -23,7 +26,7 @@ export class EthApiGeth {
     //
     // --------------------------------------------------------------------------
 
-    constructor(settings: IEthApiSettingsGeth) {
+    constructor(settings: IEthApiSettings) {
         this.client = new Web3(new Web3.providers.HttpProvider(settings.endpoint));
     }
 
@@ -32,13 +35,38 @@ export class EthApiGeth {
     // 	Public Methods
     //
     // --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
+    //
+    // 	Public Methods
+    //
+    // --------------------------------------------------------------------------
+
+    public contractCreate(abi: any, address: string): any {
+        return new this.client.eth.Contract(abi, address);
+    }
+
+    public contractCall<T>(contract: any, name: string, args: Array<any>, options?: any): Promise<T> {
+        let promise = PromiseHandler.create<T>();
+        contract.methods[name](...args).call(options, (error, data) => {
+            if (error) {
+                promise.reject(error);
+            } else {
+                promise.resolve(data);
+            }
+        });
+        return promise.promise;
+    }
 
     public async getBlockNumber(): Promise<number> {
         return this.client.eth.getBlockNumber();
     }
 
-    public async getBlock(block: number, isNeedTransactions?: boolean): Promise<IEthBlockGeth> {
+    public async getBlock(block: number | EthApiDefaultBlock, isNeedTransactions?: boolean): Promise<IEthBlock> {
         return this.client.eth.getBlock(block, isNeedTransactions);
+    }
+
+    public async getBalance(address: string, block: number | EthApiDefaultBlock = EthApiDefaultBlock.LATEST): Promise<string> {
+        return this.client.eth.getBalance(address, block);
     }
 
     public async getGasPrice(): Promise<string> {
@@ -49,6 +77,10 @@ export class EthApiGeth {
     public async getTransactionCount(address: string, block?: number): Promise<number> {
         return this.client.getTransactionCount(address, block);
     }
+
+    public async getTransaction(id: string): Promise<IEthTransaction> {
+        return this.client.eth.getTransaction(id);
+    }
 }
 
 export enum EthApiDefaultBlock {
@@ -56,48 +88,6 @@ export enum EthApiDefaultBlock {
     PENDING = 'pending',
     EARLIEST = 'earliest'
 }
-export interface IEthApiSettingsGeth {
+export interface IEthApiSettings {
     endpoint: string;
-}
-
-export interface IEthBlockGeth {
-    difficulty: string;
-    extraData: string;
-    gasLimit: number;
-    gasUsed: number;
-    hash: string;
-    logsBloom: string;
-    miner: string;
-    mixHash: string;
-    nonce: string;
-    number: number;
-    parentHash: string;
-    receiptsRoot: string;
-    sha3Uncles: string;
-    size: number;
-    stateRoot: string;
-    timestamp: number;
-    totalDifficulty: string;
-    transactions: Array<IEthTransactionGeth>;
-    transactionsRoot: string;
-    uncles: Array<any>;
-}
-
-export interface IEthTransactionGeth {
-    blockHash: string;
-    blockNumber: number;
-    transactionIndex: number;
-
-    to: string;
-    gas: string;
-    hash: string;
-    from: string;
-    gasPrice: string;
-    input: string;
-    nonce: number;
-    value: string;
-
-    r: string;
-    s: string;
-    v: string;
 }
