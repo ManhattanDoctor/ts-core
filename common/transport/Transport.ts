@@ -2,8 +2,16 @@ import { Observable } from 'rxjs';
 import { ExtendedError } from '../error';
 import { LoggerWrapper } from '../logger';
 import { ITransport, ITransportCommandAsync, ITransportCommand, ITransportCommandOptions, ITransportEvent } from './ITransport';
+import { ObjectUtil } from '../util';
 
 export abstract class Transport extends LoggerWrapper implements ITransport {
+    
+    // --------------------------------------------------------------------------
+    //
+    //  Public Methods
+    //
+    // --------------------------------------------------------------------------
+
     public abstract send<U>(command: ITransportCommand<U>): void;
     public abstract sendListen<U, V>(command: ITransportCommandAsync<U, V>, options?: ITransportCommandOptions): Promise<V>;
 
@@ -13,4 +21,15 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
 
     public abstract dispatch<T>(event: ITransportEvent<T>): void;
     public abstract getDispatcher<T>(name: string): Observable<T>;
+
+
+    // --------------------------------------------------------------------------
+    //
+    //  Protected Methods
+    //
+    // --------------------------------------------------------------------------
+
+    protected isCommandAsync<U>(command: ITransportCommand<U>): boolean {
+        return ObjectUtil.instanceOf(command, ['response']);
+    }
 }

@@ -4,7 +4,6 @@ import * as util from 'util';
 import { ExtendedError } from '../error';
 import { ILogger } from '../logger';
 import { PromiseHandler } from '../promise';
-import { ObjectUtil } from '../util';
 import { ITransportCommand, ITransportCommandAsync, ITransportCommandOptions, ITransportEvent } from './ITransport';
 import { Transport } from './Transport';
 
@@ -33,16 +32,6 @@ export class TransportLocal extends Transport {
 
         this.listeners = new Map();
         this.dispatchers = new Map();
-    }
-
-    // --------------------------------------------------------------------------
-    //
-    //  Private Methods
-    //
-    // --------------------------------------------------------------------------
-
-    private isCommandAsync<U>(command: ITransportCommand<U>): boolean {
-        return ObjectUtil.instanceOf(command, ['response']);
     }
 
     // --------------------------------------------------------------------------

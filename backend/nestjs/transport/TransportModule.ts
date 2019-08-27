@@ -2,6 +2,8 @@ import { DynamicModule, Global, Provider } from '@nestjs/common';
 import { ExtendedError } from '../../../common/error';
 import { Logger } from '../../../common/logger';
 import { Transport, TransportLocal } from '../../../common/transport';
+import { IAmqpSettings } from '../../settings/IAmqpSettings';
+import { TransportAmqp } from '../../transport/TransportAmqp';
 
 @Global()
 export class TransportModule {
@@ -24,6 +26,15 @@ export class TransportModule {
                     }
                 });
                 break;
+            case TransportType.AMQP:
+                providers.push({
+                    provide: Transport,
+                    inject: [Logger],
+                    useFactory: (logger: Logger) => {
+                        return new TransportAmqp(logger, settings.options);
+                    }
+                });
+                break;
             default:
                 throw new ExtendedError(`Can't to create transport for ${type} type`);
         }
@@ -39,8 +50,10 @@ export class TransportModule {
 
 export interface ITransportModuleSettings {
     type: TransportType;
+    options?: IAmqpSettings;
 }
 
 export enum TransportType {
-    LOCAL = 'LOCAL'
+    LOCAL = 'LOCAL',
+    AMQP = 'AMQP'
 }
