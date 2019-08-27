@@ -64,7 +64,7 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
 
         let language = this.languages.get(locale);
         if (!language) {
-            throw new ExtendedError(`Unable lo load language: can't find locale ${locale}`);
+            throw new ExtendedError(`Can't find locale ${locale}`);
         }
 
         this.status = LoadableStatus.LOADING;
@@ -86,7 +86,7 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
                 this.setLanguage(language, translation);
             } else {
                 this.status = LoadableStatus.ERROR;
-                this.observer.next(new ObservableData(LoadableEvent.ERROR, language, new ExtendedError(`Unable to load language: ${language}`)));
+                this.observer.next(new ObservableData(LoadableEvent.ERROR, language, new ExtendedError(`Can't to load language: ${language}`)));
                 this.observer.next(new ObservableData(LoadableEvent.FINISHED, language));
             }
         });
@@ -115,10 +115,10 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
             throw new ExtendedError('Service already initialized');
         }
         if (_.isEmpty(url)) {
-            throw new ExtendedError('Unable to initialize: url is undefined or empty');
+            throw new ExtendedError('Url is undefined or empty');
         }
         if (_.isEmpty(languages)) {
-            throw new ExtendedError('Unable to initialize: available languages is undefined or empty');
+            throw new ExtendedError('Available languages is undefined or empty');
         }
 
         this._languages = languages;

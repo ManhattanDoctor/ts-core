@@ -58,7 +58,7 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
 
     public translate(key: string, params?: any): string {
         if (_.isNil(key)) {
-            this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_KEY, new ExtendedError(`Unable to translate: key is undefined`, null, key)));
+            this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_KEY, new ExtendedError(`Key is undefined`, null, key)));
             return null;
         }
 
@@ -86,7 +86,7 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
             this.observer.next(
                 new ObservableData(
                     LanguageTranslatorEvent.INVALID_EXPRESSION,
-                    new ExtendedError(`Unable to compile: expression is undefined`, null, expression)
+                    new ExtendedError(`Expression is undefined`, null, expression)
                 )
             );
             return null;

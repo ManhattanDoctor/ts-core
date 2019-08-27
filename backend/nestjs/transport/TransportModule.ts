@@ -25,7 +25,7 @@ export class TransportModule {
                 });
                 break;
             default:
-                throw new ExtendedError(`Unable to create transport for ${type} type`);
+                throw new ExtendedError(`Can't to create transport for ${type} type`);
         }
 
         return {

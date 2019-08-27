@@ -36,7 +36,7 @@ export class TransportEvent<T> implements ITransportEvent<T> {
 
     protected validateData(value: T): void {
         if (_.isNil(value)) {
-            throw new ExtendedError('Unable to validate event: data is undefined');
+            throw new ExtendedError('Data is undefined');
         }
     }
 

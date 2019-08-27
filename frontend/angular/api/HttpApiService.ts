@@ -44,7 +44,7 @@ export abstract class HttpApiService extends ApiBaseService {
         }
 
         if (!observable) {
-            throw new ExtendedError('Unable to make request: method is undefined');
+            throw new ExtendedError('Method is undefined');
         }
         return observable.pipe(timeout(idleTimeout));
     }
