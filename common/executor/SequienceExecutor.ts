@@ -146,10 +146,10 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
     //
     // --------------------------------------------------------------------------
 
-    private get totalIndex(): number {
+    protected get totalIndex(): number {
         return this._totalIndex;
     }
-    private set totalIndex(value: number) {
+    protected set totalIndex(value: number) {
         if (value === this._totalIndex) {
             return;
         }
@@ -157,10 +157,10 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
         this.checkProgress();
     }
 
-    private get totalLength(): number {
+    protected get totalLength(): number {
         return this._totalLength;
     }
-    private set totalLength(value: number) {
+    protected set totalLength(value: number) {
         if (value === this._totalLength) {
             return;
         }

@@ -1,3 +1,4 @@
+import * as spinner from 'cli-spinner';
 import * as _ from 'lodash';
 import { SequienceExecutor } from '../../../common/executor';
 import { PromiseReflector } from '../../../common/promise';
@@ -8,12 +9,25 @@ import { IBtcInput } from './IBtcInput';
 export class BtcApiInputsTransactionLoader extends SequienceExecutor<Array<IBtcInput>, void> {
     // --------------------------------------------------------------------------
     //
+    //  Properties
+    //
+    // --------------------------------------------------------------------------
+
+    private preloader: any;
+
+    // --------------------------------------------------------------------------
+    //
     //  Constuructor
     //
     // --------------------------------------------------------------------------
 
-    constructor(private api: BtcApi) {
+    constructor(private api: BtcApi, isNeedPreloader?: boolean) {
         super();
+        if (!isNeedPreloader) {
+            return;
+        }
+        this.preloader = new spinner.Spinner();
+        this.preloader.setSpinnerString(18);
     }
 
     // --------------------------------------------------------------------------
@@ -45,7 +59,18 @@ export class BtcApiInputsTransactionLoader extends SequienceExecutor<Array<IBtcI
                 ObjectUtil.clear(transaction, ['txid', 'vout']);
             }
         }
-        this.api.debug(`${this.progress.toFixed(1)}% of transactions loaded`);
+        this.showProgress();
+    }
+
+    private showProgress(): void {
+        if (!this.preloader) {
+            return;
+        }
+
+        if (!this.preloader.isSpinning()) {
+            this.preloader.start();
+        }
+        this.preloader.setSpinnerTitle(`${this.totalIndex} / ${this.totalLength} (${this.progress.toFixed(1)}%) transactions loaded`);
     }
 
     // --------------------------------------------------------------------------
@@ -56,6 +81,12 @@ export class BtcApiInputsTransactionLoader extends SequienceExecutor<Array<IBtcI
 
     public destroy(): void {
         super.destroy();
+
+        if (this.preloader) {
+            this.preloader.stop(true);
+            this.preloader = null;
+        }
+
         this.api = null;
     }
 }
