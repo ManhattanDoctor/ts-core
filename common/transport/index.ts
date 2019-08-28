@@ -7,3 +7,4 @@ export * from './TransportCommandAsyncHandler';
 export * from './TransportCommandHandler';
 export * from './TransportEvent';
 export * from './TransportWaitError';
+export * from './TransportTimeoutError';

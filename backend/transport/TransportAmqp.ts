@@ -6,7 +6,6 @@ import * as uuid from 'uuid';
 import { ExtendedError } from '../../common/error';
 import { ILogger } from '../../common/logger';
 import { PromiseHandler } from '../../common/promise';
-import { ITraceable, TraceUtil } from '../../common/trace';
 import {
     ITransportCommand,
     ITransportCommandAsync,
@@ -16,6 +15,8 @@ import {
     TransportCommand,
     TransportCommandAsync,
     TransportEvent,
+    TransportLogType,
+    TransportTimeoutError,
     TransportWaitError
 } from '../../common/transport';
 import { IAmqpSettings } from '../settings/IAmqpSettings';
@@ -27,7 +28,6 @@ export class TransportAmqp extends Transport {
     //
     // --------------------------------------------------------------------------
 
-    public static WAIT_TIMEOUT = 30000;
     public static DELAY_TTL = 500;
     public static RECONNECT_DELAY = 1000;
     public static CONNECTION_TIMEOUT = 120000;
@@ -44,12 +44,12 @@ export class TransportAmqp extends Transport {
     private channel: Channel;
 
     private asserts: Set<string>;
-    private delayAsserts: Set<string>;
     private messages: Map<string, Message>;
     private listening: Set<string>;
     private consumes: Map<string, string>;
     private replyQueue: Map<string, string>;
-    private replyPromises: Map<string, PromiseHandler<any, ExtendedError>>;
+    private delayAsserts: Set<string>;
+    private promises: Map<string, PromiseHandler<any, ExtendedError>>;
 
     private eventQueueName: string;
     private subscribedEvent: Map<string, Subject<any>>;
@@ -77,7 +77,7 @@ export class TransportAmqp extends Transport {
         this.messages = new Map();
         this.listening = new Set();
         this.consumes = new Map();
-        this.replyPromises = new Map();
+        this.promises = new Map();
         this.replyQueue = new Map();
         this.subscribedEvent = new Map();
     }
@@ -114,7 +114,7 @@ export class TransportAmqp extends Transport {
                             resolve();
                         })
                         .catch(error => {
-                            this.error('channel closed Error: ' + error.message);
+                            this.error(`Channel closed ${error.message}`);
                             reject();
                         });
                 }
@@ -131,15 +131,34 @@ export class TransportAmqp extends Transport {
         if (_.isNil(command.request)) {
             throw new ExtendedError(`${command.name} command request is null or undefined`);
         }
-        this.debugSendCommand(command);
-        this.sendToQueue(command);
+
+        this.logCommand(command, TransportLogType.REQUEST_SEND);
+        this.sendToQueue(command, this.createCommandOptions(command, false));
+    }
+
+    private createCommandOptions<U>(command: ITransportCommand<U>, isNeedReply: boolean, options?: ITransportCommandOptions): ICommandOptions {
+        const waitTimeout = !options || !options.waitTimeout ? Transport.WAIT_TIMEOUT : options.waitTimeout;
+
+        if (!this.isCommandAsync(command)) {
+            return {
+                waitTimeout,
+                headers: { IS_ASYNC_COMMAND: false, IS_NEED_REPLY: false }
+            };
+        }
+
+        return {
+            waitTimeout,
+            replyTo: this.replyQueue.get(command.name),
+            correlationId: command.id,
+            headers: { GATEWAY_TRANSPORT_TIMEOUT: waitTimeout, IS_ASYNC_COMMAND: true, IS_NEED_REPLY: isNeedReply }
+        };
     }
 
     public listen<U>(commandName: string): Observable<U> {
         if (this.listening.has(commandName)) {
             throw new ExtendedError(`Command ${commandName} is already listening`);
         }
-        this.log(`Started to listen ${commandName} command`);
+        this.logListen(commandName);
         this.listening.add(commandName);
 
         const observer = new Subject<any>();
@@ -147,13 +166,18 @@ export class TransportAmqp extends Transport {
         this.listenQueue(
             commandName,
             (msg: Message) => {
-                this.messages.set(msg.properties.messageId, msg);
+                let headers = msg.properties.headers as ICommandHeaders;
+                let messageId = msg.properties.messageId;
+                if (_.isNil(headers) || _.isNil(headers.IS_NEED_REPLY) || _.isNil(headers.IS_ASYNC_COMMAND)) {
+                    throw new ExtendedError(`Invalid headers`);
+                }
+                this.messages.set(messageId, msg);
                 const requestJson = JSON.parse(msg.content.toString()) as U;
-                const command =
-                    msg.properties.headers && msg.properties.headers.IS_ASYNC_COMMAND
-                        ? new TransportCommandAsync(commandName, requestJson, msg.properties.messageId)
-                        : new TransportCommand(commandName, requestJson, msg.properties.messageId);
-                this.debugListenCommand(command);
+                const command = headers.IS_ASYNC_COMMAND
+                    ? new TransportCommandAsync(commandName, requestJson, messageId)
+                    : new TransportCommand(commandName, requestJson, messageId);
+
+                this.logCommand(command, TransportLogType.REQUEST_RECEIVE);
                 observer.next(command);
             },
             { consumerTag: uuid() }
@@ -163,28 +187,26 @@ export class TransportAmqp extends Transport {
     }
 
     public async sendListen<U, V>(command: ITransportCommandAsync<U, V>, options?: ITransportCommandOptions): Promise<V> {
-        const waitTimeout = !options || !options.waitTimeout ? TransportAmqp.WAIT_TIMEOUT : options.waitTimeout;
+        this.logCommand(command, TransportLogType.REQUEST_SEND);
 
-        this.debugSendCommand(command);
         let promise = PromiseHandler.create<any, ExtendedError>();
-
-        let correlationId = command.id;
-        this.replyPromises.set(correlationId, promise);
-
-        let error = new ExtendedError(`Command ${command.name} is timed out`, null, command);
-        setTimeout(() => promise.reject(error), waitTimeout);
 
         try {
             if (!this.replyQueue.has(command.name)) {
                 let replyQueueName = this.generateReplyQueueName(command.name);
                 this.replyQueue.set(command.name, replyQueueName);
-                await this.startListenReply(replyQueueName);
+                await this.startListenReply(replyQueueName, command);
             }
-            await this.sendToQueue(command, {
-                replyTo: this.replyQueue.get(command.name),
-                correlationId,
-                headers: { GATEWAY_TRANSPORT_TIMEOUT: waitTimeout, IS_ASYNC_COMMAND: true }
-            });
+
+            let commandOptions = this.createCommandOptions(command, true, options);
+            this.promises.set(commandOptions.correlationId, promise);
+
+            await this.sendToQueue(command, commandOptions);
+            await PromiseHandler.delay(commandOptions.waitTimeout);
+
+            promise.reject(new TransportTimeoutError(command));
+            this.promises.delete(commandOptions.correlationId);
+            
         } catch (error) {
             this.parseError(error, promise.reject);
         }
@@ -195,13 +217,17 @@ export class TransportAmqp extends Transport {
     public complete<U, V>(command: ITransportCommand<U>, result?: V | ExtendedError): Promise<void> {
         const msg = this.getMessage(command);
         this.messages.delete(command.id);
-        if (!this.isCommandAsync(command)) {
+
+        let headers = msg.properties ? msg.properties.headers : null;
+        if (!this.isCommandAsync(command) || !headers.IS_NEED_REPLY) {
+            this.logCommand(command, TransportLogType.RESPONSE_NO_REPLY);
             this.ack(msg);
             return;
         }
 
         let asyncCommand = command as ITransportCommandAsync<any, any>;
         if (!msg.properties || !msg.properties.correlationId || !msg.properties.replyTo) {
+            this.logCommand(command, TransportLogType.RESPONSE_NO_REPLY);
             this.reject(msg);
             return;
         }
@@ -211,6 +237,9 @@ export class TransportAmqp extends Transport {
         } catch (error) {
             asyncCommand.response(error);
         }
+
+        this.logCommand(asyncCommand, TransportLogType.RESPONSE_SEND);
+
         this.sendReplyToQueue(asyncCommand, msg.properties.replyTo, options);
         this.ack(msg);
     }
@@ -219,14 +248,12 @@ export class TransportAmqp extends Transport {
         const msg = this.getMessage(command);
         const waitCount = this.getRetry(msg);
 
-        const timeout =
-            !msg.properties.headers || !msg.properties.headers.GATEWAY_TRANSPORT_TIMEOUT
-                ? TransportAmqp.WAIT_TIMEOUT
-                : msg.properties.headers.GATEWAY_TRANSPORT_TIMEOUT;
+        let headers = msg.properties.headers as ICommandHeaders;
+        const timeout = _.isNil(headers.GATEWAY_TRANSPORT_TIMEOUT) ? TransportAmqp.WAIT_TIMEOUT : headers.GATEWAY_TRANSPORT_TIMEOUT;
 
         this.reject(msg);
-        if ((this.isCommandAsync(command), waitCount * TransportAmqp.DELAY_TTL > timeout)) {
-            throw new TransportWaitError('Error  CommandWait "' + command.id + '"');
+        if (this.isCommandAsync(command) && waitCount * TransportAmqp.DELAY_TTL > timeout) {
+            throw new TransportWaitError(`Wait timeout exceed ${command.name} (${command.id})`);
         }
 
         this.messages.delete(command.id);
@@ -234,7 +261,6 @@ export class TransportAmqp extends Transport {
     }
 
     public getDispatcher<T>(eventName: string): Observable<T> {
-        this.log(`Subscribed on ${eventName}`);
         if (!this.subscribedEvent.has(eventName)) {
             this.subscribedEvent.set(eventName, new Subject<T>());
         }
@@ -248,7 +274,7 @@ export class TransportAmqp extends Transport {
     }
 
     public dispatch<T>(event: ITransportEvent<T>): void {
-        this.log(`Dispatched ${event.name}`);
+        this.logDispatch(event);
         this.assertEventExchange();
         if (event instanceof TransportEvent) {
             event = event.toObject();
@@ -268,7 +294,7 @@ export class TransportAmqp extends Transport {
     // --------------------------------------------------------------------------
 
     private async reconnect(): Promise<void> {
-        this.log(`Connecting to ${this.connectionUrl}...`);
+        this.debug(`Connecting to ${this.connectionUrl}...`);
 
         try {
             this.connection = await amqp.connect(this.connectionUrl);
@@ -296,7 +322,6 @@ export class TransportAmqp extends Transport {
         if (!message) {
             message = 'Connected successfully';
         }
-        this.log(message);
         this.connectionIPromise.resolve();
     }
 
@@ -313,35 +338,40 @@ export class TransportAmqp extends Transport {
         process.exit(1);
     }
 
-    private async startListenReply(queueName: string) {
+    private async startListenReply<U, V>(queueName: string, command: ITransportCommandAsync<U, V>) {
         let assertedQueue = await this.assertReplyQueue(queueName);
         this.channel.consume(
             assertedQueue.queue,
             (msg: Message) => {
-                this.listenReply(msg);
+                this.listenReply(msg, command);
             },
             { noAck: true }
         );
     }
-    private listenReply(msg: Message) {
-        if (msg.properties.correlationId == null) {
-            this.error('CorrelationId not found, messageId=' + msg.properties.messageId);
+    private listenReply<U, V>(msg: Message, command: ITransportCommandAsync<U, V>) {
+        if (_.isNil(msg.properties.correlationId)) {
+            this.error(`CorrelationId not found, messageId=${msg.properties.messageId}`);
             this.reject(msg);
             return;
         }
 
-        const promise = this.replyPromises.get(msg.properties.correlationId);
+        const promise = this.promises.get(msg.properties.correlationId);
         if (!promise) {
             this.reject(msg, true);
             return;
         }
 
-        this.replyPromises.delete(msg.properties.correlationId);
-        let responseJson = JSON.parse(msg.content.toString());
-        responseJson = this.transformNullOrUndefined(msg, responseJson);
-        this.rejectError(msg, responseJson as ExtendedError, promise.reject);
-        this.debugReply(msg.properties.messageId, responseJson);
-        promise.resolve(responseJson);
+        let response = JSON.parse(msg.content.toString());
+        response = this.transformNullOrUndefined(msg, response);
+
+        let newCommand = new TransportCommandAsync<any, any>(command.name, command.request, command.id);
+        newCommand.response(response);
+        this.logCommand(newCommand, TransportLogType.RESPONSE_RECEIVE);
+
+        this.rejectError(msg, response as ExtendedError, promise);
+        promise.resolve(response);
+
+        this.promises.delete(msg.properties.correlationId);
     }
 
     private transformNullOrUndefined(msg: Message, data): any {
@@ -357,7 +387,7 @@ export class TransportAmqp extends Transport {
     private getMessage<U, V>(command: ITransportCommand<U>): Message {
         const msg = this.messages.get(command.id);
         if (!msg) {
-            throw new ExtendedError(`Rmq Message for command ${command.id} not found`);
+            throw new ExtendedError(`AMQP Message for command ${command.id} not found`);
         }
         return msg;
     }
@@ -388,22 +418,15 @@ export class TransportAmqp extends Transport {
         return this.channel.publish(delayQueue, '', msg.content, msg.properties);
     }
 
-    private rejectError(msg: Message, data: ExtendedError, reject: (error: ExtendedError) => void) {
+    private rejectError(msg: Message, data: ExtendedError, promise: PromiseHandler<any, ExtendedError>) {
         if (msg.properties.headers && msg.properties.headers[RMQ_HEADER.GATEWAY_TRANSPORT_ERROR]) {
-            reject(data);
+            promise.reject(data);
         }
     }
 
     private async sendToQueue<U>(command: ITransportCommand<U>, options = {} as Options.Publish): Promise<boolean> {
         options.messageId = command.id;
         const request = command.request;
-
-        if (!TraceUtil.isHas(request as ITraceable)) {
-            this.error(`Command ${command.name} doesn't have traceId`);
-        } else {
-            // this.warn(`${(request as ITraceable).traceId} | ${command.name}`);
-        }
-
         await this.assert(command.name);
         return this.channel.sendToQueue(command.name, Buffer.from(JSON.stringify(request)), options);
     }
@@ -541,6 +564,7 @@ export class TransportAmqp extends Transport {
         return !msg.properties.headers || !msg.properties.headers['x-death'] ? 0 : parseInt(msg.properties.headers['x-death'][0].count.toString(), 10);
     }
 
+    /*
     private debugSendCommand<U>(command: ITransportCommand<U>) {
         const anyRequest = (command.request as any) as ITraceable;
         const logMessage = {
@@ -569,6 +593,7 @@ export class TransportAmqp extends Transport {
         };
         this.debug(logMessage);
     }
+    */
     // --------------------------------------------------------------------------
     //
     //  Event Handlers
@@ -616,6 +641,19 @@ export class TransportAmqp extends Transport {
         }
         return value;
     }
+}
+
+interface ICommandOptions {
+    headers: ICommandHeaders;
+    replyTo?: string;
+    waitTimeout: number;
+    correlationId?: string;
+}
+
+interface ICommandHeaders {
+    IS_NEED_REPLY: boolean;
+    IS_ASYNC_COMMAND: boolean;
+    GATEWAY_TRANSPORT_TIMEOUT?: number;
 }
 
 enum RMQ_HEADER {

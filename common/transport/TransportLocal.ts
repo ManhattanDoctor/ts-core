@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
-import * as util from 'util';
 import { ExtendedError } from '../error';
 import { ILogger } from '../logger';
 import { PromiseHandler } from '../promise';
 import { ITransportCommand, ITransportCommandAsync, ITransportCommandOptions, ITransportEvent } from './ITransport';
-import { Transport } from './Transport';
+import { Transport, TransportLogType } from './Transport';
+import { TransportTimeoutError } from './TransportTimeoutError';
 
 export class TransportLocal extends Transport {
     // --------------------------------------------------------------------------
@@ -14,6 +14,7 @@ export class TransportLocal extends Transport {
     //
     // --------------------------------------------------------------------------
 
+    private options: Map<string, ITransportCommandOptions>;
     private listeners: Map<string, Subject<any>>;
     private dispatchers: Map<string, Subject<any>>;
 
@@ -28,8 +29,8 @@ export class TransportLocal extends Transport {
     constructor(logger: ILogger, context?: string) {
         super(logger, context);
 
+        this.options = new Map();
         this.promises = new Map();
-
         this.listeners = new Map();
         this.dispatchers = new Map();
     }
@@ -40,24 +41,14 @@ export class TransportLocal extends Transport {
     //
     // --------------------------------------------------------------------------
 
-    public send<U>(command: ITransportCommand<U>): void {
-        let name = command.name;
-        let listener = this.listeners.get(name);
+    public send<U>(command: ITransportCommand<U>, options?: ITransportCommandOptions): void {
+        this.options.set(command.id, options);
+        this.logCommand(command, TransportLogType.REQUEST_SEND);
 
-        if (this.isCommandAsync(command)) {
-            this.debug(`→ ${name} (${command.id})`);
-        } else {
-            this.debug(`↮ ${name}`);
+        let listener = this.listeners.get(command.name);
+        if (!_.isNil(listener)) {
+            listener.next(command);
         }
-
-        if (!_.isNil(command.request)) {
-            this.verbose(`→ ${util.inspect(command.request, { showHidden: false, depth: null })}`);
-        }
-
-        if (_.isNil(listener)) {
-            throw new ExtendedError(`No listener for command ${command.name}`);
-        }
-        listener.next(command);
     }
 
     public sendListen<U, V>(command: ITransportCommandAsync<U, V>, options?: ITransportCommandOptions): Promise<V> {
@@ -65,37 +56,48 @@ export class TransportLocal extends Transport {
         if (!item) {
             item = PromiseHandler.create();
             this.promises.set(command.id, item);
-            this.send(command);
+            this.send(command, options);
         }
+
+        let timeout = Transport.WAIT_TIMEOUT;
+        if (!_.isNil(options) && _.isNumber(options.waitTimeout)) {
+            timeout = options.waitTimeout;
+        }
+        PromiseHandler.delay(timeout).then(() => {
+            item.reject(new TransportTimeoutError(command));
+            this.promises.delete(command.id);
+        });
+
         return item.promise;
     }
 
-    public complete<U, V>(command: ITransportCommand<U>, result?: V | ExtendedError | Error): void {
+    public complete<U, V>(command: ITransportCommand<U>, result?: V | Error): void {
+        this.options.delete(command.id);
+
         if (!this.isCommandAsync(command)) {
+            this.logCommand(command, TransportLogType.RESPONSE_NO_REPLY);
             return;
         }
 
-        let name = command.name;
-        let async = command as ITransportCommandAsync<any, any>;
-
-        this.debug(`← ${name} (${command.id})`);
-        this.verbose(`← ${!_.isNil(result) ? util.inspect(result, { showHidden: false, depth: null }) : 'Nil'}`);
-
+        let async = command as ITransportCommandAsync<U, any>;
         async.response(result);
+        this.logCommand(command, TransportLogType.RESPONSE_SEND);
+
         let promise = this.promises.get(command.id);
         if (_.isNil(promise)) {
             return;
         }
 
-        if (!_.isNil(async.error)) {
+        if (this.isCommandHasError(command)) {
             promise.reject(async.error);
         } else {
             promise.resolve(async.data);
         }
-        this.promises.delete(async.id);
+        this.promises.delete(command.id);
     }
 
     public wait<U>(command: ITransportCommand<U>): void {
+        this.logCommand(command, TransportLogType.RESPONSE_WAIT);
         throw new ExtendedError(`Method doesn't implemented`);
     }
 
@@ -106,7 +108,7 @@ export class TransportLocal extends Transport {
         let item = new Subject<U>();
         this.listeners.set(name, item);
 
-        this.debug(`Start listening ${name} command`);
+        this.logListen(name);
         return item.asObservable();
     }
 
@@ -115,6 +117,7 @@ export class TransportLocal extends Transport {
         if (_.isNil(item)) {
             return;
         }
+        this.logDispatch(event);
         item.next(event);
     }
 
