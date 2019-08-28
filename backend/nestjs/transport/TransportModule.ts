@@ -30,8 +30,10 @@ export class TransportModule {
                 providers.push({
                     provide: Transport,
                     inject: [Logger],
-                    useFactory: (logger: Logger) => {
-                        return new TransportAmqp(logger, settings.options);
+                    useFactory: async (logger: Logger) => {
+                        const transport = new TransportAmqp(logger, settings.options);
+                        await transport.connect();
+                        return transport;
                     }
                 });
                 break;
