@@ -39,8 +39,7 @@ export class BtcApiInputsTransactionLoader extends SequienceExecutor<Array<IBtcI
                 transaction.vout = transaction.vout.filter(output => output.n === input.vout);
 
                 if (transaction.vout.length === 0) {
-                    console.log(input);
-                    process.exit();
+                    console.error(`Input has zero vout: ${input}`);
                 }
 
                 ObjectUtil.clear(transaction, ['txid', 'vout']);

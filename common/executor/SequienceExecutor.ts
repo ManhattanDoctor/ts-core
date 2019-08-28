@@ -97,18 +97,6 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
         this.promise = null;
     }
 
-    protected async delay(timeout: number = NaN): Promise<void> {
-        let promise = PromiseHandler.create();
-        let timer = setTimeout(
-            () => {
-                clearTimeout(timer);
-                promise.resolve();
-            },
-            _.isNaN(timeout) ? this.delayTimeout : timeout
-        );
-        return promise.promise;
-    }
-
     // --------------------------------------------------------------------------
     //
     //  Private Methods

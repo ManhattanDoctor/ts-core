@@ -35,15 +35,16 @@ export class BtcApi extends LoggerWrapper {
             return;
         }
 
-        if (!_.isNil(item.coinbase)) {
+        if (!_.isNil(item.coinbase) || _.isNil(item.tx)) {
             return;
         }
 
+        
         try {
             item.tx.vout.forEach(BtcApi.parseOutput);
         } catch (error) {
+            console.log(error);
             console.log(item);
-            console.log(item.tx);
             process.exit(0);
         }
     }

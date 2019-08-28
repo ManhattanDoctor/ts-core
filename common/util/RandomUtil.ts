@@ -32,12 +32,14 @@ export class RandomUtil {
         return url + value;
     }
 
-    public static randomString(length: number = 10): string {
-        let value = '';
-        let maxLength = RandomUtil.RANDOM_STRING_VALUES.length;
+    public static randomString(length: number = 10, availableChars?: string): string {
+        if (_.isNil(availableChars)) {
+            availableChars = RandomUtil.RANDOM_STRING_VALUES;
+        }
 
+        let value = '';
         for (let i = 0; i < length; i++) {
-            value += RandomUtil.RANDOM_STRING_VALUES.charAt(RandomUtil.randomNumber(0, maxLength - 1));
+            value += availableChars.charAt(RandomUtil.randomNumber(0, availableChars.length - 1));
         }
         return value;
     }
