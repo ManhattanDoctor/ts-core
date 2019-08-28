@@ -132,7 +132,7 @@ export class TransportAmqp extends Transport {
             throw new ExtendedError(`${command.name} command request is null or undefined`);
         }
 
-        this.logCommand(command, TransportLogType.REQUEST_SEND);
+        this.logCommand(command, TransportLogType.REQUEST_NO_REPLY);
         this.sendToQueue(command, this.createCommandOptions(command, false));
     }
 
@@ -187,9 +187,12 @@ export class TransportAmqp extends Transport {
     }
 
     public async sendListen<U, V>(command: ITransportCommandAsync<U, V>, options?: ITransportCommandOptions): Promise<V> {
-        this.logCommand(command, TransportLogType.REQUEST_SEND);
+        let item = this.promises.get(command.id);
+        if (item) {
+            return item.promise;
+        }
 
-        let promise = PromiseHandler.create<any, ExtendedError>();
+        item = PromiseHandler.create<any, ExtendedError>();
 
         try {
             if (!this.replyQueue.has(command.name)) {
@@ -199,19 +202,19 @@ export class TransportAmqp extends Transport {
             }
 
             let commandOptions = this.createCommandOptions(command, true, options);
-            this.promises.set(commandOptions.correlationId, promise);
+            this.promises.set(commandOptions.correlationId, item);
 
+            this.logCommand(command, TransportLogType.REQUEST_SEND);
             await this.sendToQueue(command, commandOptions);
-            await PromiseHandler.delay(commandOptions.waitTimeout);
-
-            promise.reject(new TransportTimeoutError(command));
-            this.promises.delete(commandOptions.correlationId);
-            
+            PromiseHandler.delay(commandOptions.waitTimeout).then(() => {
+                item.reject(new TransportTimeoutError(command));
+                this.promises.delete(commandOptions.correlationId);
+            });
         } catch (error) {
-            this.parseError(error, promise.reject);
+            this.parseError(error, item.reject);
         }
 
-        return promise.promise;
+        return item.promise;
     }
 
     public complete<U, V>(command: ITransportCommand<U>, result?: V | ExtendedError): Promise<void> {

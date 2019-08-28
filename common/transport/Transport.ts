@@ -56,7 +56,7 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
             return;
         }
         let async = command as ITransportCommandAsync<U, any>;
-        this.verboseData(this.isCommandHasError(command) ? async.error : async.response, type);
+        this.verboseData(this.isCommandHasError(command) ? async.error : async.data, type);
     }
 
     private getLogMark(type: TransportLogType): string {
@@ -65,7 +65,8 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
                 return '←';
             case TransportLogType.REQUEST_RECEIVE:
                 return '⇠';
-
+            case TransportLogType.REQUEST_NO_REPLY:
+                return '↮';
             case TransportLogType.REQUEST_SEND:
                 return '→';
             case TransportLogType.RESPONSE_SEND:
@@ -110,10 +111,12 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
         switch (type) {
             case TransportLogType.REQUEST_SEND:
             case TransportLogType.REQUEST_RECEIVE:
+            case TransportLogType.REQUEST_NO_REPLY:
                 this.logRequest(command, type);
                 break;
 
             case TransportLogType.RESPONSE_SEND:
+            case TransportLogType.RESPONSE_RECEIVE:
             case TransportLogType.RESPONSE_RECEIVE:
                 this.logResponse(command, type);
                 break;
@@ -122,10 +125,13 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
 }
 
 export enum TransportLogType {
-    RESPONSE_RECEIVE = 'RESPONSE_RECEIVE',
     REQUEST_RECEIVE = 'REQUEST_RECEIVE',
     REQUEST_SEND = 'REQUEST_SEND',
+    REQUEST_NO_REPLY = 'REQUEST_NO_REPLY',
+
+    RESPONSE_RECEIVE = 'RESPONSE_RECEIVE',
     RESPONSE_SEND = 'RESPONSE_SEND',
     RESPONSE_NO_REPLY = 'RESPONSE_NO_REPLY',
+
     RESPONSE_WAIT = 'RESPONSE_WAIT'
 }

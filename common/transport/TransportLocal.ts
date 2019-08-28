@@ -53,11 +53,13 @@ export class TransportLocal extends Transport {
 
     public sendListen<U, V>(command: ITransportCommandAsync<U, V>, options?: ITransportCommandOptions): Promise<V> {
         let item = this.promises.get(command.id);
-        if (!item) {
-            item = PromiseHandler.create();
-            this.promises.set(command.id, item);
-            this.send(command, options);
+        if (item) {
+            return item.promise;
         }
+        
+        item = PromiseHandler.create();
+        this.promises.set(command.id, item);
+        this.send(command, options);
 
         let timeout = Transport.WAIT_TIMEOUT;
         if (!_.isNil(options) && _.isNumber(options.waitTimeout)) {
@@ -67,8 +69,6 @@ export class TransportLocal extends Transport {
             item.reject(new TransportTimeoutError(command));
             this.promises.delete(command.id);
         });
-
-        return item.promise;
     }
 
     public complete<U, V>(command: ITransportCommand<U>, result?: V | Error): void {
