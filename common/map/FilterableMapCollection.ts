@@ -1,9 +1,8 @@
 import * as _ from 'lodash';
-import { Destroyable } from '../../frontend';
-import { DestroyableMapCollection } from './DestroyableMapCollection';
 import { ArrayUtil } from '../util';
+import { DestroyableMapCollection } from './DestroyableMapCollection';
 
-export class FilterableMapCollection<U extends Destroyable> extends DestroyableMapCollection<U> {
+export class FilterableMapCollection<U> extends DestroyableMapCollection<U> {
     // --------------------------------------------------------------------------
     //
     //	Properties
