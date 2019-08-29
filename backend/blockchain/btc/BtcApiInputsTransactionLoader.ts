@@ -70,7 +70,7 @@ export class BtcApiInputsTransactionLoader extends SequienceExecutor<Array<IBtcI
         if (!this.preloader.isSpinning()) {
             this.preloader.start();
         }
-        this.preloader.setSpinnerTitle(`${this.totalIndex} / ${this.totalLength} (${this.progress.toFixed(1)}%) transactions loaded`);
+        this.preloader.setSpinnerTitle(`${this.totalIndex} / ${this.totalLength} (${this.progress.toFixed(1)}%) inputs loaded`);
     }
 
     // --------------------------------------------------------------------------

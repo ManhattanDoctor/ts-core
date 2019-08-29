@@ -66,8 +66,8 @@ export class BtcApi extends LoggerWrapper {
                 item.address = item.addresses[0];
                 break;
             case BtcOutputType.NULL_DATA:
-
             case BtcOutputType.MULTI_SIGN:
+            case BtcOutputType.NON_STANDART:
             case BtcOutputType.WITNESS_V0_KEY_HASH:
             case BtcOutputType.WITNESS_V0_SCRIPT_HASH:
                 break;
@@ -121,19 +121,36 @@ export class BtcApi extends LoggerWrapper {
         return promise.promise;
     }
 
-    private async loadInputs(inputs: Array<IBtcInput>): Promise<void> {
+    private isBlock(item: any): boolean {
+        return ObjectUtil.instanceOf(item, ['tx', 'height']);
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    // 	Input Methods
+    //
+    // --------------------------------------------------------------------------
+
+    public async loadInputs(source: IBtcTransaction | IBtcBlock): Promise<void> {
+        let inputs = this.getInputs(source as IBtcTransaction | IBtcBlock);
         if (_.isEmpty(inputs)) {
             return;
         }
         let item = new BtcApiInputsTransactionLoader(this, true);
         await item.start(_.chunk(inputs, 15));
         item.destroy();
+
+        if (this.isBlock(source)) {
+            BtcApi.parseBlock(source as IBtcBlock);
+        } else {
+            BtcApi.parseTransaction(source as IBtcTransaction);
+        }
     }
 
     private getInputs(item: IBtcBlock | IBtcTransaction): Array<IBtcInput> {
         let items = [];
 
-        if (ObjectUtil.instanceOf(item, ['tx', 'height'])) {
+        if (this.isBlock(item)) {
             item = item as IBtcBlock;
             for (let transaction of item.tx) {
                 items.push(...this.getInputs(transaction));
@@ -160,26 +177,20 @@ export class BtcApi extends LoggerWrapper {
         return item.blocks;
     }
 
-    public async getBlock(block: number, isNeedTransactions?: boolean): Promise<IBtcBlock> {
+    public async getBlock(block: number): Promise<IBtcBlock> {
         let hash = await this.call('getBlockHash', block);
-        let item = await this.call<IBtcBlock>('getBlock', hash, isNeedTransactions ? 2 : 0);
-
-        if (isNeedTransactions) {
-            // item.tx = item.tx.slice(0, 5);
-            this.debug(`Loading transactions for block ${item.height}...`);
-            await this.loadInputs(this.getInputs(item));
-        }
-
+        let item = await this.call<IBtcBlock>('getBlock', hash, 2);
         BtcApi.parseBlock(item);
         return item;
     }
 
     public async getTransaction(transaction: string | IBtcTransaction, isNeedInputs?: boolean): Promise<IBtcTransaction> {
         let item = _.isString(transaction) ? await this.call('getRawTransaction', transaction, 1) : (transaction as IBtcTransaction);
-        if (!isNeedInputs || _.isEmpty(item.vin)) {
+        if (!isNeedInputs) {
             return item;
         }
-        await this.loadInputs(this.getInputs(item));
+        await this.loadInputs(item);
+        BtcApi.parseTransaction(item);
         return item;
     }
 

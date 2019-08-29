@@ -23,5 +23,6 @@ export enum BtcOutputType {
     SCRIPT_HASH = 'scripthash',
     WITNESS_V0_KEY_HASH = 'witness_v0_keyhash',
     WITNESS_V0_SCRIPT_HASH = 'witness_v0_scripthash',
-    NULL_DATA = 'nulldata'
+    NULL_DATA = 'nulldata',
+    NON_STANDART = 'nonstandard',
 }
