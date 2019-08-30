@@ -1,3 +1,4 @@
+import { isObservable, Observable } from 'rxjs';
 import { IDestroyable } from '../IDestroyable';
 
 export class PromiseHandler<U = any, V = string> implements IDestroyable {
@@ -22,6 +23,16 @@ export class PromiseHandler<U = any, V = string> implements IDestroyable {
             promise.resolve();
         }, timeout);
         return promise.promise;
+    }
+
+    public static toPromise<U>(result: U | Promise<U> | Observable<U>): Promise<U> {
+        if (result instanceof Promise) {
+            return result;
+        }
+        if (isObservable(result)) {
+            return result.toPromise();
+        }
+        return Promise.resolve(result);
     }
 
     // --------------------------------------------------------------------------
