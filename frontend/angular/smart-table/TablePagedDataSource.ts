@@ -1,7 +1,7 @@
-import { IPagination } from '@common/pagination/IPagination';
 import { IDestroyable } from '@ts-core/common';
 import { ApiResponse } from '@ts-core/frontend/api';
 import { LocalDataSource } from 'ng2-smart-table';
+import { IPagination } from '../../../common/dto';
 import { ApiPagedMapCollection } from '../api';
 import { TableDataSource } from './TableDataSource';
 
@@ -22,7 +22,7 @@ export class TablePagedDataSource<U> extends TableDataSource<U> implements IDest
     //
     //--------------------------------------------------------------------------
 
-    protected loadingCompleteHandler(response: ApiResponse<IPagination<any>>): void {
+    protected loadingCompleteHandler<T>(response: ApiResponse<IPagination<T>>): void {
         this._count = response.data.total;
         this.promiseResolve(this.map.collection);
         this.destroyPromise();
