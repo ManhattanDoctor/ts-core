@@ -331,6 +331,16 @@
     }
 }
 
+@mixin vi-mat-core-ng2-smart-table-column($width) {
+    width: $width;
+    @include text-one-line();
+
+    .ng2-smart-title {
+        width: $width;
+        @include text-one-line();
+    }
+}
+
 
 @mixin nb-ltr($prop: null, $value: null) {
     @include _prepend-with-selector('[dir=ltr]', $prop, $value) {
