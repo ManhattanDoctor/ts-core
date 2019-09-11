@@ -5,6 +5,7 @@ import { DefaultLogger } from '../logger/DefaultLogger';
 import { VIModule } from '../VIModule';
 import { AssetModule } from './asset/AssetModule';
 import { CookieModule, CookieOptions } from './cookie';
+import { ClickToCopyDirective, ClickToSelectDirective, FocusDirective } from './directive';
 import { LanguageModule } from './language/LanguageModule';
 import { LoginGuard, LoginRedirectResolver, LoginResolver } from './login';
 import { NotificationModule } from './notification';
@@ -13,7 +14,19 @@ import { ThemeModule } from './theme';
 import { WindowModule } from './window';
 
 @NgModule({
-    declarations: [NgModelErrorPipe, FinancePipe, MomentDateAdaptivePipe, MomentDatePipe, MomentTimePipe, SanitizePipe, TruncatePipe],
+    declarations: [
+        NgModelErrorPipe,
+        FinancePipe,
+        MomentDateAdaptivePipe,
+        MomentDatePipe,
+        MomentTimePipe,
+        SanitizePipe,
+        TruncatePipe,
+
+        FocusDirective,
+        ClickToSelectDirective,
+        ClickToCopyDirective
+    ],
     providers: [LoginResolver, LoginGuard, LoginRedirectResolver],
     exports: [
         VIModule,
@@ -22,13 +35,18 @@ import { WindowModule } from './window';
         WindowModule,
         NotificationModule,
         ThemeModule,
+
         NgModelErrorPipe,
         FinancePipe,
         MomentDateAdaptivePipe,
         MomentDatePipe,
         MomentTimePipe,
         SanitizePipe,
-        TruncatePipe
+        TruncatePipe,
+
+        FocusDirective,
+        ClickToSelectDirective,
+        ClickToCopyDirective
     ]
 })
 export class VIAngularModule {

@@ -167,15 +167,15 @@ export class WindowService extends Destroyable {
         this.observer.next(new ObservableData(WindowServiceEvent.CLOSED, window.window));
     }
 
-    private getById(id: string): IWindow {
-        let result = null;
+    private getById<T>(id: string): IWindow<T> {
+        let result: IWindowContent = null;
         this.windows.forEach(item => {
             if (item.config.id === id) {
                 result = item;
                 return true;
             }
         });
-        return result;
+        return !_.isNil(result)? result.window : null;
     }
 
     private setDefaultProperties(config: WindowConfig): void {
@@ -268,7 +268,7 @@ export class WindowService extends Destroyable {
         return window.content;
     }
 
-    public get<T extends IWindowContent>(value: WindowId): T {
+    public get(value: WindowId): IWindowContent {
         let id = value.toString();
         if (value instanceof WindowConfig) {
             id = value.id;
@@ -277,7 +277,10 @@ export class WindowService extends Destroyable {
             return null;
         }
         let window = this.getById(id);
-        return window ? (window.content as any) : null;
+        if (_.isNil(window)) {
+            return null;
+        }
+        return window.content;
     }
 
     public has(value: WindowId): boolean {

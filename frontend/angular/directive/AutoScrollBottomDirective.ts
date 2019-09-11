@@ -99,11 +99,14 @@ export class AutoScrollBottomDirective extends InfiniteScrollDirective {
         if (value === this._trigger) {
             return;
         }
-        if (!isNaN(this._trigger) && !isNaN(value)) this.triggerDelta = value - this._trigger;
+        if (!isNaN(this._trigger) && !isNaN(value)) {
+            this.triggerDelta = value - this._trigger;
+        }
 
         this._trigger = value;
-        if (!this.isInitialized) return;
-
+        if (!this.isInitialized) {
+            return;
+        }
         this.isScrollLocked = true;
         clearTimeout(this.triggerTimer);
         this.triggerTimer = setTimeout(this.checkTrigger, InfiniteScrollDirective.INITIALIZATION_DELAY);

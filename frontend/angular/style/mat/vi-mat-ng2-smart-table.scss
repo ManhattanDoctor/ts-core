@@ -9,6 +9,37 @@
 @mixin vi-mat-core-ng2-smart-table($typography) {
     $padding: 1rem !important;
 
+    ng2-smart-table {
+        display: block;
+
+        &::ng-deep {
+        // /deep/ {
+            .column-xs {
+                @include vi-mat-core-ng2-smart-table-column(50px);
+            }
+
+            .column-s {
+                @include vi-mat-core-ng2-smart-table-column(75px);
+            }
+
+            .column-xm {
+                @include vi-mat-core-ng2-smart-table-column(100px);
+            }
+
+            .column-m {
+                @include vi-mat-core-ng2-smart-table-column(125px);
+            }
+
+            .column-xl {
+                @include vi-mat-core-ng2-smart-table-column(150px);
+            }
+
+            .column-l {
+                @include vi-mat-core-ng2-smart-table-column(175px);
+            }
+        }
+    }
+
     table tr th,
     table tr th a {
         @include mat-typography-level-to-styles($typography, body-2);
