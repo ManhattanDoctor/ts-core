@@ -7,6 +7,17 @@ export class ArrayUtil {
     //
     // --------------------------------------------------------------------------
 
+    public static createFixedLength<T>(length: number, initialValues?: Array<T>): Array<T> {
+        let item = _.isEmpty(initialValues) ? new Array() : initialValues.slice(0, length);
+        item.push = function() {
+            if (this.length >= length) {
+                this.shift();
+            }
+            return Array.prototype.push.apply(this, arguments);
+        };
+        return item;
+    }
+
     public static sort(array: Array<{ sortIndex: number }>): void {
         if (!_.isEmpty(array)) {
             array.sort(ArrayUtil.sortFunction);
