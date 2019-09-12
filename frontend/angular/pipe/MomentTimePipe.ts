@@ -1,6 +1,4 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import * as moment from 'moment';
-import * as numeral from 'numeral';
 import { DateUtil } from '../../../common/util';
 
 @Pipe({
@@ -28,3 +26,6 @@ export class MomentTimePipe implements PipeTransform {
         return numeral(seconds).format('00:00:00');
     }
 }
+
+declare let moment: any;
+declare let numeral: any;

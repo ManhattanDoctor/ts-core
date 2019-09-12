@@ -1,6 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 import { Moment } from 'moment';
 import { MomentDatePipe } from './MomentDatePipe';
 
@@ -46,3 +45,5 @@ export class MomentDateAdaptivePipe implements PipeTransform {
         return item.format(format);
     }
 }
+
+declare let moment: any;
