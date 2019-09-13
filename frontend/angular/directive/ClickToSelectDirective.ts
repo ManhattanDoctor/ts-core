@@ -1,5 +1,5 @@
 import { Directive, ElementRef, HostListener } from '@angular/core';
-import { Destroyable } from '../../Destroyable';
+import { Destroyable } from '../../../common/Destroyable';
 import { ViewUtil } from '../util';
 
 @Directive({

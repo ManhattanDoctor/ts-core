@@ -2,7 +2,7 @@ import { Directive, ElementRef, HostListener, Input, OnInit } from '@angular/cor
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 import { Assets } from '../../asset';
-import { Destroyable } from '../../Destroyable';
+import { Destroyable } from '../../../common/Destroyable';
 import { ViewUtil } from '../util';
 import { Theme } from './Theme';
 import { ThemeService, ThemeServiceEvent } from './ThemeService';

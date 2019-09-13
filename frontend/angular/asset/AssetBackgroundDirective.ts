@@ -1,7 +1,7 @@
 import { Directive, ElementRef, Input } from '@angular/core';
 import * as _ from 'lodash';
 import { Assets } from '../../asset';
-import { Destroyable } from '../../Destroyable';
+import { Destroyable } from '../../../common/Destroyable';
 import { ViewUtil } from '../util';
 
 @Directive({

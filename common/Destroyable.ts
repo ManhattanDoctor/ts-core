@@ -1,4 +1,6 @@
-export abstract class Destroyable {
+import { IDestroyable } from './IDestroyable';
+
+export abstract class Destroyable implements IDestroyable {
     // --------------------------------------------------------------------------
     //
     //  Public Methods

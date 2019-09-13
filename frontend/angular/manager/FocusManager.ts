@@ -1,5 +1,5 @@
 import { ElementRef } from '@angular/core';
-import { Destroyable } from '../../Destroyable';
+import { Destroyable } from '../../../common/Destroyable';
 import { ViewUtil } from '../util';
 
 export class FocusManager extends Destroyable {

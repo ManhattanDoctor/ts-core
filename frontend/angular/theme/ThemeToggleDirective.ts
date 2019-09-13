@@ -1,5 +1,5 @@
 import { Directive, HostListener } from '@angular/core';
-import { Destroyable } from '../../Destroyable';
+import { Destroyable } from '../../../common/Destroyable';
 import { ThemeService } from './ThemeService';
 
 @Directive({

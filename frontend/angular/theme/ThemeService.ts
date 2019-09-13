@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 import { ExtendedError } from '../../../common/error';
 import { MapCollection } from '../../../common/map';
-import { Destroyable } from '../../Destroyable';
+import { Destroyable } from '../../../common/Destroyable';
 import { CookieService } from '../cookie';
 import { ViewUtil } from '../util';
 import { Theme } from './Theme';

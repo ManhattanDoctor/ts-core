@@ -1,6 +1,6 @@
 import { Directive, ElementRef, Input } from '@angular/core';
 import * as _ from 'lodash';
-import { Destroyable } from '../../Destroyable';
+import { Destroyable } from '../../../common/Destroyable';
 import { FocusManager } from '../manager';
 
 @Directive({

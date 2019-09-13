@@ -1,5 +1,5 @@
 import { Directive, HostListener, Input } from '@angular/core';
-import { Destroyable } from '../../Destroyable';
+import { Destroyable } from '../../../common/Destroyable';
 import { ViewUtil } from '../util';
 
 @Directive({
@@ -8,7 +8,7 @@ import { ViewUtil } from '../util';
 export class ClickToCopyDirective extends Destroyable {
     // --------------------------------------------------------------------------
     //
-    //	Properties
+    //  Properties
     //
     // --------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ export class ClickToCopyDirective extends Destroyable {
 
     // --------------------------------------------------------------------------
     //
-    //	Constructor
+    //  Constructor
     //
     // --------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ export class ClickToCopyDirective extends Destroyable {
 
     // --------------------------------------------------------------------------
     //
-    //	Event Handlers
+    //  Event Handlers
     //
     // --------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ export class ClickToCopyDirective extends Destroyable {
 
     // --------------------------------------------------------------------------
     //
-    //	Public Methods
+    //  Public Methods
     //
     // --------------------------------------------------------------------------
 

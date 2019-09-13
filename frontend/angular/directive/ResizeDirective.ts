@@ -1,7 +1,7 @@
 import { Directive, ElementRef, EventEmitter, Input, Output } from '@angular/core';
 import { Interactable } from '@interactjs/types/types';
 import * as interact from 'interactjs';
-import { Destroyable } from '../../Destroyable';
+import { Destroyable } from '../../../common/Destroyable';
 import { ViewUtil } from '../util';
 
 @Directive({

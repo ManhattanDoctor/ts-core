@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { Destroyable } from '../../Destroyable';
+import { Destroyable } from '../../../common/Destroyable';
 import { IWindowContent } from './IWindowContent';
 import { WindowConfig } from './WindowConfig';
 

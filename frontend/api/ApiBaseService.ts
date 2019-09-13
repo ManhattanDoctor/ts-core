@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
-import { Destroyable } from '../Destroyable';
+import { Destroyable } from '../../common/Destroyable';
 import { ApiMethod } from './ApiMethod';
 import { ObservableData } from '../../common/observer';
 import { LoadableEvent } from '../../common';

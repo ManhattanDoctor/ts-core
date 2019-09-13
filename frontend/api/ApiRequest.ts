@@ -1,4 +1,4 @@
-import { Destroyable } from '../Destroyable';
+import { Destroyable } from '../../common/Destroyable';
 import { ApiMethod } from './ApiMethod';
 import { IApiRequestConfig } from './IApiRequestConfig';
 

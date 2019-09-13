@@ -2,7 +2,7 @@ import { Observable, Subject } from 'rxjs';
 import { LoadableEvent } from '../../../common';
 import { ObservableData } from '../../../common/observer';
 import { ApiResponse } from '../../api';
-import { Destroyable } from '../../Destroyable';
+import { Destroyable } from '../../../common/Destroyable';
 
 export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
     // --------------------------------------------------------------------------

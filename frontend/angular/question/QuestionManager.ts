@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { PromiseHandler } from '../../../common/promise';
-import { Destroyable } from '../../Destroyable';
+import { Destroyable } from '../../../common/Destroyable';
 import { IQuestion, IQuestionOptions, QuestionMode } from './IQuestion';
 
 export class QuestionManager extends Destroyable implements IQuestion {

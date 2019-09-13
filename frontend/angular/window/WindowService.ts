@@ -4,7 +4,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 import { ObservableData } from '../../../common/observer';
-import { Destroyable } from '../../Destroyable';
+import { Destroyable } from '../../../common/Destroyable';
 import { CookieService } from '../cookie';
 import { LanguageService } from '../language';
 import { IQuestion, IQuestionOptions, QuestionMode } from '../question';

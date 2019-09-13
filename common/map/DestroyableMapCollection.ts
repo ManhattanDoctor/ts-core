@@ -4,7 +4,7 @@ import { MapCollection } from './MapCollection';
 export class DestroyableMapCollection<U> extends MapCollection<U> {
     // --------------------------------------------------------------------------
     //
-    //	Protected Methods
+    //  Protected Methods
     //
     // --------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ export class DestroyableMapCollection<U> extends MapCollection<U> {
 
     // --------------------------------------------------------------------------
     //
-    //	Public Methods
+    //  Public Methods
     //
     // --------------------------------------------------------------------------
 
