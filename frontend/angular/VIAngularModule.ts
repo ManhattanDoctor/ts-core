@@ -9,7 +9,18 @@ import { ClickToCopyDirective, ClickToSelectDirective, FocusDirective } from './
 import { LanguageModule } from './language/LanguageModule';
 import { LoginGuard, LoginRedirectResolver, LoginResolver } from './login';
 import { NotificationModule } from './notification';
-import { FinancePipe, MomentDateAdaptivePipe, MomentDatePipe, MomentTimePipe, NgModelErrorPipe, SanitizePipe, TruncatePipe, CamelCasePipe } from './pipe';
+import {
+    CamelCasePipe,
+    FinancePipe,
+    MomentDateAdaptivePipe,
+    MomentDateFromNowPipe,
+    MomentDatePipe,
+    MomentTimePipe,
+    NgModelErrorPipe,
+    SanitizePipe,
+    TruncatePipe,
+    StartCasePipe
+} from './pipe';
 import { ThemeModule } from './theme';
 import { WindowModule } from './window';
 
@@ -20,9 +31,11 @@ import { WindowModule } from './window';
         MomentDateAdaptivePipe,
         MomentDatePipe,
         MomentTimePipe,
+        MomentDateFromNowPipe,
         SanitizePipe,
         TruncatePipe,
         CamelCasePipe,
+        StartCasePipe,
 
         FocusDirective,
         ClickToSelectDirective,
@@ -42,10 +55,12 @@ import { WindowModule } from './window';
         MomentDateAdaptivePipe,
         MomentDatePipe,
         MomentTimePipe,
+        MomentDateFromNowPipe,
         SanitizePipe,
         TruncatePipe,
         CamelCasePipe,
-        
+        StartCasePipe,
+
         FocusDirective,
         ClickToSelectDirective,
         ClickToCopyDirective

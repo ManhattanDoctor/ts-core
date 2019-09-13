@@ -26,6 +26,20 @@ export class MomentDatePipe implements PipeTransform {
 
     public static DEFAULT_FORMAT = 'LLL';
 
+    public static fromNow(value: Date | Moment, format: string = 'LLL'): string {
+        if (_.isNil(value)) {
+            return '---';
+        }
+
+        let item = MomentDatePipe.parseMoment(value);
+        let date = item.fromNow();
+        date = date.charAt(0).toUpperCase() + date.slice(1);
+        if (!_.isNil(format)) {
+            date += ' (' + item.format(format) + ')';
+        }
+        return date;
+    }
+
     // --------------------------------------------------------------------------
     //
     //	Public Methods
@@ -39,19 +53,6 @@ export class MomentDatePipe implements PipeTransform {
 
         let item = MomentDatePipe.parseMoment(value);
         return item.format(format || MomentDatePipe.DEFAULT_FORMAT);
-    }
-
-    public fromNow(value: Date | Moment, format: string = 'LLL'): string {
-        if (_.isNil(value)) {
-            return null;
-        }
-
-        let item = MomentDatePipe.parseMoment(value);
-        let date = item.fromNow();
-        if (!_.isNil(format)) {
-            date += ' (' + item.format(format) + ')';
-        }
-        return date;
     }
 }
 
