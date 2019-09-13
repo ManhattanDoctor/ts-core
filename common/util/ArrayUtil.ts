@@ -8,7 +8,11 @@ export class ArrayUtil {
     // --------------------------------------------------------------------------
 
     public static createFixedLength<T>(length: number, initialValues?: Array<T>): Array<T> {
-        let item = _.isEmpty(initialValues) ? new Array() : initialValues.slice(0, length);
+        let item = [];
+        if (!_.isEmpty(initialValues)) {
+            item = initialValues.slice(-length);
+        }
+
         item.push = function() {
             if (this.length >= length) {
                 this.shift();
