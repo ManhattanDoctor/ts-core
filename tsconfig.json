@@ -12,10 +12,11 @@
         "target": "esnext",
         "sourceMap": false,
         "outDir": "./build",
-        "baseUrl": "./src",
+        "baseUrl": "./",
         "paths": {},
         "noUnusedLocals": false,
         "noUnusedParameters": false,
         "newLine": "LF"
     }
 }
+

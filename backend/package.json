@@ -1,10 +1,10 @@
 {
-    "name": "core-backend",
+    "name": "@ts-core/backend",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "",
     "scripts": {},
-    "author": "",
+    "author": "Renat Gubaev",
     "license": "ISC",
     "dependencies": {
         "@nestjs/common": "6.6.7",
