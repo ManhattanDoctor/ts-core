@@ -7,11 +7,11 @@ import { ApiResponse } from '../../api';
 import { ApiFilterableMapCollection } from '../api';
 
 export class TableDataSource<U> extends LocalDataSource implements IDestroyable {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected _count: number = 0;
 
@@ -20,11 +20,11 @@ export class TableDataSource<U> extends LocalDataSource implements IDestroyable 
     protected promiseReject: (error: string) => void;
     protected promiseResolve: (items: Array<U>) => void;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(protected map: ApiFilterableMapCollection<U, any>) {
         super();
@@ -56,11 +56,11 @@ export class TableDataSource<U> extends LocalDataSource implements IDestroyable 
         });
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Protected Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected loadingCompleteHandler(response: ApiResponse): void {
         this.data = this.map.collection;
@@ -89,11 +89,11 @@ export class TableDataSource<U> extends LocalDataSource implements IDestroyable 
         this.map.load();
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public destroy(): void {
         this.destroyPromise();

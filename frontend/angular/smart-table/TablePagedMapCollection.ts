@@ -1,35 +1,35 @@
-import { ApiBaseService, ApiMethod, ApiResponse } from '@ts-core/frontend/api';
 import { LocalDataSource } from 'ng2-smart-table';
 import { IPagination } from '../../../common/dto';
+import { ApiBaseService, ApiMethod, ApiResponse } from '../../api';
 import { ApiPagedMapCollection } from '../api';
 import { TablePagedDataSource } from './TablePagedDataSource';
 
 export abstract class TablePagedMapCollection<U, V> extends ApiPagedMapCollection<U, V> {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected _table: TablePagedDataSource<U>;
     protected isNeedTableRefresh: boolean;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     constructor(api: ApiBaseService, requestName?: string, requestMethod?: ApiMethod, uidPropertyName?: keyof U) {
         super(api, requestName, requestMethod, uidPropertyName);
         this._table = this.getTable();
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Protected Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected getTable(): TablePagedDataSource<U> {
         return new TablePagedDataSource(this);
@@ -41,11 +41,11 @@ export abstract class TablePagedMapCollection<U, V> extends ApiPagedMapCollectio
         this._isAllLoaded = false;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public reload(): void {
         this.isNeedTableRefresh = true;
@@ -69,11 +69,11 @@ export abstract class TablePagedMapCollection<U, V> extends ApiPagedMapCollectio
         }
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get table(): LocalDataSource {
         return this._table;

@@ -452,7 +452,9 @@ export class TransportAmqp extends Transport {
     }
 
     private async assert(queue: string): Promise<boolean> {
-        if (this.asserts.has(queue)) return Promise.resolve(true);
+        if (this.asserts.has(queue)) {
+            return Promise.resolve(true);
+        }
 
         try {
             let options: Options.AssertQueue = { durable: true };
@@ -495,13 +497,15 @@ export class TransportAmqp extends Transport {
     }
 
     private async assertEventExchange() {
-        if (this.asserts.has(TransportAmqp.EVENT_EXCHANGE)) return Promise.resolve(true);
+        if (this.asserts.has(TransportAmqp.EVENT_EXCHANGE)) {
+            return Promise.resolve(true);
+        }
         try {
             await this.channel.assertExchange(TransportAmqp.EVENT_EXCHANGE, 'fanout', { durable: false });
             this.asserts.add(TransportAmqp.EVENT_EXCHANGE);
             return Promise.resolve(true);
-        } catch (e) {
-            return Promise.reject(e);
+        } catch (error) {
+            return Promise.reject(error);
         }
     }
 
@@ -525,7 +529,9 @@ export class TransportAmqp extends Transport {
     }
 
     private async assertDelay(queue: string, delayQueue: string): Promise<boolean> {
-        if (this.delayAsserts.has(queue)) return Promise.resolve(true);
+        if (this.delayAsserts.has(queue)) {
+            return Promise.resolve(true);
+        }
         try {
             await this.channel.assertExchange(delayQueue, 'direct');
             await this.channel.assertQueue(delayQueue, {

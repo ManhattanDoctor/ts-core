@@ -4,20 +4,20 @@ import { ApiResponse } from '../../api';
 import { ApiFilterableMapCollection } from './ApiFilterableMapCollection';
 
 export abstract class ApiPagedMapCollection<U, V> extends ApiFilterableMapCollection<U, IPagination<V>> implements IPage {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected _pageSize: number = 10;
     protected _pageIndex: number = 0;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public reload(): void {
         this._pageIndex = 0;
@@ -30,11 +30,11 @@ export abstract class ApiPagedMapCollection<U, V> extends ApiFilterableMapCollec
         this._pageIndex = null;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Protected Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected getParamsForRequest(): IPaginable<IPagination<V>> {
         let params: IPaginable<V> = super.getParamsForRequest() as any;
@@ -68,11 +68,11 @@ export abstract class ApiPagedMapCollection<U, V> extends ApiFilterableMapCollec
 
     protected commitPageIndexProperties(): void {}
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get pageSize(): number {
         return this._pageSize;

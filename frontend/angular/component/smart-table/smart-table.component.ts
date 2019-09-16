@@ -7,11 +7,11 @@ import { LanguageService } from '../../language';
 import { TableMapCollection, TablePagedMapCollection } from '../../smart-table';
 
 export abstract class SmartTableComponent<V, U extends TableMapCollection<V, any> | TablePagedMapCollection<V, any>> extends DestroyableContainer {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     @Input()
     public isHideHeader: boolean = false;
@@ -39,11 +39,11 @@ export abstract class SmartTableComponent<V, U extends TableMapCollection<V, any
     private _settings: any;
     private _table: U;
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Constructor
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected constructor(language: LanguageService) {
         super();
@@ -56,11 +56,11 @@ export abstract class SmartTableComponent<V, U extends TableMapCollection<V, any
         );
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Private Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected commitTableProperties(): void {
         this._settings = this.getTableSettings(this.table);
@@ -118,11 +118,11 @@ export abstract class SmartTableComponent<V, U extends TableMapCollection<V, any
         return 'mouse-inactive text-one-line';
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get settings(): any {
         return this._settings;

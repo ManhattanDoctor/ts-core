@@ -4,22 +4,22 @@ import { ApiMethod } from '../../api';
 import { ApiLoadableMapCollection } from './ApiLoadableMapCollection';
 
 export abstract class ApiFilterableMapCollection<U, V> extends ApiLoadableMapCollection<U, V> {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     //  Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected _items: Array<U>;
 
     protected _sort: FilterableSort<U> = {};
     protected _conditions: FilterableConditions<U> = {};
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public reload(): void {
         this._items = [];
@@ -34,11 +34,11 @@ export abstract class ApiFilterableMapCollection<U, V> extends ApiLoadableMapCol
         this._conditions = null;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Protected Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     protected getParamsForRequest(): IFilterable<V> {
         let params: IFilterable<V> = {};
@@ -56,11 +56,11 @@ export abstract class ApiFilterableMapCollection<U, V> extends ApiLoadableMapCol
         return this.requestMethod === ApiMethod.GET ? JSON.stringify(param) : param;
     }
 
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Public Properties
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
     public get sort(): FilterableSort<U> {
         return this._sort;
