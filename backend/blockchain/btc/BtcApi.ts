@@ -1,5 +1,6 @@
 import * as RpcClient from 'bitcoind-rpc';
 import * as _ from 'lodash';
+import { ExtendedError } from '../../../common/error';
 import { ILogger, LoggerWrapper } from '../../../common/logger';
 import { PromiseHandler } from '../../../common/promise';
 import { ObjectUtil } from '../../../common/util';
@@ -108,11 +109,11 @@ export class BtcApi extends LoggerWrapper {
             params = [];
         }
 
-        let promise = PromiseHandler.create();
+        let promise = PromiseHandler.create<any, ExtendedError>();
         let method = this.client[methodName];
         params.push((error, data): void => {
             if (error) {
-                promise.reject(error);
+                promise.reject(new ExtendedError(error.message, error.code));
             } else {
                 promise.resolve(data.result);
             }
@@ -166,11 +167,19 @@ export class BtcApi extends LoggerWrapper {
         return items;
     }
 
+    private isError(data: any): boolean {
+        return _.isNil(data) ? true : ObjectUtil.instanceOf(data, ['code', 'message']);
+    }
+
     // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
     // --------------------------------------------------------------------------
+
+    public async sendRawTransaction(data: string): Promise<string> {
+        return this.call('sendRawTransaction', data);
+    }
 
     public async getBlockNumber(): Promise<number> {
         let item = await this.call('getBlockchainInfo');

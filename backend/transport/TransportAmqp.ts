@@ -371,7 +371,7 @@ export class TransportAmqp extends Transport {
         newCommand.response(response);
         this.logCommand(newCommand, TransportLogType.RESPONSE_RECEIVE);
 
-        this.rejectError(msg, response as ExtendedError, promise);
+        this.rejectError(msg, response, promise);
         promise.resolve(response);
 
         this.promises.delete(msg.properties.correlationId);
@@ -421,9 +421,9 @@ export class TransportAmqp extends Transport {
         return this.channel.publish(delayQueue, '', msg.content, msg.properties);
     }
 
-    private rejectError(msg: Message, data: ExtendedError, promise: PromiseHandler<any, ExtendedError>) {
+    private rejectError(msg: Message, data: any, promise: PromiseHandler<any, ExtendedError>) {
         if (msg.properties.headers && msg.properties.headers[RMQ_HEADER.GATEWAY_TRANSPORT_ERROR]) {
-            promise.reject(data);
+            promise.reject(new ExtendedError(data.message, data.code, data.details, data.isFatal));
         }
     }
 

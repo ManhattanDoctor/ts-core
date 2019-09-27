@@ -35,11 +35,10 @@ export class EthApi {
     // 	Public Methods
     //
     // --------------------------------------------------------------------------
-    // --------------------------------------------------------------------------
-    //
-    // 	Public Methods
-    //
-    // --------------------------------------------------------------------------
+
+    public async sendSignedTransaction(data: string): Promise<string> {
+        return this.client.eth.sendSignedTransaction(data);
+    }
 
     public contractCreate(abi: any, address: string): any {
         return new this.client.eth.Contract(abi, address);
