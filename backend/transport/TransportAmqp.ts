@@ -305,7 +305,6 @@ export class TransportAmqp extends Transport {
             this.channel.prefetch(1);
             this.connectionSucceed();
         } catch (error) {
-            console.log(error);
             if (this.connectionAttempts * TransportAmqp.RECONNECT_DELAY >= TransportAmqp.CONNECTION_TIMEOUT) {
                 this.connectionFailed('Unable to connect: timeout expired');
                 return;
