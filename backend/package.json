@@ -16,6 +16,8 @@
         "@nestjs/websockets": "6.6.7",
         "@nestjs/platform-ws": "6.6.7",
         "@nestjs/platform-socket.io": "6.6.7",
+        "@nestjs/swagger": "3.1.0",
+        "swagger-ui-express": "4.1.1",
         "passport": "0.4.0",
         "passport-http-bearer": "1.0.1",
         "passport-jwt": "4.0.0",
