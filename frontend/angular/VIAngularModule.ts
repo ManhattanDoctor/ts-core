@@ -5,7 +5,7 @@ import { DefaultLogger } from '../logger/DefaultLogger';
 import { VIModule } from '../VIModule';
 import { AssetModule } from './asset/AssetModule';
 import { CookieModule, CookieOptions } from './cookie';
-import { ClickToCopyDirective, ClickToSelectDirective, FocusDirective } from './directive';
+import { ClickToCopyDirective, ClickToSelectDirective, FocusDirective, ScrollDirective, AspectRatioResizeDirective, InfiniteScrollDirective, ResizeDirective } from './directive';
 import { LanguageModule } from './language/LanguageModule';
 import { LoginGuard, LoginRedirectResolver, LoginResolver } from './login';
 import { NotificationModule } from './notification';
@@ -38,8 +38,12 @@ import { WindowModule } from './window';
         StartCasePipe,
 
         FocusDirective,
+        ResizeDirective,
+        ScrollDirective,
+        ClickToCopyDirective,
         ClickToSelectDirective,
-        ClickToCopyDirective
+        InfiniteScrollDirective,
+        AspectRatioResizeDirective,
     ],
     providers: [LoginResolver, LoginGuard, LoginRedirectResolver],
     exports: [
@@ -62,8 +66,12 @@ import { WindowModule } from './window';
         StartCasePipe,
 
         FocusDirective,
+        ResizeDirective,
+        ScrollDirective,
+        ClickToCopyDirective,
         ClickToSelectDirective,
-        ClickToCopyDirective
+        InfiniteScrollDirective,
+        AspectRatioResizeDirective,
     ]
 })
 export class VIAngularModule {
