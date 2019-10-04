@@ -5,7 +5,15 @@ import { DefaultLogger } from '../logger/DefaultLogger';
 import { VIModule } from '../VIModule';
 import { AssetModule } from './asset/AssetModule';
 import { CookieModule, CookieOptions } from './cookie';
-import { ClickToCopyDirective, ClickToSelectDirective, FocusDirective, ScrollDirective, AspectRatioResizeDirective, InfiniteScrollDirective, ResizeDirective } from './directive';
+import {
+    AspectRatioResizeDirective,
+    ClickToCopyDirective,
+    ClickToSelectDirective,
+    FocusDirective,
+    InfiniteScrollDirective,
+    ResizeDirective,
+    ScrollDirective
+} from './directive';
 import { LanguageModule } from './language/LanguageModule';
 import { LoginGuard, LoginRedirectResolver, LoginResolver } from './login';
 import { NotificationModule } from './notification';
@@ -18,8 +26,8 @@ import {
     MomentTimePipe,
     NgModelErrorPipe,
     SanitizePipe,
-    TruncatePipe,
-    StartCasePipe
+    StartCasePipe,
+    TruncatePipe
 } from './pipe';
 import { ThemeModule } from './theme';
 import { WindowModule } from './window';
@@ -43,7 +51,7 @@ import { WindowModule } from './window';
         ClickToCopyDirective,
         ClickToSelectDirective,
         InfiniteScrollDirective,
-        AspectRatioResizeDirective,
+        AspectRatioResizeDirective
     ],
     providers: [LoginResolver, LoginGuard, LoginRedirectResolver],
     exports: [
@@ -71,7 +79,7 @@ import { WindowModule } from './window';
         ClickToCopyDirective,
         ClickToSelectDirective,
         InfiniteScrollDirective,
-        AspectRatioResizeDirective,
+        AspectRatioResizeDirective
     ]
 })
 export class VIAngularModule {
@@ -94,7 +102,14 @@ export class VIAngularModule {
 }
 
 export class VIAngularSettings implements CookieOptions {
-    loggerLevel = LoggerLevel.ALL;
+    path?: string;
+    domain?: string;
+    expires?: string | Date;
+    secure?: boolean;
+    httpOnly?: boolean;
+    storeUnencoded?: boolean;
+
+    loggerLevel?: LoggerLevel = LoggerLevel.ALL;
 }
 
 export function loggerFactory(settings: VIAngularSettings): ILogger {

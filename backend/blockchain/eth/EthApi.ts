@@ -74,7 +74,7 @@ export class EthApi {
     }
 
     public async getTransactionCount(address: string, block?: number): Promise<number> {
-        return this.client.getTransactionCount(address, block);
+        return this.client.eth.getTransactionCount(address, block);
     }
 
     public async getTransaction(id: string): Promise<IEthTransaction> {
