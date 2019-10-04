@@ -328,10 +328,14 @@ export class TransportAmqp extends Transport {
         this.connectionIPromise.resolve();
     }
 
-    private connectionFailed(message?: string): void {
+    private connectionFailed(message?: string, error?: Error): void {
         if (!message) {
             message = 'Connection failed';
         }
+        if (error) {
+            message += `:\n${error.message}`;
+        }
+
         this.connectionIPromise.reject(message);
         this.connectionIPromise = null;
         this.connectionPromise = null;
@@ -610,10 +614,10 @@ export class TransportAmqp extends Transport {
     // --------------------------------------------------------------------------
 
     private connectionErrorHandler = (error?: Error) => {
-        this.connectionFailed('Connection error');
+        this.connectionFailed('Connection error', error);
     };
     private connectionClosedHandler = (error?: Error) => {
-        this.connectionFailed('Connection closed');
+        this.connectionFailed('Connection closed', error);
     };
 
     // --------------------------------------------------------------------------
