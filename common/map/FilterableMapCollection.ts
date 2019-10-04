@@ -93,7 +93,8 @@ export class FilterableMapCollection<U> extends DestroyableMapCollection<U> {
     public get filtered(): Array<U> {
         return this._filtered;
     }
-    public get filters(): Array<(U) => void> {
+
+    public get filters(): Array<(U) => boolean> {
         return this._filters;
     }
 }
