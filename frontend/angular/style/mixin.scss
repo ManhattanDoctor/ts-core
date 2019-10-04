@@ -42,6 +42,10 @@
 //
 //-------------------------------------------------------------------------*/
 
+@mixin word-wrap-break() {
+    word-wrap: break-word;
+}
+
 @mixin text-one-line() {
     min-width: 0;
     overflow: hidden;

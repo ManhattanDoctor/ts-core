@@ -232,6 +232,9 @@
     .text-one-line {
         @include text-one-line();
     }
+    .word-wrap-break {
+        @include word-wrap-break();
+    }
     .scroll-no {
         @include scroll-no();
     }
