@@ -248,11 +248,10 @@ export class TransportAmqp extends Transport {
     }
 
     public wait<U>(command: ITransportCommand<U>): void {
-        const msg = this.getMessage(command);
-        const waitCount = this.getRetry(msg);
-
+        let msg = this.getMessage(command);
+        let waitCount = this.getRetry(msg);
         let headers = msg.properties.headers as ICommandHeaders;
-        const timeout = _.isNil(headers.GATEWAY_TRANSPORT_TIMEOUT) ? TransportAmqp.WAIT_TIMEOUT : headers.GATEWAY_TRANSPORT_TIMEOUT;
+        let timeout = _.isNil(headers.GATEWAY_TRANSPORT_TIMEOUT) ? TransportAmqp.WAIT_TIMEOUT : headers.GATEWAY_TRANSPORT_TIMEOUT;
 
         this.reject(msg);
         if (this.isCommandAsync(command) && waitCount * TransportAmqp.DELAY_TTL > timeout) {
