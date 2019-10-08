@@ -101,14 +101,7 @@ export class VIAngularModule {
     }
 }
 
-export class VIAngularSettings implements CookieOptions {
-    path?: string;
-    domain?: string;
-    expires?: string | Date;
-    secure?: boolean;
-    httpOnly?: boolean;
-    storeUnencoded?: boolean;
-
+export class VIAngularSettings extends CookieOptions {
     loggerLevel?: LoggerLevel = LoggerLevel.ALL;
 }
 
