@@ -44,7 +44,7 @@ export class DateUtil {
             return dateNumber > 0 ? DateUtil.getDate(dateNumber) : null;
         }
         if (_.isArray(value)) {
-            return value.length == 3 ? new Date(value[2], value[1], value[0]) : null;
+            return value.length === 3 ? new Date(value[2], value[1], value[0]) : null;
         }
         if (_.isString(value)) {
             return DateUtil.parseDate(value.split('.'));

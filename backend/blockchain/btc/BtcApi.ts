@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { ExtendedError } from '../../../common/error';
 import { ILogger, LoggerWrapper } from '../../../common/logger';
 import { PromiseHandler } from '../../../common/promise';
-import { ObjectUtil } from '../../../common/util';
+import { DateUtil, ObjectUtil } from '../../../common/util';
 import { BtcApiInputsTransactionLoader } from './BtcApiInputsTransactionLoader';
 import { IBtcBlock } from './IBtcBlock';
 import { IBtcInput } from './IBtcInput';
@@ -19,6 +19,7 @@ export class BtcApi extends LoggerWrapper {
 
     public static parseBlock(item: IBtcBlock): void {
         item.number = item.height;
+        item.createdDate = DateUtil.parseDate(item.time * DateUtil.MILISECONDS_MINUTE);
         item.tx.forEach(BtcApi.parseTransaction);
     }
 

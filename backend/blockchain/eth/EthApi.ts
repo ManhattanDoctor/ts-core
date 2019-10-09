@@ -1,5 +1,6 @@
 import * as Web3 from 'web3';
 import { PromiseHandler } from '../../../common/promise';
+import { DateUtil } from '../../../common/util';
 import { IEthBlock } from './IEthBlock';
 import { IEthTransaction } from './IEthTransaction';
 
@@ -11,6 +12,16 @@ export class EthApi {
     // --------------------------------------------------------------------------
 
     public static GAS_FEE_TRANSFER = 21000;
+
+    // --------------------------------------------------------------------------
+    //
+    // 	Static Methods
+    //
+    // --------------------------------------------------------------------------
+
+    public static parseBlock(item: IEthBlock): void {
+        item.createdDate = DateUtil.parseDate(item.timestamp * DateUtil.MILISECONDS_SECOND);
+    }
 
     // --------------------------------------------------------------------------
     //
@@ -61,7 +72,9 @@ export class EthApi {
     }
 
     public async getBlock(block: number | EthApiDefaultBlock, isNeedTransactions?: boolean): Promise<IEthBlock> {
-        return this.client.eth.getBlock(block, isNeedTransactions);
+        let item = await this.client.eth.getBlock(block, isNeedTransactions);
+        EthApi.parseBlock(item);
+        return item;
     }
 
     public async getBalance(address: string, block: number | EthApiDefaultBlock = EthApiDefaultBlock.LATEST): Promise<string> {

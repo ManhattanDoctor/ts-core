@@ -1,6 +1,12 @@
 import { IEthTransaction } from './IEthTransaction';
 
-export interface IEthBlock {
+export interface IEthBlock extends IEthBlockGeth {
+    number: number;
+    createdDate: Date;
+}
+
+export interface IEthBlockGeth {
+    number: number;
     difficulty: string;
     extraData: string;
     gasLimit: number;
@@ -10,7 +16,6 @@ export interface IEthBlock {
     miner: string;
     mixHash: string;
     nonce: string;
-    number: number;
     parentHash: string;
     receiptsRoot: string;
     sha3Uncles: string;

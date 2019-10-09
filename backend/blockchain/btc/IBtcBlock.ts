@@ -2,6 +2,7 @@ import { IBtcTransaction } from './IBtcTransaction';
 
 export interface IBtcBlock extends IBtcBlockBitcore {
     number: number;
+    createdDate: Date;
     tx: Array<IBtcTransaction>;
 }
 
