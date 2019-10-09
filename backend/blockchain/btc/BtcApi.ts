@@ -19,7 +19,7 @@ export class BtcApi extends LoggerWrapper {
 
     public static parseBlock(item: IBtcBlock): void {
         item.number = item.height;
-        item.createdDate = DateUtil.parseDate(item.time * DateUtil.MILISECONDS_MINUTE);
+        item.createdDate = DateUtil.parseDate(item.time * DateUtil.MILISECONDS_SECOND);
         item.tx.forEach(BtcApi.parseTransaction);
     }
 
