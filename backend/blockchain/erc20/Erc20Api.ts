@@ -1,4 +1,4 @@
-import { EthApi, EthApiDefaultBlock, IEthApiSettings, IEthEvent } from '../eth';
+import { EthApi, EthApiDefaultBlock, IEthApiSettings, IEthBlock, IEthEvent } from '../eth';
 
 export class Erc20Api {
     // --------------------------------------------------------------------------
@@ -33,6 +33,10 @@ export class Erc20Api {
 
     public async getBalance(address: string): Promise<string> {
         return this.client.contractCall<string>(this.contract, 'balanceOf', [address]);
+    }
+
+    public async getBlock(block: number | EthApiDefaultBlock, isNeedTransactions?: boolean): Promise<IEthBlock> {
+        return this.client.getBlock(block, isNeedTransactions);
     }
 
     // --------------------------------------------------------------------------
