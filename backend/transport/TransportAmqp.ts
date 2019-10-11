@@ -437,20 +437,20 @@ export class TransportAmqp extends Transport {
         return this.channel.sendToQueue(command.name, Buffer.from(JSON.stringify(request)), options);
     }
 
-    private async sendReplyToQueue<U, V>(command: ITransportCommandAsync<U, V>, replyQueueName, options = {} as Options.Publish): Promise<boolean> {
+    private async sendReplyToQueue<U, V>(command: ITransportCommandAsync<U, V>, replyQueueName: string, options = {} as Options.Publish): Promise<boolean> {
         options.messageId = command.id;
-        const data = command.error ? command.error : command.data;
-
+        let data = command.error ? command.error : command.data;
         options.headers = {};
 
         if (command.error) {
             options.headers[RMQ_HEADER.GATEWAY_TRANSPORT_ERROR] = true;
         } else if (data === undefined) {
             options.headers[RMQ_HEADER.GATEWAY_UNDERFINED_RESPONSE] = true;
+            data = {} as any;
         } else if (data === null) {
             options.headers[RMQ_HEADER.GATEWAY_NULL_RESPONSE] = true;
+            data = {} as any;
         }
-
         return this.channel.sendToQueue(replyQueueName, Buffer.from(JSON.stringify(data)), options);
     }
 

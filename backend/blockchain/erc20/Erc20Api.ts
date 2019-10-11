@@ -35,10 +35,6 @@ export class Erc20Api {
         return this.client.contractCall<string>(this.contract, 'balanceOf', [address]);
     }
 
-    public async getBlock(block: number | EthApiDefaultBlock, isNeedTransactions?: boolean): Promise<IEthBlock> {
-        return this.client.getBlock(block, isNeedTransactions);
-    }
-
     // --------------------------------------------------------------------------
     //
     // 	Public Properties
