@@ -3,6 +3,7 @@ import { PromiseHandler } from '../../../common/promise';
 import { DateUtil } from '../../../common/util';
 import { IEthBlock } from './IEthBlock';
 import { IEthTransaction } from './IEthTransaction';
+import { IEthTransactionReceipt } from './IEthTransactionReceipt';
 
 export class EthApi {
     // --------------------------------------------------------------------------
@@ -47,7 +48,7 @@ export class EthApi {
     //
     // --------------------------------------------------------------------------
 
-    public async sendSignedTransaction(data: string): Promise<string> {
+    public async sendSignedTransaction(data: string): Promise<IEthTransactionReceipt> {
         return this.client.eth.sendSignedTransaction(data);
     }
 

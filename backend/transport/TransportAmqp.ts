@@ -100,7 +100,7 @@ export class TransportAmqp extends Transport {
         return this.connectionPromise;
     }
 
-    public async disconnect() {
+    public async disconnect(): Promise<void> {
         this.unsubscribeListeners();
         let promises = [];
         this.consumes.forEach(async (key, value) => {
@@ -137,20 +137,20 @@ export class TransportAmqp extends Transport {
     }
 
     private createCommandOptions<U>(command: ITransportCommand<U>, isNeedReply: boolean, options?: ITransportCommandOptions): ICommandOptions {
-        const waitTimeout = !options || !options.waitTimeout ? Transport.WAIT_TIMEOUT : options.waitTimeout;
+        if (_.isNil(options)) {
+            options = {};
+        }
 
+        let expiration = _.isNumber(options.waitTimeout) ? options.waitTimeout : Transport.WAIT_TIMEOUT;
         if (!this.isCommandAsync(command)) {
-            return {
-                waitTimeout,
-                headers: { IS_ASYNC_COMMAND: false, IS_NEED_REPLY: false }
-            };
+            return { headers: { IS_ASYNC_COMMAND: false, IS_NEED_REPLY: false } };
         }
 
         return {
-            waitTimeout,
+            expiration,
             replyTo: this.replyQueue.get(command.name),
             correlationId: command.id,
-            headers: { GATEWAY_TRANSPORT_TIMEOUT: waitTimeout, IS_ASYNC_COMMAND: true, IS_NEED_REPLY: isNeedReply }
+            headers: { GATEWAY_TRANSPORT_TIMEOUT: expiration, IS_ASYNC_COMMAND: true, IS_NEED_REPLY: isNeedReply }
         };
     }
 
@@ -206,10 +206,13 @@ export class TransportAmqp extends Transport {
 
             this.logCommand(command, TransportLogType.REQUEST_SEND);
             await this.sendToQueue(command, commandOptions);
-            PromiseHandler.delay(commandOptions.waitTimeout).then(() => {
-                item.reject(new TransportTimeoutError(command));
-                this.promises.delete(commandOptions.correlationId);
-            });
+
+            if (_.isNumber(commandOptions.expiration)) {
+                PromiseHandler.delay(commandOptions.expiration).then(() => {
+                    item.reject(new TransportTimeoutError(command));
+                    this.promises.delete(commandOptions.correlationId);
+                });
+            }
         } catch (error) {
             this.parseError(error, item.reject);
         }
@@ -357,13 +360,15 @@ export class TransportAmqp extends Transport {
     private listenReply<U, V>(msg: Message, command: ITransportCommandAsync<U, V>) {
         if (_.isNil(msg.properties.correlationId)) {
             this.error(`CorrelationId not found, messageId=${msg.properties.messageId}`);
-            this.reject(msg);
+            this.error('!!!!!! No CorrelationId');
+            // this.reject(msg);
             return;
         }
 
-        const promise = this.promises.get(msg.properties.correlationId);
+        let promise = this.promises.get(msg.properties.correlationId);
         if (!promise) {
-            this.reject(msg, true);
+            this.error('!!!!!! No PROMISE FOUND');
+            // this.reject(msg, true);
             return;
         }
 
@@ -430,7 +435,11 @@ export class TransportAmqp extends Transport {
         }
     }
 
-    private async sendToQueue<U>(command: ITransportCommand<U>, options = {} as Options.Publish): Promise<boolean> {
+    private async sendToQueue<U>(command: ITransportCommand<U>, options?: Options.Publish): Promise<boolean> {
+        if (_.isNil(options)) {
+            options = {};
+        }
+
         options.messageId = command.id;
         const request = command.request;
         await this.assert(command.name);
@@ -439,9 +448,9 @@ export class TransportAmqp extends Transport {
 
     private async sendReplyToQueue<U, V>(command: ITransportCommandAsync<U, V>, replyQueueName: string, options = {} as Options.Publish): Promise<boolean> {
         options.messageId = command.id;
-        let data = command.error ? command.error : command.data;
         options.headers = {};
 
+        let data = command.error ? command.error : command.data;
         if (command.error) {
             options.headers[RMQ_HEADER.GATEWAY_TRANSPORT_ERROR] = true;
         } else if (data === undefined) {
@@ -658,7 +667,7 @@ export class TransportAmqp extends Transport {
 interface ICommandOptions {
     headers: ICommandHeaders;
     replyTo?: string;
-    waitTimeout: number;
+    expiration?: number;
     correlationId?: string;
 }
 

@@ -5,7 +5,7 @@ import { ObservableData } from './observer';
 export abstract class Loadable<U, V> extends DestroyableContainer {
     // --------------------------------------------------------------------------
     //
-    //	Properties
+    //  Properties
     //
     // --------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ export abstract class Loadable<U, V> extends DestroyableContainer {
 
     // --------------------------------------------------------------------------
     //
-    //	Constructor
+    //  Constructor
     //
     // --------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ export abstract class Loadable<U, V> extends DestroyableContainer {
 
     // --------------------------------------------------------------------------
     //
-    //	Private Methods
+    //  Private Methods
     //
     // --------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ export abstract class Loadable<U, V> extends DestroyableContainer {
 
     // --------------------------------------------------------------------------
     //
-    //	Public Methods
+    //  Public Methods
     //
     // --------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ export abstract class Loadable<U, V> extends DestroyableContainer {
 
     // --------------------------------------------------------------------------
     //
-    //	Private Properties
+    //  Private Properties
     //
     // --------------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ export abstract class Loadable<U, V> extends DestroyableContainer {
     }
     // --------------------------------------------------------------------------
     //
-    //	Public Properties
+    //  Public Properties
     //
     // --------------------------------------------------------------------------
 
