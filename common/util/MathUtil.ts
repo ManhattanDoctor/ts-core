@@ -8,7 +8,7 @@ export class MathUtil {
     //
     // --------------------------------------------------------------------------
 
-    private static _config: Decimal.Config;
+    private static _config: MathUtilConfig = { defaults: true };
 
     // --------------------------------------------------------------------------
     //
@@ -16,11 +16,11 @@ export class MathUtil {
     //
     // --------------------------------------------------------------------------
 
-    public static get config(): Decimal.Config {
+    public static get config(): MathUtilConfig {
         return MathUtil._config;
     }
 
-    public static set config(value: Decimal.Config) {
+    public static set config(value: MathUtilConfig) {
         if (value === MathUtil._config) {
             return;
         }
@@ -180,3 +180,5 @@ export class MathUtil {
         return new constructor(first).equals(new constructor(second));
     }
 }
+
+export type MathUtilConfig = Decimal.Config;
