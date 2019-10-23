@@ -1,8 +1,9 @@
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import { AbstractSettingsStorage } from '../../common/settings';
+import { IModeSettings, Mode } from './IModeSettings';
 
-export class EnvSettingsStorage extends AbstractSettingsStorage {
+export class EnvSettingsStorage extends AbstractSettingsStorage implements IModeSettings {
     // --------------------------------------------------------------------------
     //
     //  Constructor
@@ -47,15 +48,19 @@ export class EnvSettingsStorage extends AbstractSettingsStorage {
     //
     // --------------------------------------------------------------------------
 
+    public get mode(): Mode {
+        return this.getValue('NODE_ENV');
+    }
+
     public get isTesting(): boolean {
-        return this.getValue('NODE_ENV') === 'testing';
+        return this.mode === Mode.TESTING;
     }
 
     public get isProduction(): boolean {
-        return this.getValue('NODE_ENV') === 'production';
+        return this.mode === Mode.PRODUCTION;
     }
 
     public get isDevelopment(): boolean {
-        return this.getValue('NODE_ENV') === 'development';
+        return this.mode === Mode.DEVELOPMENT;
     }
 }
