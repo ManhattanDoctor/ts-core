@@ -1,9 +1,8 @@
 import { DatePipe } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
-import { LoadableEvent } from '../../../common';
-import { DestroyableContainer } from '../../../common';
+import { DestroyableContainer, LoadableEvent } from '../../../common';
 import { LanguageService } from '../language';
-import { MomentDateAdaptivePipe, MomentDatePipe, MomentTimePipe, SanitizePipe, TruncatePipe } from '../pipe';
+import { CamelCasePipe, MomentDateAdaptivePipe, MomentDatePipe, MomentTimePipe, SanitizePipe, TruncatePipe } from '../pipe';
 import { FinancePipe } from '../pipe/FinancePipe';
 
 export class PipeBaseService extends DestroyableContainer {
@@ -17,6 +16,8 @@ export class PipeBaseService extends DestroyableContainer {
     private static FINANCE: FinancePipe;
     private static TRUNCATE: TruncatePipe;
     private static SANITIZE: SanitizePipe;
+
+    private static CAMEL_CASE: CamelCasePipe;
 
     private static MOMENT_TIME: MomentTimePipe;
     private static MOMENT_DATE: MomentDatePipe;
@@ -119,6 +120,13 @@ export class PipeBaseService extends DestroyableContainer {
             PipeBaseService.SANITIZE = new SanitizePipe(this.sanitizer);
         }
         return PipeBaseService.SANITIZE;
+    }
+
+    public get camelCase(): CamelCasePipe {
+        if (!PipeBaseService.CAMEL_CASE) {
+            PipeBaseService.CAMEL_CASE = new CamelCasePipe();
+        }
+        return PipeBaseService.CAMEL_CASE;
     }
 
     public get locale(): string {

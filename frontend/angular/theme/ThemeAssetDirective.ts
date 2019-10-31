@@ -1,8 +1,8 @@
 import { Directive, ElementRef, HostListener, Input, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
-import { Assets } from '../../asset';
 import { Destroyable } from '../../../common/Destroyable';
+import { Assets } from '../../asset';
 import { ViewUtil } from '../util';
 import { Theme } from './Theme';
 import { ThemeService, ThemeServiceEvent } from './ThemeService';
@@ -22,10 +22,8 @@ export class ThemeAssetDirective extends Destroyable implements OnInit {
     @Input()
     public isBackground: boolean = false;
 
-    @Input()
-    public name: string;
-    @Input()
-    public extension: string = 'png';
+    protected _name: string;
+    protected _extension: string = 'png';
 
     protected source: string;
     protected element: HTMLElement;
@@ -131,6 +129,40 @@ export class ThemeAssetDirective extends Destroyable implements OnInit {
         if (this.subscription) {
             this.subscription.unsubscribe();
             this.subscription = null;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    //	Public Properties
+    //
+    // --------------------------------------------------------------------------
+
+    public get name(): string {
+        return this._name;
+    }
+    @Input()
+    public set name(value: string) {
+        if (value === this._name) {
+            return;
+        }
+        this._name = value;
+        if (this.name) {
+            this.updateSourceProperties();
+        }
+    }
+
+    public get extension(): string {
+        return this._extension;
+    }
+    @Input()
+    public set extension(value: string) {
+        if (value === this._extension) {
+            return;
+        }
+        this._extension = value;
+        if (this.extension) {
+            this.updateSourceProperties();
         }
     }
 }

@@ -17,4 +17,12 @@ export class CamelCasePipe implements PipeTransform {
         }
         return _.camelCase(value);
     }
+
+    // --------------------------------------------------------------------------
+    //
+    //	Constructor
+    //
+    // --------------------------------------------------------------------------
+
+    constructor() {}
 }
