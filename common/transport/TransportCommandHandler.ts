@@ -13,6 +13,7 @@ export abstract class TransportCommandHandler<U, T extends ITransportCommand<U>>
     protected constructor(logger: ILogger, protected transport: ITransport, name: string) {
         super(logger);
 
+        this.log(`Started to listen ${name} command`);
         this.transport.listen<T>(name).subscribe(async command => {
             try {
                 this.transport.complete(command, await this.execute(command.request));
