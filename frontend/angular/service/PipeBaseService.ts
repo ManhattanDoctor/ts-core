@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
 import { DestroyableContainer, LoadableEvent } from '../../../common';
 import { LanguageService } from '../language';
-import { CamelCasePipe, MomentDateAdaptivePipe, MomentDatePipe, MomentTimePipe, SanitizePipe, TruncatePipe } from '../pipe';
+import { CamelCasePipe, MomentDateAdaptivePipe, MomentDatePipe, MomentTimePipe, SanitizePipe, TruncatePipe, MomentDateFromNowPipe } from '../pipe';
 import { FinancePipe } from '../pipe/FinancePipe';
 
 export class PipeBaseService extends DestroyableContainer {
@@ -21,6 +21,7 @@ export class PipeBaseService extends DestroyableContainer {
 
     private static MOMENT_TIME: MomentTimePipe;
     private static MOMENT_DATE: MomentDatePipe;
+    private static MOMENT_DATE_FROM_NOW: MomentDateFromNowPipe;
     private static MOMENT_ADAPTIVE_DATE: MomentDateAdaptivePipe;
 
     // --------------------------------------------------------------------------
@@ -99,6 +100,13 @@ export class PipeBaseService extends DestroyableContainer {
             PipeBaseService.MOMENT_DATE = new MomentDatePipe();
         }
         return PipeBaseService.MOMENT_DATE;
+    }
+
+    public get momentDateFromNow(): MomentDateFromNowPipe {
+        if (!PipeBaseService.MOMENT_DATE_FROM_NOW) {
+            PipeBaseService.MOMENT_DATE_FROM_NOW = new MomentDateFromNowPipe();
+        }
+        return PipeBaseService.MOMENT_DATE_FROM_NOW;
     }
 
     public get momentDateAdaptive(): MomentDateAdaptivePipe {
