@@ -3,6 +3,7 @@ import * as moment from 'moment';
 import { LoadableEvent } from '../../../common';
 import { ObservableData } from '../../../common/observer';
 import { Language } from '../../language';
+import { SettingsBaseService } from '../../service';
 import { LanguageService, LanguageServiceEvent } from '../language';
 import { ViewUtil } from '../util';
 import { ApplicationBaseComponent } from './ApplicationBaseComponent';
@@ -22,7 +23,12 @@ export abstract class ApplicationComponent extends ApplicationBaseComponent {
     //
     // --------------------------------------------------------------------------
 
-    constructor(element: ElementRef, protected language: LanguageService, protected renderer: Renderer2, viewReadyDelay: number = NaN) {
+    constructor(
+        element: ElementRef,
+        protected settings: SettingsBaseService,
+        protected language: LanguageService,
+        viewReadyDelay: number = NaN
+    ) {
         super(element, viewReadyDelay);
     }
 
@@ -33,7 +39,8 @@ export abstract class ApplicationComponent extends ApplicationBaseComponent {
     // --------------------------------------------------------------------------
 
     protected initialize(): void {
-        ViewUtil.initialize(this.renderer);
+        // Settings
+        this.settings.initialize(this.config, this.routerParams);
 
         // Language
         this.addSubscription(
@@ -53,7 +60,7 @@ export abstract class ApplicationComponent extends ApplicationBaseComponent {
     protected isReady(): boolean {
         return super.isReady() && this.isLanguageLoaded;
     }
-    
+
     // --------------------------------------------------------------------------
     //
     // 	Event Handlers
@@ -71,21 +78,12 @@ export abstract class ApplicationComponent extends ApplicationBaseComponent {
 
     // --------------------------------------------------------------------------
     //
-    // 	Public Methods
-    //
-    // --------------------------------------------------------------------------
-
-    public destroy(): void {
-        super.destroy();
-    }
-
-    // --------------------------------------------------------------------------
-    //
     // 	Protected Properties
     //
     // --------------------------------------------------------------------------
 
     protected abstract get config(): any;
+    protected abstract get routerParams(): any;
 }
 
 declare let numeral: any;

@@ -84,6 +84,8 @@ export abstract class ShellBaseComponent extends DestroyableContainer {
     protected isNeedSideCheck = (): void => {
         this.isNeedSide = this.breakpointObserver.isMatched(this.sideMediaQueryToCheck);
         this.isShowMenuCheck();
+        console.log(123);
+        console.log(this.isNeedSide);
     };
 
     // --------------------------------------------------------------------------
@@ -112,7 +114,9 @@ export abstract class ShellBaseComponent extends DestroyableContainer {
     //
     // --------------------------------------------------------------------------
 
-    protected abstract get sideMediaQueryToCheck(): string;
+    protected get sideMediaQueryToCheck(): string {
+        return `(min-width: 1000px)`;
+    }
 
     public get notificationItems(): Array<NotificationConfig> {
         return this.notifications.closedConfigs;
