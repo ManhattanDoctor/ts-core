@@ -75,17 +75,9 @@ export abstract class ShellBaseComponent extends DestroyableContainer {
         }
     };
 
-    protected isShowMenuCheck = (): void => {
-        if (!this.isNeedSide) {
-            this.isShowMenu = false;
-        }
-    };
-
     protected isNeedSideCheck = (): void => {
         this.isNeedSide = this.breakpointObserver.isMatched(this.sideMediaQueryToCheck);
-        this.isShowMenuCheck();
-        console.log(123);
-        console.log(this.isNeedSide);
+        this.isShowMenu = this.isNeedSide;
     };
 
     // --------------------------------------------------------------------------

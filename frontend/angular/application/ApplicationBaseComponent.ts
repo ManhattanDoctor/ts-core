@@ -33,6 +33,7 @@ export abstract class ApplicationBaseComponent extends DestroyableContainer impl
 
     private makeViewReady = (): void => {
         this._viewReady.resolve();
+        this.viewReadyHandler();
         this.checkReady();
     };
 
@@ -46,6 +47,7 @@ export abstract class ApplicationBaseComponent extends DestroyableContainer impl
         if (!this.isReady() || this.isReadyAlreadyCalled) {
             return;
         }
+
         this.isReadyAlreadyCalled = true;
         this.readyHandler();
     }
@@ -53,6 +55,8 @@ export abstract class ApplicationBaseComponent extends DestroyableContainer impl
     protected isReady(): boolean {
         return this.isViewReady;
     }
+
+    protected viewReadyHandler(): void {}
 
     protected abstract readyHandler(): void;
 

@@ -9,6 +9,7 @@ import { ApiRequest } from '../../api/ApiRequest';
 import { ApiResponse } from '../../api/ApiResponse';
 
 export abstract class HttpApiService extends ApiBaseService {
+
     // --------------------------------------------------------------------------
     //
     // 	Constructor

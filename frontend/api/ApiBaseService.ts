@@ -25,6 +25,8 @@ export abstract class ApiBaseService extends Destroyable {
     // --------------------------------------------------------------------------
 
     public sid: string;
+    public url: string;
+    public locale: string;
 
     protected _isLoading: boolean;
 
