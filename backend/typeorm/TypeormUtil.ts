@@ -3,7 +3,8 @@ import { ValidatorOptions } from 'class-validator/validation/ValidatorOptions';
 import * as fs from 'fs';
 import * as _ from 'lodash';
 import { Connection, ConnectionOptions, QueryFailedError, SelectQueryBuilder } from 'typeorm';
-import { FilterableConditions, FilterableSort, IFilterable, IPaginable, IPagination } from '../../common/dto';
+import { FilterableConditions, FilterableSort, FilterableType, IFilterable, IPaginable, IPagination, isIFilterableCondition } from '../../common/dto';
+import { ExtendedError } from '../../common/error';
 import { PromiseHandler } from '../../common/promise';
 import { ObjectUtil } from '../../common/util';
 
@@ -26,15 +27,51 @@ export class TypeormUtil {
         if (!conditions) {
             return query;
         }
+
         for (let key of Object.keys(conditions)) {
             let value = conditions[key];
+            let property = `${query.alias}.${key}`;
             if (_.isArray(value)) {
-                query.andWhere(`${query.alias}.${key} IN (:...${key})`, conditions);
-            } else {
-                query.andWhere(`${query.alias}.${key} = :${key}`, conditions);
+                query.andWhere(`${property} IN (:...${key})`, { [key]: value });
+                continue;
             }
+
+            if (!isIFilterableCondition(value)) {
+                query.andWhere(`${property} = :${key}`, { [key]: value });
+                continue;
+            }
+
+            let conditionKey = `:${key}`;
+            switch (value.type) {
+                case FilterableType.CONTAINS:
+                    property = `LOWER(${property})`;
+                    conditionKey = `LOWER(${conditionKey})`;
+                    break;
+            }
+
+            let condition = this.getConditionByType(value.type);
+            query.andWhere(`${property} ${condition} ${conditionKey}`, { [key]: value.value });
         }
         return query;
+    }
+
+    private static getConditionByType(item: FilterableType): string {
+        switch (item) {
+            case FilterableType.EQUAL:
+                return '=';
+            case FilterableType.MORE:
+                return '>';
+            case FilterableType.MORE_OR_EQUAL:
+                return '>=';
+            case FilterableType.LESS:
+                return '<';
+            case FilterableType.LESS_OR_EQUAL:
+                return '<=';
+            case FilterableType.CONTAINS:
+            case FilterableType.CONTAINS_SENSITIVE:
+                return 'like';
+        }
+        throw new ExtendedError(`Invalid condition type ${item}`);
     }
 
     private static applySort<U, T>(query: SelectQueryBuilder<U>, sort: FilterableSort<T>): SelectQueryBuilder<U> {
