@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import { LocalDataSource } from 'ng2-smart-table';
 import { Subscription } from 'rxjs';
 import { IDestroyable, LoadableEvent } from '../../../common';
+import { FilterableType } from '../../../common/dto';
 import { ObjectUtil } from '../../../common/util';
 import { ApiResponse } from '../../api';
 import { ApiFilterableMapCollection } from '../api';
@@ -128,7 +129,15 @@ export class TableDataSource<U> extends LocalDataSource implements IDestroyable 
         let filters = this.getFilter();
         if (!_.isNil(filters) && !_.isEmpty(filters.filters)) {
             for (let item of filters.filters) {
-                this.map.conditions[item.field] = item.filter ? item.filter(item.search) : item.search;
+                let key = item.field;
+                let value = item.search;
+                let type = FilterableType.EQUAL;
+                if (!_.isNil(item.filter)) {
+                    let result = item.filter(item.search);
+                    type = result.type;
+                    value = result.value;
+                }
+                this.map.conditions[key] = { type, value };
             }
         }
 

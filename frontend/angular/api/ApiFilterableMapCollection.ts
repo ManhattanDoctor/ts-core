@@ -51,7 +51,7 @@ export abstract class ApiFilterableMapCollection<U, V> extends ApiLoadableMapCol
         }
         return params;
     }
-
+    
     protected parseParamForRequest(param: any): any {
         return this.requestMethod === ApiMethod.GET ? JSON.stringify(param) : param;
     }
