@@ -1,7 +1,7 @@
 import { IsOptional } from 'class-validator';
 import * as _ from 'lodash';
 import { TraceUtil } from '../trace';
-import { FilterableConditions, FilterableSort, IFilterable } from './IFilterable';
+import { FilterableConditions, FilterableSort, IFilterable, isIFilterableCondition } from './IFilterable';
 
 export class Filterable<U> implements IFilterable<U> {
     // --------------------------------------------------------------------------
@@ -52,6 +52,15 @@ export class Filterable<U> implements IFilterable<U> {
     }
 
     private static transformCondition(item: any, key: string, value: any): void {
+        if (isIFilterableCondition(value)) {
+            if (_.isEmpty(value.value)) {
+                delete item[key];
+            }
+            return;
+        }
+        if (_.isBoolean(value)) {
+            return;
+        }
         if (_.isEmpty(value)) {
             delete item[key];
             return;
