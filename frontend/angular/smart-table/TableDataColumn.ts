@@ -29,7 +29,6 @@ export class TableDataColumn<U> {
                 value = `%${value}%`;
                 break;
         }
-        console.log(type, value);
         return { value, type };
     }
 
