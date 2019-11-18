@@ -1,5 +1,5 @@
-import { ObjectUtil } from '@ts-core/common/util';
 import { ITraceable } from '../trace';
+import { ObjectUtil } from '../util';
 
 export enum FilterableType {
     EQUAL = 'EQUAL',
