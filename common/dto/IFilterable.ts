@@ -30,7 +30,7 @@ export interface IFilterableCondition<T = any, P extends keyof T = any> {
 }
 
 export const isIFilterableCondition = (value: any): boolean => {
-    return ObjectUtil.instanceOf(value, ['type', 'value']);
+    return ObjectUtil.instanceOf(value, ['condition', 'value']);
 };
 
 export type FilterableSort<T> = { [P in keyof T]?: boolean };

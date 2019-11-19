@@ -1,20 +1,23 @@
 import * as _ from 'lodash';
-import { FilterableConditionType, IFilterableCondition } from '../../../common/dto';
+import { FilterableConditionType, FilterableDataType, IFilterableCondition } from '../../../common/dto';
 import { ObjectUtil } from '../../../common/util';
 
 export class TableDataColumn<U> {
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     //
     // 	Static Methods
     //
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
-    public static filterFunction(value: string, defaultCondition: FilterableConditionType = FilterableConditionType.CONTAINS): IFilterableCondition {
+    public static filterFunction(
+        value: string,
+        type: FilterableDataType = FilterableDataType.STRING,
+        condition: FilterableConditionType = FilterableConditionType.CONTAINS
+    ): IFilterableCondition {
         if (_.isEmpty(value)) {
-            return { condition: defaultCondition, value };
+            return { condition, value };
         }
 
-        let condition = defaultCondition;
         for (let filter of Object.values(FilterableConditionType)) {
             if (!value.includes(TableDataColumn.getConditionType(filter))) {
                 continue;
@@ -29,7 +32,7 @@ export class TableDataColumn<U> {
                 value = `%${value}%`;
                 break;
         }
-        return { value, condition };
+        return { value, type, condition };
     }
 
     private static getConditionType(item: string): FilterableConditionType {

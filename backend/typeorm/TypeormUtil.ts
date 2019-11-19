@@ -42,14 +42,14 @@ export class TypeormUtil {
             }
 
             let conditionKey = `:${key}`;
-            switch (value.type) {
+            switch (value.condition) {
                 case FilterableConditionType.CONTAINS:
                     property = `LOWER(${property})`;
                     conditionKey = `LOWER(${conditionKey})`;
                     break;
             }
 
-            let condition = this.getConditionByType(value.type);
+            let condition = this.getConditionByType(value.condition);
             query.andWhere(`${property} ${condition} ${conditionKey}`, { [key]: value.value });
         }
         return query;

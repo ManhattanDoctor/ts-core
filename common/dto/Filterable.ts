@@ -53,7 +53,7 @@ export class Filterable<U> implements IFilterable<U> {
 
     private static transformCondition(item: any, key: string, value: any): void {
         if (isIFilterableCondition(value)) {
-            if (_.isEmpty(value.value)) {
+            if (_.isEmpty(value.value) && !_.isBoolean(value)) {
                 delete item[key];
             }
             return;
