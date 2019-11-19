@@ -1,7 +1,7 @@
 import { ITraceable } from '../trace';
 import { ObjectUtil } from '../util';
 
-export enum FilterableType {
+export enum FilterableConditionType {
     EQUAL = 'EQUAL',
     MORE = 'MORE',
     MORE_OR_EQUAL = 'MORE_OR_EQUAL',
@@ -11,13 +11,21 @@ export enum FilterableType {
     CONTAINS_SENSITIVE = 'CONTAINS_SENSITIVE'
 }
 
+export enum FilterableDataType {
+    DATE = 'DATE',
+    STRING = 'STRING',
+    NUMBER = 'NUMBER',
+    BOOLEAN = 'BOOLEAN',
+}
+
 export interface IFilterable<U> extends ITraceable {
     sort?: FilterableSort<U>;
     conditions?: FilterableConditions<U>;
 }
 
 export interface IFilterableCondition<T = any, P extends keyof T = any> {
-    type: FilterableType;
+    condition: FilterableConditionType;
+    type?: FilterableDataType;
     value: T[P];
 }
 

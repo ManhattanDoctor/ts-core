@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { FilterableType, IFilterableCondition } from '../../../common/dto';
+import { FilterableConditionType, IFilterableCondition } from '../../../common/dto';
 import { ObjectUtil } from '../../../common/util';
 
 export class TableDataColumn<U> {
@@ -9,27 +9,40 @@ export class TableDataColumn<U> {
     //
     //--------------------------------------------------------------------------
 
-    public static filterFunction(value: string, defaultType: FilterableType = FilterableType.CONTAINS): IFilterableCondition {
+    public static filterFunction(value: string, defaultCondition: FilterableConditionType = FilterableConditionType.CONTAINS): IFilterableCondition {
         if (_.isEmpty(value)) {
-            return { type: defaultType, value };
+            return { condition: defaultCondition, value };
         }
 
-        let type = defaultType;
-        for (let filter of Object.values(FilterableType)) {
-            if (!value.includes(filter)) {
+        let condition = defaultCondition;
+        for (let filter of Object.values(FilterableConditionType)) {
+            if (!value.includes(TableDataColumn.getConditionType(filter))) {
                 continue;
             }
-            type = filter;
+            condition = filter;
             value = value.replace(filter, '').trim();
         }
 
-        switch (type) {
-            case FilterableType.CONTAINS:
-            case FilterableType.CONTAINS_SENSITIVE:
+        switch (condition) {
+            case FilterableConditionType.CONTAINS:
+            case FilterableConditionType.CONTAINS_SENSITIVE:
                 value = `%${value}%`;
                 break;
         }
-        return { value, type };
+        return { value, condition };
+    }
+
+    private static getConditionType(item: string): FilterableConditionType {
+        if (item.includes('=')) {
+            return FilterableConditionType.EQUAL;
+        }
+        if (item.includes('>')) {
+            return FilterableConditionType.MORE;
+        }
+        if (item.includes('<')) {
+            return FilterableConditionType.LESS;
+        }
+        return null;
     }
 
     //--------------------------------------------------------------------------

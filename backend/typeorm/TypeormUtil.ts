@@ -3,7 +3,7 @@ import { ValidatorOptions } from 'class-validator/validation/ValidatorOptions';
 import * as fs from 'fs';
 import * as _ from 'lodash';
 import { Connection, ConnectionOptions, QueryFailedError, SelectQueryBuilder } from 'typeorm';
-import { FilterableConditions, FilterableSort, FilterableType, IFilterable, IPaginable, IPagination, isIFilterableCondition } from '../../common/dto';
+import { FilterableConditions, FilterableSort, FilterableConditionType, IFilterable, IPaginable, IPagination, isIFilterableCondition } from '../../common/dto';
 import { ExtendedError } from '../../common/error';
 import { PromiseHandler } from '../../common/promise';
 import { ObjectUtil } from '../../common/util';
@@ -43,7 +43,7 @@ export class TypeormUtil {
 
             let conditionKey = `:${key}`;
             switch (value.type) {
-                case FilterableType.CONTAINS:
+                case FilterableConditionType.CONTAINS:
                     property = `LOWER(${property})`;
                     conditionKey = `LOWER(${conditionKey})`;
                     break;
@@ -55,20 +55,20 @@ export class TypeormUtil {
         return query;
     }
 
-    private static getConditionByType(item: FilterableType): string {
+    private static getConditionByType(item: FilterableConditionType): string {
         switch (item) {
-            case FilterableType.EQUAL:
+            case FilterableConditionType.EQUAL:
                 return '=';
-            case FilterableType.MORE:
+            case FilterableConditionType.MORE:
                 return '>';
-            case FilterableType.MORE_OR_EQUAL:
+            case FilterableConditionType.MORE_OR_EQUAL:
                 return '>=';
-            case FilterableType.LESS:
+            case FilterableConditionType.LESS:
                 return '<';
-            case FilterableType.LESS_OR_EQUAL:
+            case FilterableConditionType.LESS_OR_EQUAL:
                 return '<=';
-            case FilterableType.CONTAINS:
-            case FilterableType.CONTAINS_SENSITIVE:
+            case FilterableConditionType.CONTAINS:
+            case FilterableConditionType.CONTAINS_SENSITIVE:
                 return 'like';
         }
         throw new ExtendedError(`Invalid condition type ${item}`);
