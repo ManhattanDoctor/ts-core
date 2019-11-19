@@ -18,34 +18,33 @@ export class TableDataColumn<U> {
             return { condition, value };
         }
 
-        for (let filter of Object.values(FilterableConditionType)) {
-            if (!value.includes(TableDataColumn.getConditionType(filter))) {
-                continue;
+        if (type === FilterableDataType.STRING) {
+            switch (condition) {
+                case FilterableConditionType.CONTAINS:
+                case FilterableConditionType.CONTAINS_SENSITIVE:
+                    value = `%${value}%`;
+                    break;
             }
-            condition = filter;
-            value = value.replace(filter, '').trim();
+            return { value, type, condition };
         }
 
-        switch (condition) {
-            case FilterableConditionType.CONTAINS:
-            case FilterableConditionType.CONTAINS_SENSITIVE:
-                value = `%${value}%`;
+        if (value.includes('=')) {
+            condition = FilterableConditionType.EQUAL;
+        } else if (value.includes('>')) {
+            condition = FilterableConditionType.MORE;
+        } else if (value.includes('<')) {
+            condition = FilterableConditionType.LESS;
+        }
+        value = value.replace(/[<=>]/g, '').trim();
+
+        switch (type) {
+            case FilterableDataType.NUMBER:
+                value = parseFloat(value) as any;
                 break;
         }
-        return { value, type, condition };
-    }
 
-    private static getConditionType(item: string): FilterableConditionType {
-        if (item.includes('=')) {
-            return FilterableConditionType.EQUAL;
-        }
-        if (item.includes('>')) {
-            return FilterableConditionType.MORE;
-        }
-        if (item.includes('<')) {
-            return FilterableConditionType.LESS;
-        }
-        return null;
+        console.log(value, type, condition);
+        return { value, type, condition };
     }
 
     //--------------------------------------------------------------------------
