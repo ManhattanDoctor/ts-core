@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import * as _ from 'lodash';
 import { ILogger, LoggerWrapper } from '../../../common/logger';
+import { DateUtil } from '../../../common/util';
 import { IBtcApiSettingsInsight } from './BtcApiInsight';
 import { IBtcBlockInsight } from './IBtcBlockInsight';
 import { IBtcInputInsight } from './IBtcInputInsight';
@@ -19,7 +20,7 @@ export class BtcApiInsignt extends LoggerWrapper {
             return;
         }
         item.number = item.height;
-        // item.createdDate = DateUtil.parseDate(item.time * DateUtil.MILISECONDS_SECOND);
+        item.createdDate = new Date(item.time);
         if (!_.isEmpty(item.transactions)) {
             item.transactions.forEach(BtcApiInsignt.parseTransaction);
         }

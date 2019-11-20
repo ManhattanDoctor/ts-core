@@ -23,7 +23,9 @@ export class BtcApi extends LoggerWrapper {
         }
         item.number = item.height;
         item.createdDate = DateUtil.parseDate(item.time * DateUtil.MILISECONDS_SECOND);
-        item.tx.forEach(BtcApi.parseTransaction);
+       
+        item.transactions = item.tx;
+        item.transactions.forEach(BtcApi.parseTransaction);
     }
 
     public static parseTransaction(item: IBtcTransaction): void {
@@ -156,7 +158,7 @@ export class BtcApi extends LoggerWrapper {
 
         if (this.isBlock(item)) {
             item = item as IBtcBlock;
-            for (let transaction of item.tx) {
+            for (let transaction of item.transactions) {
                 items.push(...this.getInputs(transaction));
             }
         } else {

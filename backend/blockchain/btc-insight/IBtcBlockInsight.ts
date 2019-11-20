@@ -2,6 +2,7 @@ import { IBtcTransactionInsight } from './IBtcTransactionInsight';
 
 export interface IBtcBlockInsight {
     number: number;
+    createdDate: Date;
     transactions: Array<IBtcTransactionInsight>;
 
     chain: string;

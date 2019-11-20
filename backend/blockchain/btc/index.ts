@@ -5,5 +5,3 @@ export * from './IBtcBlock';
 export * from './IBtcInput';
 export * from './IBtcOutput';
 export * from './IBtcTransaction';
-
-// export * from './BtcApiInsight';

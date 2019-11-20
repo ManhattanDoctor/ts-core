@@ -1,11 +1,15 @@
 export interface IBtcOutputInsight {
     txid: string;
+    chain: string;
+    network: string;
     coinbase: boolean;
-    vout: 0;
     spentTxid: string;
     mintTxid: string;
+    mintIndex: number;
     mintHeight: number;
     spentHeight: number;
-    address: boolean;
+    address: string;
     value: number;
+    script: string;
+    confirmations: number;
 }

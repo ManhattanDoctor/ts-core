@@ -1,37 +1,34 @@
-import axios, { AxiosInstance } from 'axios';
+import { ExtendedError } from '@ts-core/common/error';
+import { ObjectUtil } from '@ts-core/common/util';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import * as _ from 'lodash';
 import { ILogger, LoggerWrapper } from '../../../common/logger';
+import { IRippleLedger } from './IRippleLedger';
+import { IRippleTransaction } from './IRippleTransaction';
 
-export class RippleInsignt extends LoggerWrapper {
+export class RippleApi extends LoggerWrapper {
     // --------------------------------------------------------------------------
     //
     // 	Static Methods
     //
     // --------------------------------------------------------------------------
 
-    /*
-    public static parseBlock(item: IBtcBlockInsight): void {
+    public static parseLedger(item: IRippleLedger): void {
         if (_.isNil(item)) {
             return;
         }
-        item.number = item.height;
+
+        item.number = parseInt(item.ledger_index.toString(), 10);
         if (!_.isEmpty(item.transactions)) {
-            item.transactions.forEach(BtcApiInsignt.parseTransaction);
+            item.transactions.forEach(RippleApi.parseTransaction);
         }
     }
 
-    public static parseTransaction(item: IBtcTransactionInsight): void {
+    public static parseTransaction(item: IRippleTransaction): void {
         if (_.isNil(item)) {
             return;
         }
-        if (!_.isEmpty(item.inputs)) {
-            item.inputs.forEach(BtcApiInsignt.parseInput);
-        }
-        if (!_.isEmpty(item.outputs)) {
-            item.outputs.forEach(BtcApiInsignt.parseOutput);
-        }
     }
-    */
 
     // --------------------------------------------------------------------------
     //
@@ -54,52 +51,60 @@ export class RippleInsignt extends LoggerWrapper {
 
     // --------------------------------------------------------------------------
     //
+    // 	Private Methods
+    //
+    // --------------------------------------------------------------------------
+
+    private async call<T = any>(methodName: string, params?: any): Promise<T> {
+        if (_.isNil(params)) {
+            params = {};
+        }
+        let response = await this.client.post(``, { method: methodName, params: [params] });
+        this.checkError(response);
+        return response.data.result;
+    }
+
+    private checkError(response: AxiosResponse<any>): void {
+        let data = response.data.result;
+        if (ObjectUtil.hasOwnProperties(data, ['error_message', 'error_code'])) {
+            throw new ExtendedError(data.error_message, data.error_code);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+    //
     // 	Public Methods
     //
     // --------------------------------------------------------------------------
 
-    public async getBlockNumber(): Promise<number> {
-        let item = (await this.client.get(`block/tip`)).data;
-        return item.height;
+    public async getLedgerNumber(): Promise<number> {
+        let response = await this.call('ledger', { ledger_index: 'validated' });
+
+        let item = response.ledger as IRippleLedger;
+        RippleApi.parseLedger(item);
+        return item.ledger_index;
+    }
+
+    public async getLedger(ledger: number | string, isNeedTransactions?: boolean): Promise<IRippleLedger> {
+        let params = { transactions: isNeedTransactions, expand: isNeedTransactions } as any;
+        params[`${_.isNumber(ledger) ? 'ledger_index' : 'ledger_hash'}`] = ledger;
+
+        let response = await this.call('ledger', params);
+        let item = response.ledger as IRippleLedger;
+        RippleApi.parseLedger(item);
+        return item;
+    }
+
+    public async getTransaction(transaction: string): Promise<IRippleTransaction> {
+        let response = await this.client.post(``, { method: '', params: [] });
+        this.checkError(response);
+
+        let item = await this.call<IRippleTransaction>('tx', { transaction, binary: false });
+        RippleApi.parseTransaction(item);
+        return item;
     }
 
     /*
-    public async getBlock(block: number | IBtcBlockInsight, isNeedTransactions?: boolean): Promise<IBtcBlockInsight> {
-        let item: IBtcBlockInsight = null;
-        if (_.isNumber(block)) {
-            item = (await this.client.get<IBtcBlockInsight>(`block/${block}`)).data;
-        } else {
-            item = item as IBtcBlockInsight;
-        }
-
-        if (isNeedTransactions) {
-            item.transactions = (await this.client.get<Array<IBtcTransactionInsight>>(`tx?blockHeight=${block}`)).data;
-            for (let transaction of item.transactions) {
-                await this.getTransaction(transaction, true);
-            }
-        }
-        BtcApiInsignt.parseBlock(item);
-        return item;
-    }
-
-    public async getTransaction(transaction: string | IBtcTransactionInsight, isNeedDetails?: boolean): Promise<IBtcTransactionInsight> {
-        let item: IBtcTransactionInsight = null;
-        if (_.isString(transaction)) {
-            item = (await this.client.get<IBtcTransactionInsight>(`tx/${transaction}`)).data;
-        } else {
-            item = transaction as IBtcTransactionInsight;
-        }
-
-        if (isNeedDetails) {
-            let response = (await this.client.get(`tx/${item.txid}/coins`)).data;
-            item.inputs = response.inputs;
-            item.outputs = response.outputs;
-        }
-
-        BtcApiInsignt.parseTransaction(item);
-        return item;
-    }
-
     public async getBalance(address: string): Promise<IBtcApiBalanceInsight> {
         let item = await this.client.get<IBtcApiBalanceInsight>(`address/${address}/balance`);
         return item.data;
