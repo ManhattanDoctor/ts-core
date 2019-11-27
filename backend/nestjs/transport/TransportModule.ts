@@ -31,9 +31,9 @@ export class TransportModule {
                     provide: Transport,
                     inject: [Logger],
                     useFactory: async (logger: Logger) => {
-                        const transport = new TransportAmqp(logger, settings.options);
-                        await transport.connect();
-                        return transport;
+                        let item = new TransportAmqp(logger, settings.options);
+                        await item.connect();
+                        return item;
                     }
                 });
                 break;
