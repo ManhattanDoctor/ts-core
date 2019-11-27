@@ -1,6 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, InternalServerErrorException } from '@nestjs/common';
-import { ILogger } from '@ts-core/common/logger';
 import * as _ from 'lodash';
+import { ILogger } from '../../../common/logger';
 import { ObjectUtil } from '../../../common/util';
 
 @Catch(Error)
