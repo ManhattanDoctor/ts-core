@@ -1,4 +1,5 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, InternalServerErrorException } from '@nestjs/common';
+import { ILogger } from '@ts-core/common/logger';
 import * as _ from 'lodash';
 import { ObjectUtil } from '../../../common/util';
 
@@ -22,6 +23,14 @@ export class DefaultHttpExceptionFilter implements ExceptionFilter<any> {
         }
         return exception;
     }
+
+    // --------------------------------------------------------------------------
+    //
+    //  Constructor
+    //
+    // --------------------------------------------------------------------------
+
+    constructor(private logger?: ILogger) {}
 
     // --------------------------------------------------------------------------
     //
@@ -51,6 +60,11 @@ export class DefaultHttpExceptionFilter implements ExceptionFilter<any> {
         if (_.isNil(message)) {
             message = defaultError.message;
         }
+
+        if (!_.isNil(this.logger)) {
+            this.logger.error(message);
+        }
+
         response.status(status).json({ code, message, isError: true });
     }
 }
