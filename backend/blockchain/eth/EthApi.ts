@@ -84,7 +84,6 @@ export class EthApi {
 
     public async getGasPrice(): Promise<string> {
         return this.client.getGasPrice();
-        // resolve(amount.toString(10));
     }
 
     public async getTransactionCount(address: string, block?: number): Promise<number> {

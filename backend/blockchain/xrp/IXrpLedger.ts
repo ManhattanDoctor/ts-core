@@ -1,9 +1,9 @@
-import { IRippleTransaction } from './IRippleTransaction';
+import { IXrpTransaction } from './IXrpTransaction';
 
-export interface IRippleLedger {
+export interface IXrpLedger {
     number: number;
     createdDate: Date;
-    transactions: Array<IRippleTransaction>;
+    transactions: Array<IXrpTransaction>;
 
     account_hash: string;
     close_flags: number;
