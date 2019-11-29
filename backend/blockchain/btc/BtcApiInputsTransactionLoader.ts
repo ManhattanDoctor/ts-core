@@ -40,7 +40,8 @@ export class BtcApiInputsTransactionLoader extends SequienceExecutor<Array<IBtcI
         let ids: Array<string> = _.uniq(_.compact(inputs.map(input => input.txid)));
 
         let promises = ids.map(id => PromiseReflector.create(this.api.getTransaction(id)));
-        for (let item of await Promise.all(promises)) {
+        for (let promise of promises) {
+            let item = await promise;
             if (item.isError) {
                 throw item.error;
             }
