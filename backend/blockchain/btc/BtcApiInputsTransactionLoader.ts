@@ -21,8 +21,9 @@ export class BtcApiInputsTransactionLoader extends SequienceExecutor<Array<IBtcI
     //
     // --------------------------------------------------------------------------
 
-    constructor(private api: BtcApi, isNeedPreloader?: boolean) {
+    constructor(private api: BtcApi, isNeedPreloader?: boolean, timeout: number = NaN) {
         super();
+        this.timeout = timeout;
         if (!isNeedPreloader) {
             return;
         }

@@ -23,7 +23,7 @@ export class BtcApi extends LoggerWrapper {
         }
         item.number = item.height;
         item.createdDate = DateUtil.parseDate(item.time * DateUtil.MILISECONDS_SECOND);
-       
+
         item.transactions = item.tx;
         item.transactions.forEach(BtcApi.parseTransaction);
     }
@@ -50,7 +50,6 @@ export class BtcApi extends LoggerWrapper {
         } catch (error) {
             console.log(error);
             console.log(item);
-            process.exit(0);
         }
     }
 
@@ -80,7 +79,6 @@ export class BtcApi extends LoggerWrapper {
             default:
                 console.log(item.type);
                 console.log(item);
-                process.exit(0);
         }
     }
 
@@ -142,7 +140,7 @@ export class BtcApi extends LoggerWrapper {
         if (_.isEmpty(inputs)) {
             return;
         }
-        let item = new BtcApiInputsTransactionLoader(this, true);
+        let item = new BtcApiInputsTransactionLoader(this, true, 5 * DateUtil.MILISECONDS_MINUTE);
         await item.start(_.chunk(inputs, 15));
         item.destroy();
 

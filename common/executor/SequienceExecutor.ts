@@ -11,9 +11,11 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
     //
     // --------------------------------------------------------------------------
 
+    public timeout: number = NaN;
+    protected timeoutTimer: any;
+
     protected inputs: Array<U>;
     protected isDestroyed: boolean;
-    protected delayTimeout: number = 1000;
 
     private index: number = NaN;
 
@@ -76,6 +78,11 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
         this.status = LoadableStatus.LOADING;
         this.observer.next(new ObservableData(LoadableEvent.STARTED));
 
+        clearTimeout(this.timeoutTimer);
+        if (!_.isNaN(this.timeout) && this.timeout > 0) {
+            this.timeoutTimer = setTimeout(() => this.timeoutExired(), this.timeout);
+        }
+
         this.index = 0;
         this.nextInput();
     }
@@ -87,14 +94,23 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
         this.status = LoadableStatus.LOADED;
 
         ArrayUtil.clear(this.inputs);
+        clearTimeout(this.timeoutTimer);
         this.observer.next(new ObservableData(LoadableEvent.FINISHED));
 
+        if (!this.promise) {
+            return;
+        }
+        
         if (error) {
             this.promise.reject(error);
         } else {
             this.promise.resolve();
         }
         this.promise = null;
+    }
+
+    protected timeoutExired(): void {
+        this.makeFinished(`Timeout error`);
     }
 
     // --------------------------------------------------------------------------
@@ -199,6 +215,8 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
 
     public destroy(): void {
         this.stop();
+        clearTimeout(this.timeoutTimer);
+
         this.inputs = null;
         this.observer = null;
         this.isDestroyed = true;
