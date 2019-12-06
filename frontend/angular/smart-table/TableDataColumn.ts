@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { FilterableConditionType, FilterableDataType, IFilterableCondition } from '../../../common/dto';
-import { ObjectUtil } from '../../../common/util';
+import { DateUtil, ObjectUtil } from '../../../common/util';
 
 export class TableDataColumn<U> {
     // --------------------------------------------------------------------------
@@ -41,9 +41,12 @@ export class TableDataColumn<U> {
             case FilterableDataType.NUMBER:
                 value = parseFloat(value) as any;
                 break;
+            case FilterableDataType.DATE:
+                let date = DateUtil.parseDate(value, '/');
+                value = !_.isNil(date)? date.getTime().toString() : null;
+                break;
         }
 
-        console.log(value, type, condition);
         return { value, type, condition };
     }
 

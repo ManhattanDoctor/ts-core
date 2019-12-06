@@ -1,7 +1,7 @@
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { Renderer2 } from '@angular/core';
 import * as _ from 'lodash';
 import { ObjectUtil } from '../../../common/util';
-import { OverlayContainer } from '@angular/cdk/overlay';
 
 export class ViewUtil {
     // --------------------------------------------------------------------------
@@ -75,7 +75,9 @@ export class ViewUtil {
             selection.removeAllRanges();
 
             let range = document.createRange();
-            range.selectNodeContents(container);
+            if (!_.isNil(container)) {
+                range.selectNodeContents(container);
+            }
             selection.addRange(range);
 
             if (isNeedCopyToClipboard) {

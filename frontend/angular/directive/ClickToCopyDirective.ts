@@ -1,5 +1,6 @@
 import { Directive, HostListener, Input } from '@angular/core';
 import { Destroyable } from '../../../common/Destroyable';
+import { DateUtil } from '../../../common/util';
 import { ViewUtil } from '../util';
 
 @Directive({
@@ -14,6 +15,8 @@ export class ClickToCopyDirective extends Destroyable {
 
     @Input('vi-click-to-copy')
     public element: HTMLElement;
+
+    private selectionClearTimer: any;
 
     // --------------------------------------------------------------------------
     //
@@ -34,7 +37,14 @@ export class ClickToCopyDirective extends Destroyable {
     @HostListener('click', ['$event'])
     private clickHandler(event: MouseEvent) {
         ViewUtil.selectContent(this.element, true);
+
+        clearTimeout(this.selectionClearTimer);
+        this.selectionClearTimer = setTimeout(this.selectionRemove, DateUtil.MILISECONDS_SECOND / 2);
     }
+
+    private selectionRemove = (): void => {
+        ViewUtil.selectContent(null);
+    };
 
     // --------------------------------------------------------------------------
     //
@@ -44,5 +54,6 @@ export class ClickToCopyDirective extends Destroyable {
 
     public destroy(): void {
         this.element = null;
+        clearTimeout(this.selectionClearTimer);
     }
 }

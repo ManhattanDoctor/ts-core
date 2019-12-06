@@ -31,23 +31,25 @@ export class DateUtil {
         return date;
     }
 
-    public static parseDate(value: any): Date {
-        if (_.isNil(value)) {
-            return null;
-        }
+    public static parseDate(value: any, splitter: string = '.'): Date {
         if (_.isDate(value)) {
             return value;
         }
-
-        let dateNumber = parseFloat(value);
-        if (!_.isNaN(value) && _.isNumber(dateNumber)) {
-            return dateNumber > 0 ? DateUtil.getDate(dateNumber) : null;
-        }
-        if (_.isArray(value)) {
-            return value.length === 3 ? new Date(value[2], value[1], value[0]) : null;
+        if (_.isNumber(value)) {
+            return DateUtil.getDate(value);
         }
         if (_.isString(value)) {
-            return DateUtil.parseDate(value.split('.'));
+            return DateUtil.parseDate(value.split(splitter));
+        }
+        if (_.isArray(value)) {
+            if (value.length != 3) {
+                return null;
+            }
+            value = value.map(item => Number(item));
+            if (value.some(item => _.isNaN(item))) {
+                return null;
+            }
+            return new Date(value[2], value[1], value[0]);
         }
         return null;
     }
