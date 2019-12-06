@@ -1,7 +1,8 @@
+import { DateUtil } from '@ts-core/common/util';
 import { IsOptional } from 'class-validator';
 import * as _ from 'lodash';
 import { TraceUtil } from '../trace';
-import { FilterableConditions, FilterableSort, IFilterable, isIFilterableCondition } from './IFilterable';
+import { FilterableConditions, FilterableDataType, FilterableSort, IFilterable, IFilterableCondition, isIFilterableCondition } from './IFilterable';
 
 export class Filterable<U> implements IFilterable<U> {
     // --------------------------------------------------------------------------
@@ -11,7 +12,7 @@ export class Filterable<U> implements IFilterable<U> {
     // --------------------------------------------------------------------------
 
     public static transform<U>(item: IFilterable<U>): Filterable<U> {
-        if (!item) {
+        if (_.isNil(item)) {
             return item;
         }
         if (!_.isNil(item.conditions)) {
@@ -26,7 +27,7 @@ export class Filterable<U> implements IFilterable<U> {
 
     // --------------------------------------------------------------------------
     //
-    //  Parse Methods
+    //  Transform Methods
     //
     // --------------------------------------------------------------------------
 
@@ -53,15 +54,10 @@ export class Filterable<U> implements IFilterable<U> {
 
     private static transformCondition(item: any, key: string, value: any): void {
         if (isIFilterableCondition(value)) {
-            if (_.isEmpty(value.value) && !_.isBoolean(value)) {
-                delete item[key];
-            }
+            Filterable.transformFilterableCondition(item, key, value);
             return;
         }
-        if (_.isBoolean(value)) {
-            return;
-        }
-        if (_.isEmpty(value)) {
+        if (Filterable.isConditionValueInvalid(value)) {
             delete item[key];
             return;
         }
@@ -69,6 +65,20 @@ export class Filterable<U> implements IFilterable<U> {
 
     private static transformSort(item: any, key: string, value: any): void {
         return Filterable.transformCondition(item, key, value);
+    }
+
+    private static transformFilterableCondition(item: any, key: string, condition: IFilterableCondition): void {
+        if (Filterable.isConditionValueInvalid(condition.value)) {
+            delete item[key];
+            return;
+        }
+        if (condition.type === FilterableDataType.DATE) {
+            condition.value = DateUtil.getDate(condition.value);
+        }
+    }
+
+    private static isConditionValueInvalid(value: any): boolean {
+        return _.isEmpty(value) && !_.isBoolean(value);
     }
 
     // --------------------------------------------------------------------------

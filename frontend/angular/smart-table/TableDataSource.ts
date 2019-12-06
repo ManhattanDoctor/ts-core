@@ -121,7 +121,7 @@ export class TableDataSource<U> extends LocalDataSource implements IDestroyable 
         if (!_.isEmpty(sorts)) {
             ObjectUtil.clear(this.map.sort);
             for (let item of sorts) {
-                this.map.sort[item.field] = item.direction.toLowerCase() === 'asc';
+                this.map.sort[item.field] = item.direction.toUpperCase() === 'ASC';
             }
         }
 

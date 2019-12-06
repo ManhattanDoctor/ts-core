@@ -140,7 +140,7 @@ export class BtcApi extends LoggerWrapper {
         if (_.isEmpty(inputs)) {
             return;
         }
-        let item = new BtcApiInputsTransactionLoader(this, true, 5 * DateUtil.MILISECONDS_MINUTE);
+        let item = new BtcApiInputsTransactionLoader(this, true, 10 * DateUtil.MILISECONDS_MINUTE);
         await item.start(_.chunk(inputs, 15));
         item.destroy();
 
