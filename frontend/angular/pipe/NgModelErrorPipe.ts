@@ -35,5 +35,5 @@ export class NgModelErrorPipe implements PipeTransform {
     //
     // --------------------------------------------------------------------------
 
-    constructor(private language: LanguageService) {}
+    constructor(protected language: LanguageService) {}
 }

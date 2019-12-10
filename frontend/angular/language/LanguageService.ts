@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import { forkJoin, Observable, of } from 'rxjs';
@@ -79,7 +79,7 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
             if (this.isDestroyed) {
                 return;
             }
-            let items = results.filter(item => !(item instanceof Error));
+            let items = results.filter(item => !(item instanceof Error) && !(item instanceof HttpErrorResponse));
             if (!_.isEmpty(items)) {
                 let translation = {} as any;
                 items.forEach(item => CloneUtil.deepExtend(translation, item));

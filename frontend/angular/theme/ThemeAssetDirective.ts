@@ -93,7 +93,7 @@ export class ThemeAssetDirective extends Destroyable implements OnInit {
     }
 
     protected getSourceId(theme: Theme): string {
-        return this.name + _.capitalize(theme.name);
+        return !_.isNil(theme) ? this.name + _.capitalize(theme.name) : null;
     }
 
     protected getDefaultSourceId(theme: Theme): string {
