@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { PromiseHandler } from '../../common/promise';
+import { PromiseHandler } from '@ts-core/common/promise';
 
 export class FileUtil {
     // --------------------------------------------------------------------------

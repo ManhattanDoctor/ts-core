@@ -1,6 +1,6 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { Logger } from '../../common/logger';
-import { ILogger, LoggerLevel } from '../../common/logger/ILogger';
+import { Logger } from '@ts-core/common/logger';
+import { ILogger, LoggerLevel } from '@ts-core/common/logger/ILogger';
 import { DefaultLogger } from '../logger/DefaultLogger';
 import { VIModule } from '../VIModule';
 import { AssetModule } from './asset/AssetModule';

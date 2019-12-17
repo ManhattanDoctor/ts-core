@@ -1,7 +1,7 @@
 import { Directive, ElementRef, HostListener, Input, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
-import { Destroyable } from '../../../common/Destroyable';
+import { Destroyable } from '@ts-core/common/Destroyable';
 import { Assets } from '../../asset';
 import { ViewUtil } from '../util';
 import { Theme } from './Theme';

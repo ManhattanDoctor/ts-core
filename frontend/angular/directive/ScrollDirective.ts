@@ -1,6 +1,6 @@
 import { Directive, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import * as _ from 'lodash';
-import { Destroyable } from '../../../common/Destroyable';
+import { Destroyable } from '@ts-core/common/Destroyable';
 import { ViewUtil } from '../util';
 
 @Directive({

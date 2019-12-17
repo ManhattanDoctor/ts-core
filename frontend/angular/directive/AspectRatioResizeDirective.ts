@@ -1,6 +1,6 @@
 import { AfterViewInit, Directive, ElementRef, Input } from '@angular/core';
 import * as _ from 'lodash';
-import { DestroyableContainer } from '../../../common';
+import { DestroyableContainer } from '@ts-core/common';
 import { ResizeManager } from '../manager';
 import { ViewUtil } from '../util';
 

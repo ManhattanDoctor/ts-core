@@ -1,10 +1,10 @@
 import { HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
-import { Destroyable } from '../../common/Destroyable';
+import { Destroyable } from '@ts-core/common/Destroyable';
 import { ApiMethod } from './ApiMethod';
-import { ObservableData } from '../../common/observer';
-import { LoadableEvent } from '../../common';
+import { ObservableData } from '@ts-core/common/observer';
+import { LoadableEvent } from '@ts-core/common';
 import { ApiRequest } from './ApiRequest';
 import { ApiResponse } from './ApiResponse';
 import { IApiRequestConfig } from './IApiRequestConfig';

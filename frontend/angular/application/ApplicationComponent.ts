@@ -1,6 +1,6 @@
 import { Renderer2 } from '@angular/core';
 import * as moment from 'moment';
-import { LoadableEvent } from '../../../common';
+import { LoadableEvent } from '@ts-core/common';
 import { ApiBaseService, ApiResponse } from '../../api';
 import { Assets } from '../../asset';
 import { Language } from '../../language';

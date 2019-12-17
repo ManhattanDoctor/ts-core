@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { IPage, IPaginable, IPagination } from '../../../common/dto';
+import { IPage, IPaginable, IPagination } from '@ts-core/common/dto';
 import { ApiResponse } from '../../api';
 import { ApiFilterableMapCollection } from './ApiFilterableMapCollection';
 

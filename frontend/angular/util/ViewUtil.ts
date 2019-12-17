@@ -1,7 +1,7 @@
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Renderer2 } from '@angular/core';
 import * as _ from 'lodash';
-import { ObjectUtil } from '../../../common/util';
+import { ObjectUtil } from '@ts-core/common/util';
 
 export class ViewUtil {
     // --------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 import * as Web3 from 'web3';
-import { PromiseHandler } from '../../../common/promise';
-import { DateUtil } from '../../../common/util';
+import { PromiseHandler } from '@ts-core/common/promise';
+import { DateUtil } from '@ts-core/common/util';
 import { IEthBlock } from './IEthBlock';
 import { IEthTransaction } from './IEthTransaction';
 import { IEthTransactionReceipt } from './IEthTransactionReceipt';

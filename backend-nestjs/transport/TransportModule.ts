@@ -1,9 +1,9 @@
 import { DynamicModule, Global, Provider } from '@nestjs/common';
-import { ExtendedError } from '../../../common/error';
-import { Logger } from '../../../common/logger';
-import { Transport, TransportLocal } from '../../../common/transport';
-import { IAmqpSettings } from '../../settings/IAmqpSettings';
-import { TransportAmqp } from '../../transport/TransportAmqp';
+import { IAmqpSettings } from '@ts-core/backend/settings';
+import { TransportAmqp } from '@ts-core/backend/transport';
+import { ExtendedError } from '@ts-core/common/error';
+import { Logger } from '@ts-core/common/logger';
+import { Transport, TransportLocal } from '@ts-core/common/transport';
 
 @Global()
 export class TransportModule {

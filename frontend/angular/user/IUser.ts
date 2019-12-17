@@ -1,4 +1,4 @@
-import { IDestroyable } from '../../../common';
+import { IDestroyable } from '@ts-core/common';
 
 export abstract class IUser<T = any> implements IDestroyable {
     // --------------------------------------------------------------------------

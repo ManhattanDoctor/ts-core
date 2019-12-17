@@ -1,5 +1,5 @@
 import { LocalDataSource } from 'ng2-smart-table';
-import { IPagination } from '../../../common/dto';
+import { IPagination } from '@ts-core/common/dto';
 import { ApiBaseService, ApiMethod, ApiResponse } from '../../api';
 import { ApiPagedMapCollection } from '../api';
 import { TablePagedDataSource } from './TablePagedDataSource';

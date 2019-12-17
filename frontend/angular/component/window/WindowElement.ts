@@ -1,5 +1,5 @@
 import { AfterViewInit, ElementRef } from '@angular/core';
-import { DestroyableContainer } from '../../../../common';
+import { DestroyableContainer } from '@ts-core/common';
 import { ViewUtil } from '../../util';
 import { IWindow } from '../../window';
 

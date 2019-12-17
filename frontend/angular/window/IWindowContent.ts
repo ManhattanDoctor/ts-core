@@ -1,6 +1,6 @@
 import { AfterViewInit, ElementRef, ViewContainerRef } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DestroyableContainer } from '../../../common';
+import { DestroyableContainer } from '@ts-core/common';
 import { IWindow, WindowEvent } from './IWindow';
 import { WindowConfig } from './WindowConfig';
 

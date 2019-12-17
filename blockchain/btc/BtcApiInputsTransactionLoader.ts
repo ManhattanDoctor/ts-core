@@ -1,8 +1,8 @@
 import * as spinner from 'cli-spinner';
 import * as _ from 'lodash';
-import { SequienceExecutor } from '../../../common/executor';
-import { PromiseReflector } from '../../../common/promise';
-import { ObjectUtil } from '../../../common/util';
+import { SequienceExecutor } from '@ts-core/common/executor';
+import { PromiseReflector } from '@ts-core/common/promise';
+import { ObjectUtil } from '@ts-core/common/util';
 import { BtcApi } from './BtcApi';
 import { IBtcInput } from './IBtcInput';
 

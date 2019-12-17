@@ -1,8 +1,8 @@
 import { EventEmitter, Input, Output } from '@angular/core';
 import * as _ from 'lodash';
 import { Row } from 'ng2-smart-table/lib/lib/data-set/row';
-import { DestroyableContainer, LoadableEvent } from '../../../../common';
-import { ObjectUtil } from '../../../../common/util';
+import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
+import { ObjectUtil } from '@ts-core/common/util';
 import { LanguageService } from '../../language';
 import { TableMapCollection, TablePagedMapCollection } from '../../smart-table';
 

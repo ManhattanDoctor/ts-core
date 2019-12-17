@@ -3,10 +3,10 @@ import { ValidatorOptions } from 'class-validator/validation/ValidatorOptions';
 import * as fs from 'fs';
 import * as _ from 'lodash';
 import { Connection, ConnectionOptions, QueryFailedError, SelectQueryBuilder } from 'typeorm';
-import { FilterableConditions, FilterableSort, FilterableConditionType, IFilterable, IPaginable, IPagination, isIFilterableCondition } from '../../common/dto';
-import { ExtendedError } from '../../common/error';
-import { PromiseHandler } from '../../common/promise';
-import { ObjectUtil } from '../../common/util';
+import { FilterableConditions, FilterableSort, FilterableConditionType, IFilterable, IPaginable, IPagination, isIFilterableCondition } from '@ts-core/common/dto';
+import { ExtendedError } from '@ts-core/common/error';
+import { PromiseHandler } from '@ts-core/common/promise';
+import { ObjectUtil } from '@ts-core/common/util';
 
 export class TypeormUtil {
     // --------------------------------------------------------------------------

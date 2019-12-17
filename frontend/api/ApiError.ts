@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { ObjectUtil } from '../../common/util';
+import { ObjectUtil } from '@ts-core/common/util';
 
 export class ApiError implements Error {
     // --------------------------------------------------------------------------

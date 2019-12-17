@@ -3,9 +3,9 @@ import { Channel, Message, Options, Replies } from 'amqplib';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 import * as uuid from 'uuid';
-import { ExtendedError } from '../../common/error';
-import { ILogger } from '../../common/logger';
-import { PromiseHandler } from '../../common/promise';
+import { ExtendedError } from '@ts-core/common/error';
+import { ILogger } from '@ts-core/common/logger';
+import { PromiseHandler } from '@ts-core/common/promise';
 import {
     ITransportCommand,
     ITransportCommandAsync,
@@ -18,7 +18,7 @@ import {
     TransportLogType,
     TransportTimeoutError,
     TransportWaitError
-} from '../../common/transport';
+} from '@ts-core/common/transport';
 import { IAmqpSettings } from '../settings/IAmqpSettings';
 
 export class TransportAmqp extends Transport {

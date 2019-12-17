@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
-import { IDestroyable } from '../../common';
-import { ExtendedError } from '../../common/error';
-import { LoggerLevel } from '../../common/logger/ILogger';
-import { MapCollection } from '../../common/map';
-import { AbstractSettingsStorage } from '../../common/settings';
+import { IDestroyable } from '@ts-core/common';
+import { ExtendedError } from '@ts-core/common/error';
+import { LoggerLevel } from '@ts-core/common/logger/ILogger';
+import { MapCollection } from '@ts-core/common/map';
+import { AbstractSettingsStorage } from '@ts-core/common/settings';
 import { Language } from '../language/Language';
 import { UrlUtil } from '../util';
 

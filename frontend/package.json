@@ -7,6 +7,8 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@ts-core/common": "file:./../common",
+        
         "@angular/animations": "8.0.3",
         "@angular/cdk": "8.0.1",
         "@angular/cli": "8.0.6",

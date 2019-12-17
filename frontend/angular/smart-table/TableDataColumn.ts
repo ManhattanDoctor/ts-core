@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
-import { FilterableConditionType, FilterableDataType, IFilterableCondition } from '../../../common/dto';
-import { DateUtil, ObjectUtil } from '../../../common/util';
+import { FilterableConditionType, FilterableDataType, IFilterableCondition } from '@ts-core/common/dto';
+import { DateUtil, ObjectUtil } from '@ts-core/common/util';
 
 export class TableDataColumn<U> {
     // --------------------------------------------------------------------------

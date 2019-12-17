@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Resolve } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { LoadableEvent } from '../../../common';
+import { LoadableEvent } from '@ts-core/common';
 import { LanguageService } from './LanguageService';
 
 @Injectable()

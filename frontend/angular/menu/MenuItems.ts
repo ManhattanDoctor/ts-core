@@ -1,6 +1,6 @@
-import { LoadableEvent } from '../../../common';
-import { DestroyableContainer } from '../../../common';
-import { ArrayUtil } from '../../../common/util';
+import { LoadableEvent } from '@ts-core/common';
+import { DestroyableContainer } from '@ts-core/common';
+import { ArrayUtil } from '@ts-core/common/util';
 import { LanguageService } from '../language';
 import { MenuItem } from './MenuItem';
 import { MenuItemBase } from './MenuItemBase';

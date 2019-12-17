@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { timeout } from 'rxjs/internal/operators';
-import { ExtendedError } from '../../../common/error';
+import { ExtendedError } from '@ts-core/common/error';
 import { ApiBaseService } from '../../api/ApiBaseService';
 import { ApiError } from '../../api/ApiError';
 import { ApiMethod } from '../../api/ApiMethod';

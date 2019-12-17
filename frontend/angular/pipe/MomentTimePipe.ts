@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { DateUtil } from '../../../common/util';
+import { DateUtil } from '@ts-core/common/util';
 
 @Pipe({
     name: 'viMomentTime'

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
-import { ExtendedError } from '../../../common/error';
-import { MapCollection } from '../../../common/map';
-import { Destroyable } from '../../../common/Destroyable';
+import { ExtendedError } from '@ts-core/common/error';
+import { MapCollection } from '@ts-core/common/map';
+import { Destroyable } from '@ts-core/common/Destroyable';
 import { CookieService } from '../cookie';
 import { ViewUtil } from '../util';
 import { Theme } from './Theme';

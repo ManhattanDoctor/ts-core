@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
-import { IDestroyable } from '../../../common';
-import { ObservableData } from '../../../common/observer';
+import { IDestroyable } from '@ts-core/common';
+import { ObservableData } from '@ts-core/common/observer';
 
 export interface ILanguageTranslator extends IDestroyable {
     compile(expression: string, params?: any): string;

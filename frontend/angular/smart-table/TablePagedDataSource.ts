@@ -1,6 +1,6 @@
 import { LocalDataSource } from 'ng2-smart-table';
-import { IDestroyable } from '../../../common';
-import { IPagination } from '../../../common/dto';
+import { IDestroyable } from '@ts-core/common';
+import { IPagination } from '@ts-core/common/dto';
 import { ApiResponse } from '../../api';
 import { ApiPagedMapCollection } from '../api';
 import { TableDataSource } from './TableDataSource';

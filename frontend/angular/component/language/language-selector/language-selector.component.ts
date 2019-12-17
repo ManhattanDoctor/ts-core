@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input } from '@angular/core';
-import { DestroyableContainer } from '../../../../../common';
+import { DestroyableContainer } from '@ts-core/common';
 import { LanguageService } from '../../../language';
 import { ViewUtil } from '../../../util';
 

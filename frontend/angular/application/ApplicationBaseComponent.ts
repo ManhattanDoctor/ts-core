@@ -1,6 +1,6 @@
 import { AfterViewInit, ElementRef } from '@angular/core';
-import { DestroyableContainer } from '../../../common';
-import { PromiseHandler } from '../../../common/promise';
+import { DestroyableContainer } from '@ts-core/common';
+import { PromiseHandler } from '@ts-core/common/promise';
 
 export abstract class ApplicationBaseComponent extends DestroyableContainer implements AfterViewInit {
     // --------------------------------------------------------------------------

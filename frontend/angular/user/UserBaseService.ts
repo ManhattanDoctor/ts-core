@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
-import { ObservableData } from '../../../common/observer';
+import { ObservableData } from '@ts-core/common/observer';
 import { LoginBaseService, LoginBaseServiceEvent } from '../login';
 import { IUser } from './IUser';
 

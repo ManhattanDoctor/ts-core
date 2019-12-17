@@ -1,5 +1,5 @@
 import { ControlValueAccessor } from '@angular/forms';
-import { Destroyable } from '../../../common/Destroyable';
+import { Destroyable } from '@ts-core/common/Destroyable';
 
 export class ValueAccessor<T> extends Destroyable implements ControlValueAccessor {
     // --------------------------------------------------------------------------

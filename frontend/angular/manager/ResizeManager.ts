@@ -1,5 +1,5 @@
 import { ResizeSensor } from 'css-element-queries';
-import { IDestroyable } from '../../../common';
+import { IDestroyable } from '@ts-core/common';
 
 export class ResizeManager implements IDestroyable {
     // --------------------------------------------------------------------------

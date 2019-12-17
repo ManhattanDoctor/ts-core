@@ -1,8 +1,8 @@
 import { Observable, Subject } from 'rxjs';
-import { LoadableEvent } from '../../../common';
-import { ObservableData } from '../../../common/observer';
+import { LoadableEvent } from '@ts-core/common';
+import { ObservableData } from '@ts-core/common/observer';
 import { ApiResponse } from '../../api';
-import { Destroyable } from '../../../common/Destroyable';
+import { Destroyable } from '@ts-core/common/Destroyable';
 
 export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
     // --------------------------------------------------------------------------

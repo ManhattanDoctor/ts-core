@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatPaginatorIntl } from '@angular/material';
 import { Subscription } from 'rxjs';
-import { LoadableEvent } from '../../../common';
+import { LoadableEvent } from '@ts-core/common';
 import { LanguageService } from './LanguageService';
 
 @Injectable()

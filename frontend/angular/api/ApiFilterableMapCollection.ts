@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { FilterableConditions, FilterableSort, IFilterable } from '../../../common/dto';
+import { FilterableConditions, FilterableSort, IFilterable } from '@ts-core/common/dto';
 import { ApiMethod } from '../../api';
 import { ApiLoadableMapCollection } from './ApiLoadableMapCollection';
 

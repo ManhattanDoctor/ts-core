@@ -2,7 +2,7 @@ import { ExtendedError } from '@ts-core/common/error';
 import { DateUtil, ObjectUtil } from '@ts-core/common/util';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import * as _ from 'lodash';
-import { ILogger, LoggerWrapper } from '../../../common/logger';
+import { ILogger, LoggerWrapper } from '@ts-core/common/logger';
 import { IXrpAccountRoot } from './IXrpAccountRoot';
 import { IXrpLedger } from './IXrpLedger';
 import { IXrpTransaction, IXrpTransactionReceipt } from './IXrpTransaction';

@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
-import { DestroyableContainer, LoadableEvent } from '../../../common';
+import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
 import { LanguageService } from '../language';
 import { CamelCasePipe, MomentDateAdaptivePipe, MomentDatePipe, MomentTimePipe, SanitizePipe, TruncatePipe, MomentDateFromNowPipe } from '../pipe';
 import { FinancePipe } from '../pipe/FinancePipe';

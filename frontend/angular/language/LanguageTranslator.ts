@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
-import { DestroyableContainer, IDestroyable } from '../../../common';
-import { ExtendedError } from '../../../common/error';
-import { DestroyableMapCollection } from '../../../common/map';
-import { ObservableData } from '../../../common/observer';
-import { ObjectUtil } from '../../../common/util';
+import { DestroyableContainer, IDestroyable } from '@ts-core/common';
+import { ExtendedError } from '@ts-core/common/error';
+import { DestroyableMapCollection } from '@ts-core/common/map';
+import { ObservableData } from '@ts-core/common/observer';
+import { ObjectUtil } from '@ts-core/common/util';
 import { ILanguageTranslator, LanguageTranslatorEvent } from './ILanguageTranslator';
 
 export class LanguageTranslator extends DestroyableContainer implements ILanguageTranslator {

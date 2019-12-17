@@ -1,7 +1,6 @@
 import { DynamicModule, Global, Provider } from '@nestjs/common';
-import { Logger } from '../../../common/logger';
-import { LoggerLevel } from '../../../common/logger/ILogger';
-import { ILoggerSettings } from '../../settings';
+import { ILoggerSettings } from '@ts-core/backend/settings';
+import { Logger, LoggerLevel } from '@ts-core/common/logger';
 import { DefaultLogger } from './DefaultLogger';
 
 @Global()

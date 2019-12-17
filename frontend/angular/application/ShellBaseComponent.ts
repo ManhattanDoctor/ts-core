@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import * as _ from 'lodash';
 import { filter } from 'rxjs/operators';
-import { DestroyableContainer } from '../../../common';
+import { DestroyableContainer } from '@ts-core/common';
 import { MenuItems, NavigationMenuItem } from '../menu';
 import { NotificationConfig, NotificationService, NotificationServiceEvent } from '../notification';
 import { RouterBaseService, RouterBaseServiceEvent } from '../router';

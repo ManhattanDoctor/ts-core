@@ -1,8 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
 import { validate, ValidationError, ValidatorOptions } from 'class-validator';
 import * as _ from 'lodash';
-import { ExtendedError } from '../../../common/error';
-import { ILogger, LoggerWrapper } from '../../../common/logger';
+import { ExtendedError } from '@ts-core/common/error';
+import { ILogger, LoggerWrapper } from '@ts-core/common/logger';
 
 export abstract class DefaultController<U, V> extends LoggerWrapper {
     // --------------------------------------------------------------------------

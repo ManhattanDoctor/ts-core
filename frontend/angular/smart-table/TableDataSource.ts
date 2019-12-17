@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
 import { LocalDataSource } from 'ng2-smart-table';
 import { Subscription } from 'rxjs';
-import { IDestroyable, LoadableEvent } from '../../../common';
-import { ObjectUtil } from '../../../common/util';
+import { IDestroyable, LoadableEvent } from '@ts-core/common';
+import { ObjectUtil } from '@ts-core/common/util';
 import { ApiResponse } from '../../api';
 import { ApiFilterableMapCollection } from '../api';
 

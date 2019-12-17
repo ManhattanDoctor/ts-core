@@ -1,7 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, InternalServerErrorException } from '@nestjs/common';
 import * as _ from 'lodash';
-import { ILogger } from '../../../common/logger';
-import { ObjectUtil } from '../../../common/util';
+import { ILogger } from '@ts-core/common/logger';
+import { ObjectUtil } from '@ts-core/common/util';
 
 @Catch(Error)
 export class DefaultHttpExceptionFilter implements ExceptionFilter<any> {

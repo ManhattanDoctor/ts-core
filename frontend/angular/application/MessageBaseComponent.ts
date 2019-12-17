@@ -1,6 +1,6 @@
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { DestroyableContainer, LoadableEvent } from '../../../common';
+import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
 import { LanguageService } from '../language';
 
 export abstract class MessageBaseComponent extends DestroyableContainer {

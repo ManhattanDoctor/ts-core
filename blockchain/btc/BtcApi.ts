@@ -1,9 +1,9 @@
 import * as RpcClient from 'bitcoind-rpc';
 import * as _ from 'lodash';
-import { ExtendedError } from '../../../common/error';
-import { ILogger, LoggerWrapper } from '../../../common/logger';
-import { PromiseHandler } from '../../../common/promise';
-import { DateUtil, ObjectUtil } from '../../../common/util';
+import { ExtendedError } from '@ts-core/common/error';
+import { ILogger, LoggerWrapper } from '@ts-core/common/logger';
+import { PromiseHandler } from '@ts-core/common/promise';
+import { DateUtil, ObjectUtil } from '@ts-core/common/util';
 import { BtcApiInputsTransactionLoader } from './BtcApiInputsTransactionLoader';
 import { IBtcBlock } from './IBtcBlock';
 import { IBtcInput } from './IBtcInput';

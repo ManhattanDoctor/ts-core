@@ -1,5 +1,5 @@
-import { SequienceExecutor } from '../../../common/executor';
-import { PromiseReflector } from '../../../common/promise';
+import { SequienceExecutor } from '@ts-core/common/executor';
+import { PromiseReflector } from '@ts-core/common/promise';
 import { BtcApi } from './BtcApi';
 import { IBtcTransaction } from './IBtcTransaction';
 

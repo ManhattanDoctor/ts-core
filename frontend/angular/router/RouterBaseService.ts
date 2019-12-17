@@ -1,8 +1,8 @@
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationExtras, NavigationStart, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
-import { DestroyableContainer } from '../../../common';
-import { ObservableData } from '../../../common/observer';
+import { DestroyableContainer } from '@ts-core/common';
+import { ObservableData } from '@ts-core/common/observer';
 import { NativeWindowService } from '../../service/NativeWindowService';
 
 export class RouterBaseService extends DestroyableContainer {

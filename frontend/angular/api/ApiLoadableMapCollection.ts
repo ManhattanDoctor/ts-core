@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
-import { LoadableMapCollection } from '../../../common/map';
+import { LoadableMapCollection } from '@ts-core/common/map';
 import { ApiMethod, ApiResponse } from '../../api';
 import { ApiBaseService } from '../../api/ApiBaseService';
 

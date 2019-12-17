@@ -1,4 +1,4 @@
-import { Destroyable } from '../../common/Destroyable';
+import { Destroyable } from '@ts-core/common/Destroyable';
 import { ApiMethod } from './ApiMethod';
 import { IApiRequestConfig } from './IApiRequestConfig';
 
