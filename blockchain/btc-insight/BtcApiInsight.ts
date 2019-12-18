@@ -1,7 +1,6 @@
 import { ILogger, LoggerWrapper } from '@ts-core/common/logger';
 import axios, { AxiosInstance } from 'axios';
 import * as _ from 'lodash';
-import { IBtcApiSettingsInsight } from './BtcApiInsight';
 import { IBtcBlockInsight } from './IBtcBlockInsight';
 import { IBtcInputInsight } from './IBtcInputInsight';
 import { IBtcOutputInsight } from './IBtcOutputInsight';
