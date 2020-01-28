@@ -1,5 +1,5 @@
-import * as nacl from 'tweetnacl';
 import * as _ from 'lodash';
+import * as nacl from 'tweetnacl';
 
 export class TweetNaCl {
     // --------------------------------------------------------------------------
@@ -46,3 +46,4 @@ export class TweetNaCl {
         return Buffer.from(nacl.hash(Buffer.from(message)));
     }
 }
+
