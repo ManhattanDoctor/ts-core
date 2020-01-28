@@ -354,4 +354,14 @@
     ::-webkit-scrollbar-thumb {
         background-color: $thumb-color;
     }
+    
+}
+
+@mixin vi-mat-checkbox-multiline() {
+    .mat-checkbox-layout {
+        white-space: normal !important;
+    }
+    .mat-checkbox-inner-container {
+        margin-top: 3px !important;
+    }
 }
