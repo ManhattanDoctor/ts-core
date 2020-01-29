@@ -35,7 +35,7 @@ export class LoggerWrapper implements ILogger, IDestroyable {
 
     protected commitLoggerProperties(): void {}
 
-    private isLevelSatisfy(level: LoggerLevel): boolean {
+    protected isLevelSatisfy(level: LoggerLevel): boolean {
         if (this.level === LoggerLevel.NONE) {
             return false;
         }
@@ -43,6 +43,26 @@ export class LoggerWrapper implements ILogger, IDestroyable {
             return true;
         }
         return this.level <= level;
+    }
+
+    protected logAdd(message: any, context: string): void {
+        this.currentLogger.log(message, context);
+    }
+
+    protected errorAdd(message: any, trace: string, context: string): void {
+        this.currentLogger.error(message, trace, context);
+    }
+
+    protected warnAdd(message: any, context: string): void {
+        this.currentLogger.warn(message, context);
+    }
+
+    protected debugAdd(message: any, context: string): void {
+        this.currentLogger.debug(message, context);
+    }
+
+    protected verboseAdd(message: any, context: string): void {
+        this.currentLogger.verbose(message, context);
     }
 
     // --------------------------------------------------------------------------
@@ -55,7 +75,7 @@ export class LoggerWrapper implements ILogger, IDestroyable {
         if (!this.isLevelSatisfy(LoggerLevel.LOG)) {
             return;
         }
-        this.currentLogger.log(message, context);
+        this.logAdd(message, context);
     }
 
     public error(message: any, trace?: string, context: string = this.context): void {
@@ -69,7 +89,7 @@ export class LoggerWrapper implements ILogger, IDestroyable {
         if (message instanceof Error) {
             message = message.toString();
         }
-        this.currentLogger.error(message, trace, context);
+        this.errorAdd(message, trace, context);
     }
 
     public warn(message: any, context: string = this.context): void {
@@ -80,21 +100,21 @@ export class LoggerWrapper implements ILogger, IDestroyable {
         if (message instanceof Error) {
             message = message.toString();
         }
-        this.currentLogger.warn(message, context);
+        this.warnAdd(message, context);
     }
 
     public debug(message: any, context: string = this.context): void {
         if (!this.isLevelSatisfy(LoggerLevel.DEBUG)) {
             return;
         }
-        this.currentLogger.debug(message, context);
+        this.debugAdd(message, context);
     }
 
     public verbose(message: any, context: string = this.context): void {
         if (!this.isLevelSatisfy(LoggerLevel.VERBOSE)) {
             return;
         }
-        this.currentLogger.verbose(message, context);
+        this.verboseAdd(message, context);
     }
 
     public destroy(): void {
