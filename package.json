@@ -1,11 +1,62 @@
 {
     "name": "ts-core",
     "version": "1.0.0",
-    "description": "",
-    "main": "",
-    "scripts": {},
+    "description": "Common classes for typescript based projects",
     "author": "Renat Gubaev",
     "license": "ISC",
-    "dependencies": {},
-    "devDependencies": {}
+    "main": "index.js",
+    "scripts": {
+        "prettier": "prettier --config .prettierrc.json --write packages/**/*.ts",
+        "clean":"rmdir dist /S /Q",
+        "build": "tsc --p ./ --sourceMap false",
+
+        "clean1": "gulp clean:bundle",
+        "build1": "gulp build --dist node_modules/@ts-core",
+        "lint": "eslint 'packages/**/**.ts'",
+        "format": "prettier \"**/*.ts\" --ignore-path ./.prettierignore --write && git status",
+        "prebuild": "rm -rf node_modules/@ts-core",
+        "postbuild": "gulp move",
+        "prebuild:prod": "npm run clean",
+        "build:prod": "gulp build",
+        "build:samples": "gulp install:samples && npm run build && gulp build:samples && gulp test:samples && gulp test:e2e:samples",
+        "prerelease": "gulp copy-misc && gulp build --dist node_modules/@ts-core",
+        "publish": "npm run prerelease && npm run build:prod && ./node_modules/.bin/lerna publish --force-publish --access public --exact -m \"chore(@ts-core) publish %s release\"",
+        "publish:rc": "npm run prerelease && npm run build:prod && ./node_modules/.bin/lerna publish --npm-tag=rc --access public -m \"chore(@ts-core) publish %s release\"",
+        "publish:next": "npm run prerelease && npm run build:prod && ./node_modules/.bin/lerna publish --npm-tag=next --access public --skip-git -m \"chore(@ts-core) publish %s release\"",
+        "publish:beta": "npm run prerelease && npm run build:prod && ./node_modules/.bin/lerna publish --npm-tag=beta --access public -m \"chore(@ts-core) publish %s release\"",
+        "publish:test": "npm run prerelease && npm run build:prod && ./node_modules/.bin/lerna publish --force-publish --access public --npm-tag=test --skip-git -m \"chore(@ts-core) publish %s release\""
+    },
+    "devDependencies": {
+        "eslint": "6.8.0",
+        "eslint-config-prettier": "6.10.0",
+        "eslint-plugin-import": "2.20.1",
+        "gulp": "4.0.2",
+        "gulp-clang-format": "1.0.27",
+        "gulp-clean": "0.4.0",
+        "gulp-sourcemaps": "2.6.5",
+        "gulp-typescript": "5.0.1",
+        "gulp-watch": "5.0.1",
+        "husky": "4.2.1",
+        "delete-empty": "3.0.0",
+        "nyc": "15.0.0",
+        "prettier": "1.19.1",
+        "tslint": "5.20.1",
+        "ts-node": "8.6.2",
+        "typescript": "3.7.5",
+        "tsconfig-paths": "3.9.0"
+    },
+    "engines": {
+        "node": ">= 12.12.18"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ManhattanDoctor/ts-core.git"
+    },
+    "keywords": [
+        "typescript"
+    ],
+    "bugs": {
+        "url": "https://github.com/ManhattanDoctor/ts-core/issues"
+    },
+    "homepage": "https://github.com/ManhattanDoctor/ts-core#readme"
 }

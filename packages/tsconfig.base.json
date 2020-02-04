@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "declaration": true,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false,
+        "allowSyntheticDefaultImports": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "preserveSymlinks": true,
+        "target": "es2017",
+        "sourceMap": false,
+        "outDir": "./build",
+        "baseUrl": "./",
+        "paths": {},
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "newLine": "LF",
+
+        "skipLibCheck": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "importHelpers": true,
+        "allowJs": false,
+        "strict": true,
+        "strictNullChecks": false
+    },
+    "exclude": ["../node_modules", "./**/*.spec.ts"]
+}
+
