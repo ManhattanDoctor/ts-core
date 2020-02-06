@@ -1,5 +1,5 @@
-import * as fs from 'fs';
 import { PromiseHandler } from '@ts-core/common/promise';
+import * as fs from 'fs';
 
 export class FileUtil {
     // --------------------------------------------------------------------------
@@ -12,6 +12,19 @@ export class FileUtil {
         let promise = PromiseHandler.create();
         fs.exists(path, value => {
             promise.resolve(value);
+        });
+        return promise.promise;
+    }
+
+    public static async remove(path: string): Promise<void> {
+        let promise = PromiseHandler.create();
+        fs.unlink(path, error => {
+            console.log(path, error);
+            if (error) {
+                promise.reject(error.message);
+            } else {
+                promise.resolve();
+            }
         });
         return promise.promise;
     }

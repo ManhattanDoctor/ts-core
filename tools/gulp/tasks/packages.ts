@@ -1,63 +1,119 @@
-import * as log from 'fancy-log';
-import { dest, series, task, watch } from 'gulp';
-import * as sourcemaps from 'gulp-sourcemaps';
+import { FileUtil } from '@ts-core/backend/file';
+import * as del from 'del';
+import { dest, series, src, task } from 'gulp';
+import * as clean from 'gulp-clean';
+// import * as debug from 'gulp-debug';
+import run from 'gulp-run-command';
 import { createProject } from 'gulp-typescript';
-import { source } from '../config';
 
-// Has to be a hardcoded object due to build order
+// --------------------------------------------------------------------------
+//
+//  Properties
+//
+// --------------------------------------------------------------------------
+
 const packages = {
     common: createProject('packages/common/tsconfig.json'),
-    core: createProject('packages/core/tsconfig.json'),
-    microservices: createProject('packages/microservices/tsconfig.json')
+    backend: createProject('packages/backend/tsconfig.json')
 };
 
 const modules = Object.keys(packages);
+const output = `dist/@ts-core`;
 
-const distId = process.argv.indexOf('--dist');
-const dist = distId < 0 ? source : process.argv[distId + 1];
+// --------------------------------------------------------------------------
+//
+//  Package Methods
+//
+// --------------------------------------------------------------------------
 
-/**
- * Watches the packages/* folder and
- * builds the package on file change
- */
-function defaultTask() {
-    log.info('Watching files..');
-    modules.forEach(packageName => {
-        watch([`${source}/${packageName}/**/*.ts`, `${source}/${packageName}/*.ts`], series(packageName));
+const packageClean = async (packageName: string): Promise<void> => {
+    const projectDirectory = `packages/${packageName}`;
+
+    // Remove node_modules
+    await del([`${projectDirectory}/node_modules`, `${projectDirectory}/package.json`], { force: true });
+
+    // Remove compiled files
+    await new Promise(resolve => {
+        src(
+            [
+                `${projectDirectory}/**/*.js`,
+                `${projectDirectory}/**/*.d.ts`,
+                `${projectDirectory}/**/*.js.map`,
+                `${projectDirectory}/**/*.d.ts.map`,
+                `!${projectDirectory}/**/node_modules/**/*`
+            ],
+            {
+                read: false
+            }
+        )
+            .pipe(clean())
+            .on('finish', resolve);
     });
-}
+};
 
-/**
- * Builds the given package
- * @param packageName The name of the package
- */
-function buildPackage(packageName: string) {
-    return packages[packageName]
-        .src()
-        .pipe(packages[packageName]())
-        .pipe(dest(`${dist}/${packageName}`));
-}
+const packageBuild = async (packageName: string): Promise<void> => {
+    const project = packages[packageName];
+    const projectDirectory = project.projectDirectory;
+    const outputDirectory = `${output}/${packageName}`;
 
-/**
- * Builds the given package and adds sourcemaps
- * @param packageName The name of the package
- */
-function buildPackageDev(packageName: string) {
-    return packages[packageName]
-        .src()
-        .pipe(sourcemaps.init())
-        .pipe(packages[packageName]())
-        .pipe(sourcemaps.mapSources((sourcePath: string) => './' + sourcePath.split('/').pop()))
-        .pipe(sourcemaps.write('.', {}))
-        .pipe(dest(`${dist}/${packageName}`));
-}
+    // Install dependencies if need
+    if (!(await FileUtil.isExists(`${projectDirectory}/package-lock.json`))) {
+        await run(`npm --prefix ${projectDirectory} install ${projectDirectory}`)();
+    }
 
-modules.forEach(packageName => {
-    task(packageName, () => buildPackage(packageName));
-    task(`${packageName}:dev`, () => buildPackageDev(packageName));
-});
+    // Remove output directory
+    await del(outputDirectory, { force: true });
 
-task('common:dev', series(modules.map(packageName => `${packageName}:dev`)));
-task('build', series(modules));
-task('build:dev', series('common:dev'));
-task('default', defaultTask);
+    // Format and fix code
+    // await run(`prettier --write '${projectDirectory}/**/*.{ts,js,json}'`)();
+
+    // Compile project
+    await new Promise(resolve => {
+        project
+            .src()
+            .pipe(project())
+            .pipe(dest(outputDirectory))
+            .on('finish', resolve);
+    });
+
+    // Copy files
+    await new Promise(resolve => {
+        src([`.npmrc`])
+            //.pipe(debug())
+            .pipe(dest(outputDirectory))
+            .on('finish', resolve);
+    });
+};
+
+const packagePublish = async (packageName: string, type: 'patch' | 'minor' | 'major'): Promise<void> => {
+    const project = packages[packageName];
+    const projectDirectory = project.projectDirectory;
+    const outputDirectory = `${output}/${packageName}`;
+
+    // Build package
+    await packageBuild(packageName);
+
+    // Update version of package.js
+    await run(`npm --prefix ${projectDirectory} version ${type}`)();
+
+    // Copy package.js
+    await new Promise(resolve => {
+        src([`${projectDirectory}/package.json`])
+            .pipe(dest(outputDirectory))
+            .on('finish', resolve);
+    });
+
+    // Publish to npm
+    await run(`npm --prefix ${outputDirectory} publish ${outputDirectory}`)();
+};
+
+(() => {
+    for (let packageName of modules) {
+        task(`${packageName}:clean`, () => packageClean(packageName));
+        task(`${packageName}:build`, () => packageBuild(packageName));
+        task(`${packageName}:publish:patch`, () => packagePublish(packageName, 'patch'));
+        task(`${packageName}:publish:minor`, () => packagePublish(packageName, 'minor'));
+        task(`${packageName}:publish:major`, () => packagePublish(packageName, 'major'));
+        task(`${packageName}:publish`, series(`${packageName}:publish:patch`));
+    }
+})();

@@ -7,7 +7,7 @@ import { source } from '../config';
  * Cleans the build output assets from the packages folders
  */
 function cleanOutput() {
-    return src([`${source}/**/*.js`, `${source}/**/*.d.ts`, `${source}/**/*.js.map`, `${source}/**/*.d.ts.map`], {
+    return src([`${source}/**/*.js`, `${source}/**/*.d.ts`, `${source}/**/*.js.map`, `${source}/**/*.d.ts.map`, `!${source}/**/node_modules/**/*`], {
         read: false
     }).pipe(clean());
 }
@@ -15,11 +15,12 @@ function cleanOutput() {
 /**
  * Cleans empty dirs
  */
-function cleanDirs(done: () => void) {
+function cleanEmpty(done: () => void) {
     deleteEmpty.sync(`${source}/`);
     done();
 }
 
-task('clean:dirs', cleanDirs);
+task('clean:empty', cleanEmpty);
 task('clean:output', cleanOutput);
-task('clean:bundle', series('clean:output', 'clean:dirs'));
+//task('clean', series('clean:output', 'clean:empty'));
+task('clean', series('clean:output'));

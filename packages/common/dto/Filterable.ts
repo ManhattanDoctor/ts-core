@@ -1,7 +1,7 @@
-import { DateUtil } from '@ts-core/common/util';
 import { IsOptional } from 'class-validator';
 import * as _ from 'lodash';
 import { TraceUtil } from '../trace';
+import { DateUtil } from '../util';
 import { FilterableConditions, FilterableDataType, FilterableSort, IFilterable, IFilterableCondition, isIFilterableCondition } from './IFilterable';
 
 export class Filterable<U> implements IFilterable<U> {

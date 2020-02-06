@@ -1,10 +1,13 @@
 {
-    "name": "@ts-core/common",
-    "version": "1.0.0",
+    "name": "@test/common",
+    "version": "1.0.1",
     "description": "",
-    "main": "",
+    "main": "index.js",
     "scripts": {},
-    "author": "Renat Gubaev",
+    "author": {
+        "name": "Renat Gubaev",
+        "email": "renat.gubaev@gmail.com"
+    },
     "license": "ISC",
     "dependencies": {
         "class-transformer": "0.2.3",
@@ -17,9 +20,5 @@
         "process": "0.11.10",
         "rxjs": "6.5.3",
         "uuid": "3.3.3"
-    },
-    "devDependencies": {
-        "prettier": "1.18.2",
-        "@types/lodash": "4.14.135"
     }
 }

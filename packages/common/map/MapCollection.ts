@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
-import { ArrayUtil, ObjectUtil } from '@ts-core/common/util';
 import { Destroyable } from '../Destroyable';
 import { ExtendedError } from '../error';
+import { ArrayUtil, ObjectUtil } from '../util';
 
 export class MapCollection<U> extends Destroyable {
     // --------------------------------------------------------------------------

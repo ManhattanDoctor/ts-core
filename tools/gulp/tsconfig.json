@@ -7,7 +7,7 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "outDir": "../../dist/tools/gulp",
-        "strictNullChecks": true,
+        "strictNullChecks": false,
         "strictFunctionTypes": true,
         "noImplicitThis": true,
         "noEmitOnError": true,

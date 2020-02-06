@@ -6,20 +6,19 @@
     "license": "ISC",
     "main": "index.js",
     "scripts": {
-        "prettier": "prettier --config .prettierrc.json --write packages/**/*.ts",
-        "clean":"rmdir dist /S /Q",
-        "build": "tsc --p ./ --sourceMap false",
-
-        "clean1": "gulp clean:bundle",
-        "build1": "gulp build --dist node_modules/@ts-core",
+        "postinstall1": "for d in packages/*; do echo \"---npm install in $d---\" && cd $(pwd)/$d && npm install && cd -; done",
+        "format": "prettier --ignore-path ./.prettierignore --check \"packages/**/*.{ts,js,json}\"",
+        "format:fix": "prettier --ignore-path ./.prettierignore --write \"packages/**/*.{ts,js,json}\" --loglevel warn",
+        "common:build": "tsc --project packages/common/tsconfig.json; cp -r ./packages/common/package.json ./dist/common/",
+        "clean": "gulp clean",
+        "build": "gulp build --dist dist/@ts-core",
         "lint": "eslint 'packages/**/**.ts'",
-        "format": "prettier \"**/*.ts\" --ignore-path ./.prettierignore --write && git status",
-        "prebuild": "rm -rf node_modules/@ts-core",
+        "prebuild": "rm -rf dist/@ts-core",
         "postbuild": "gulp move",
         "prebuild:prod": "npm run clean",
         "build:prod": "gulp build",
         "build:samples": "gulp install:samples && npm run build && gulp build:samples && gulp test:samples && gulp test:e2e:samples",
-        "prerelease": "gulp copy-misc && gulp build --dist node_modules/@ts-core",
+        "prerelease": "gulp copy-misc && npm run build",
         "publish": "npm run prerelease && npm run build:prod && ./node_modules/.bin/lerna publish --force-publish --access public --exact -m \"chore(@ts-core) publish %s release\"",
         "publish:rc": "npm run prerelease && npm run build:prod && ./node_modules/.bin/lerna publish --npm-tag=rc --access public -m \"chore(@ts-core) publish %s release\"",
         "publish:next": "npm run prerelease && npm run build:prod && ./node_modules/.bin/lerna publish --npm-tag=next --access public --skip-git -m \"chore(@ts-core) publish %s release\"",
@@ -27,12 +26,16 @@
         "publish:test": "npm run prerelease && npm run build:prod && ./node_modules/.bin/lerna publish --force-publish --access public --npm-tag=test --skip-git -m \"chore(@ts-core) publish %s release\""
     },
     "devDependencies": {
+        "@ts-core/common": "file:./packages/common",
+        "@ts-core/backend": "file:./packages/backend",
+        "@types/node": "12.12.18",
         "eslint": "6.8.0",
         "eslint-config-prettier": "6.10.0",
         "eslint-plugin-import": "2.20.1",
         "gulp": "4.0.2",
         "gulp-clang-format": "1.0.27",
         "gulp-clean": "0.4.0",
+        "gulp-exec": "4.0.0",
         "gulp-sourcemaps": "2.6.5",
         "gulp-typescript": "5.0.1",
         "gulp-watch": "5.0.1",
@@ -58,5 +61,11 @@
     "bugs": {
         "url": "https://github.com/ManhattanDoctor/ts-core/issues"
     },
-    "homepage": "https://github.com/ManhattanDoctor/ts-core#readme"
+    "homepage": "https://github.com/ManhattanDoctor/ts-core#readme",
+    "dependencies": {
+        "del": "^5.1.0",
+        "gulp-clean-dir": "^1.0.2",
+        "gulp-debug": "^4.0.0",
+        "gulp-run-command": "0.0.10"
+    }
 }

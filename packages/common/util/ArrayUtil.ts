@@ -17,7 +17,7 @@ export class ArrayUtil {
             if (this.length >= length) {
                 this.shift();
             }
-            return Array.prototype.push.apply(this, arguments);
+            return Array.prototype.push.apply(this, arguments as any);
         };
         return item;
     }
