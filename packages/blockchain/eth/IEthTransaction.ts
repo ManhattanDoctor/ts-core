@@ -1,18 +1,3 @@
-export interface IEthTransaction {
-    blockHash: string;
-    blockNumber: number;
-    transactionIndex: number;
+import { Transaction } from 'web3-core';
 
-    to: string;
-    gas: string;
-    hash: string;
-    from: string;
-    gasPrice: string;
-    input: string;
-    nonce: number;
-    value: string;
-
-    r: string;
-    s: string;
-    v: string;
-}
+export interface IEthTransaction extends Transaction {}

@@ -1,8 +1,3 @@
-import * as amqp from 'amqplib';
-import { Channel, Message, Options, Replies } from 'amqplib';
-import * as _ from 'lodash';
-import { Observable, Subject } from 'rxjs';
-import * as uuid from 'uuid';
 import { ExtendedError } from '@ts-core/common/error';
 import { ILogger } from '@ts-core/common/logger';
 import { PromiseHandler } from '@ts-core/common/promise';
@@ -19,6 +14,11 @@ import {
     TransportTimeoutError,
     TransportWaitError
 } from '@ts-core/common/transport';
+import * as amqp from 'amqplib';
+import { Channel, Message, Options, Replies } from 'amqplib';
+import * as _ from 'lodash';
+import { Observable, Subject } from 'rxjs';
+import * as uuid from 'uuid';
 import { IAmqpSettings } from '../settings/IAmqpSettings';
 
 export class TransportAmqp extends Transport {
@@ -555,8 +555,8 @@ export class TransportAmqp extends Transport {
             await this.channel.bindQueue(delayQueue, delayQueue, '');
             this.delayAsserts.add(delayQueue);
             return Promise.resolve(true);
-        } catch (e) {
-            return Promise.reject(e);
+        } catch (error) {
+            return Promise.reject(error);
         }
     }
 

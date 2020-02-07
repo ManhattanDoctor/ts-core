@@ -22,7 +22,7 @@
         "suppressImplicitAnyIndexErrors": true,
         "importHelpers": true,
         "allowJs": false,
-        "strict": true,
+        "noStrictGenericChecks": true,
         "strictNullChecks": false
     },
     "exclude": ["../node_modules", "./**/*.spec.ts"]

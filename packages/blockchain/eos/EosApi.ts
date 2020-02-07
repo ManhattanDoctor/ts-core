@@ -26,8 +26,8 @@ export class EosApi {
         this.api = new Api({
             rpc: new JsonRpc(settings.endpoint, { fetch }),
             chainId: settings.chainId,
-            textEncoder: new TextEncoder(),
-            textDecoder: new TextDecoder(),
+            textEncoder: new TextEncoder() as any,
+            textDecoder: new TextDecoder() as any,
             signatureProvider: this.signature
         });
     }

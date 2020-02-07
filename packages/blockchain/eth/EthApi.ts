@@ -1,6 +1,7 @@
-import * as Web3 from 'web3';
+// import * as Web3 from 'web3';
 import { PromiseHandler } from '@ts-core/common/promise';
 import { DateUtil } from '@ts-core/common/util';
+import Web3 from 'web3';
 import { IEthBlock } from './IEthBlock';
 import { IEthTransaction } from './IEthTransaction';
 import { IEthTransactionReceipt } from './IEthTransactionReceipt';
@@ -21,7 +22,7 @@ export class EthApi {
     // --------------------------------------------------------------------------
 
     public static parseBlock(item: IEthBlock): void {
-        item.createdDate = DateUtil.parseDate(item.timestamp * DateUtil.MILISECONDS_SECOND);
+        item.createdDate = DateUtil.parseDate(Number(item.timestamp) * DateUtil.MILISECONDS_SECOND);
     }
 
     // --------------------------------------------------------------------------
@@ -73,7 +74,7 @@ export class EthApi {
     }
 
     public async getBlock(block: number | EthApiDefaultBlock, isNeedTransactions?: boolean): Promise<IEthBlock> {
-        let item = await this.client.eth.getBlock(block, isNeedTransactions);
+        let item = (await this.client.eth.getBlock(block, isNeedTransactions as any)) as IEthBlock;
         EthApi.parseBlock(item);
         return item;
     }
@@ -83,7 +84,7 @@ export class EthApi {
     }
 
     public async getGasPrice(): Promise<string> {
-        return this.client.getGasPrice();
+        return this.client.eth.getGasPrice();
     }
 
     public async getTransactionCount(address: string, block?: number): Promise<number> {

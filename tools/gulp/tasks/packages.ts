@@ -2,7 +2,6 @@ import { FileUtil } from '@ts-core/backend/file';
 import * as del from 'del';
 import { dest, series, src, task } from 'gulp';
 import * as clean from 'gulp-clean';
-// import * as debug from 'gulp-debug';
 import run from 'gulp-run-command';
 import { createProject } from 'gulp-typescript';
 
@@ -14,11 +13,39 @@ import { createProject } from 'gulp-typescript';
 
 const packages = {
     common: createProject('packages/common/tsconfig.json'),
-    backend: createProject('packages/backend/tsconfig.json')
+    backend: createProject('packages/backend/tsconfig.json'),
+    frontend: createProject('packages/frontend/tsconfig.json'),
+    blockchain: createProject('packages/blockchain/tsconfig.json'),
+    'backend-nestjs': createProject('packages/backend-nestjs/tsconfig.json')
 };
 
 const modules = Object.keys(packages);
 const output = `dist/@ts-core`;
+
+// --------------------------------------------------------------------------
+//
+//  Registry Methods
+//
+// --------------------------------------------------------------------------
+
+const registryPublicSet = async (): Promise<void> => {
+    await new Promise(resolve => {
+        src([`packages/**/.npmrc`], {
+            read: false
+        })
+            .pipe(clean())
+            .on('finish', resolve);
+    });
+};
+const registryPrivateSet = async (): Promise<void> => {
+    for (let packageName of modules) {
+        await new Promise(resolve => {
+            src([`.npmrc`])
+                .pipe(dest(packages[packageName].projectDirectory))
+                .on('finish', resolve);
+        });
+    }
+};
 
 // --------------------------------------------------------------------------
 //
@@ -30,7 +57,7 @@ const packageClean = async (packageName: string): Promise<void> => {
     const projectDirectory = `packages/${packageName}`;
 
     // Remove node_modules
-    await del([`${projectDirectory}/node_modules`, `${projectDirectory}/package.json`], { force: true });
+    await del([`${projectDirectory}/node_modules`, `${projectDirectory}/package-lock.json`], { force: true });
 
     // Remove compiled files
     await new Promise(resolve => {
@@ -40,6 +67,7 @@ const packageClean = async (packageName: string): Promise<void> => {
                 `${projectDirectory}/**/*.d.ts`,
                 `${projectDirectory}/**/*.js.map`,
                 `${projectDirectory}/**/*.d.ts.map`,
+                `!${projectDirectory}/**/package.json`,
                 `!${projectDirectory}/**/node_modules/**/*`
             ],
             {
@@ -51,14 +79,28 @@ const packageClean = async (packageName: string): Promise<void> => {
     });
 };
 
-const packageBuild = async (packageName: string): Promise<void> => {
+const packageCompile = async (packageName: string): Promise<void> => {
     const project = packages[packageName];
-    const projectDirectory = project.projectDirectory;
     const outputDirectory = `${output}/${packageName}`;
 
-    // Install dependencies if need
-    if (!(await FileUtil.isExists(`${projectDirectory}/package-lock.json`))) {
-        await run(`npm --prefix ${projectDirectory} install ${projectDirectory}`)();
+    await new Promise(resolve => {
+        project
+            .src()
+            .pipe(project())
+            .pipe(dest(outputDirectory))
+            .on('finish', resolve);
+    });
+};
+
+const packageBuild = async (packageName: string): Promise<void> => {
+    const projectDirectory = packages[packageName].projectDirectory;
+    const outputDirectory = `${output}/${packageName}`;
+
+    // Update dependencies or install it
+    if (await FileUtil.isExists(`${projectDirectory}/package-lock.json`)) {
+        await run(`npm --prefix ${projectDirectory} update`)();
+    } else {
+        await run(`npm --prefix ${projectDirectory} install`)();
     }
 
     // Remove output directory
@@ -68,17 +110,11 @@ const packageBuild = async (packageName: string): Promise<void> => {
     // await run(`prettier --write '${projectDirectory}/**/*.{ts,js,json}'`)();
 
     // Compile project
-    await new Promise(resolve => {
-        project
-            .src()
-            .pipe(project())
-            .pipe(dest(outputDirectory))
-            .on('finish', resolve);
-    });
+    await packageCompile(packageName);
 
     // Copy files
     await new Promise(resolve => {
-        src([`.npmrc`])
+        src([`${projectDirectory}/.npmrc`, `${projectDirectory}/package.json`])
             //.pipe(debug())
             .pipe(dest(outputDirectory))
             .on('finish', resolve);
@@ -86,8 +122,7 @@ const packageBuild = async (packageName: string): Promise<void> => {
 };
 
 const packagePublish = async (packageName: string, type: 'patch' | 'minor' | 'major'): Promise<void> => {
-    const project = packages[packageName];
-    const projectDirectory = project.projectDirectory;
+    const projectDirectory = packages[packageName].projectDirectory;
     const outputDirectory = `${output}/${packageName}`;
 
     // Build package
@@ -110,10 +145,15 @@ const packagePublish = async (packageName: string, type: 'patch' | 'minor' | 'ma
 (() => {
     for (let packageName of modules) {
         task(`${packageName}:clean`, () => packageClean(packageName));
+        task(`${packageName}:compile`, () => packageCompile(packageName));
         task(`${packageName}:build`, () => packageBuild(packageName));
         task(`${packageName}:publish:patch`, () => packagePublish(packageName, 'patch'));
         task(`${packageName}:publish:minor`, () => packagePublish(packageName, 'minor'));
         task(`${packageName}:publish:major`, () => packagePublish(packageName, 'major'));
+
         task(`${packageName}:publish`, series(`${packageName}:publish:patch`));
     }
+
+    task(`registry:public`, () => registryPublicSet());
+    task(`registry:private`, () => registryPrivateSet());
 })();

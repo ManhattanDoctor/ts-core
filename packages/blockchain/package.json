@@ -1,14 +1,18 @@
 {
     "name": "@ts-core/blockchain",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "",
     "main": "",
     "scripts": {},
-    "author": "Renat Gubaev",
+    "author": {
+        "name": "Renat Gubaev",
+        "email": "renat.gubaev@gmail.com"
+    },
     "license": "ISC",
     "dependencies": {
+        "@ts-core/common": "~1.0.0",
         "bitcoind-rpc": "0.8.1",
         "eosjs": "20.0.0",
-        "web3": "1.0.0-beta.37"
+        "web3": "1.2.6"
     }
 }

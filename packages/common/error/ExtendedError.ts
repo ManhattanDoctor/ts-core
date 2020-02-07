@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-export class ExtendedError<T = any> extends Error {
+export class ExtendedError<T = any> implements Error {
     // --------------------------------------------------------------------------
     //
     //  Constants
@@ -41,8 +41,6 @@ export class ExtendedError<T = any> extends Error {
     // --------------------------------------------------------------------------
 
     constructor(message: string, code: number = null, details: T = null, isFatal: boolean = true) {
-        super();
-
         if (!_.isNumber(code)) {
             code = ExtendedError.DEFAULT_ERROR_CODE;
         }
@@ -68,5 +66,15 @@ export class ExtendedError<T = any> extends Error {
             value += `\n${this.details}`;
         }
         return value;
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    //  Public Properties
+    //
+    // --------------------------------------------------------------------------
+
+    public get name(): string {
+        return this.code.toString();
     }
 }
