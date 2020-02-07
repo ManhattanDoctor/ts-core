@@ -107,14 +107,14 @@ const packageBuild = async (packageName: string): Promise<void> => {
     await del(outputDirectory, { force: true });
 
     // Format and fix code
-    // await run(`prettier --write '${projectDirectory}/**/*.{ts,js,json}'`)();
+    await run(`prettier --write '${projectDirectory}/**/*.{ts,js,json}'`)();
 
     // Compile project
     await packageCompile(packageName);
 
     // Copy files
     await new Promise(resolve => {
-        src([`${projectDirectory}/.npmrc`, `${projectDirectory}/package.json`])
+        src([`${projectDirectory}/.npmrc`, `${projectDirectory}/package.json`], { allowEmpty: true })
             //.pipe(debug())
             .pipe(dest(outputDirectory))
             .on('finish', resolve);
@@ -139,7 +139,7 @@ const packagePublish = async (packageName: string, type: 'patch' | 'minor' | 'ma
     });
 
     // Publish to npm
-    await run(`npm --prefix ${outputDirectory} publish ${outputDirectory}`)();
+    await run(`npm --prefix ${outputDirectory} --access public publish ${outputDirectory}`)();
 };
 
 (() => {

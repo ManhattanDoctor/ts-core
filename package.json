@@ -6,28 +6,14 @@
     "license": "ISC",
     "main": "index.js",
     "scripts": {
-        "postinstall1": "for d in packages/*; do echo \"---npm install in $d---\" && cd $(pwd)/$d && npm install && cd -; done",
+        "example":"ts-node -r tsconfig-paths/register examples/main.ts",
         "format": "prettier --ignore-path ./.prettierignore --check \"packages/**/*.{ts,js,json}\"",
-        "format:fix": "prettier --ignore-path ./.prettierignore --write \"packages/**/*.{ts,js,json}\" --loglevel warn",
-        "common:build": "tsc --project packages/common/tsconfig.json; cp -r ./packages/common/package.json ./dist/common/",
-        "clean": "gulp clean",
-        "build": "gulp build --dist dist/@ts-core",
-        "lint": "eslint 'packages/**/**.ts'",
-        "prebuild": "rm -rf dist/@ts-core",
-        "postbuild": "gulp move",
-        "prebuild:prod": "npm run clean",
-        "build:prod": "gulp build",
-        "build:samples": "gulp install:samples && npm run build && gulp build:samples && gulp test:samples && gulp test:e2e:samples",
-        "prerelease": "gulp copy-misc && npm run build",
-        "publish": "npm run prerelease && npm run build:prod && ./node_modules/.bin/lerna publish --force-publish --access public --exact -m \"chore(@ts-core) publish %s release\"",
-        "publish:rc": "npm run prerelease && npm run build:prod && ./node_modules/.bin/lerna publish --npm-tag=rc --access public -m \"chore(@ts-core) publish %s release\"",
-        "publish:next": "npm run prerelease && npm run build:prod && ./node_modules/.bin/lerna publish --npm-tag=next --access public --skip-git -m \"chore(@ts-core) publish %s release\"",
-        "publish:beta": "npm run prerelease && npm run build:prod && ./node_modules/.bin/lerna publish --npm-tag=beta --access public -m \"chore(@ts-core) publish %s release\"",
-        "publish:test": "npm run prerelease && npm run build:prod && ./node_modules/.bin/lerna publish --force-publish --access public --npm-tag=test --skip-git -m \"chore(@ts-core) publish %s release\""
+        "format:fix": "prettier --ignore-path ./.prettierignore --write \"packages/**/*.{ts,js,json}\" --loglevel warn"
     },
     "devDependencies": {
         "@ts-core/common": "file:./packages/common",
         "@ts-core/backend": "file:./packages/backend",
+        "@ts-core/blockchain": "file:./packages/blockchain",
         "@types/node": "12.12.18",
         "eslint": "6.8.0",
         "eslint-config-prettier": "6.10.0",
@@ -46,7 +32,8 @@
         "tslint": "5.20.1",
         "ts-node": "8.6.2",
         "typescript": "3.7.5",
-        "tsconfig-paths": "3.9.0"
+        "tsconfig-paths": "3.9.0",
+        "ts-node-dev": "1.0.0-pre.44"
     },
     "engines": {
         "node": ">= 12.12.18"

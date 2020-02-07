@@ -1,7 +1,6 @@
-// import * as Web3 from 'web3';
 import { PromiseHandler } from '@ts-core/common/promise';
 import { DateUtil } from '@ts-core/common/util';
-import Web3 from 'web3';
+import Web3, * as GLOBAL_WEB3 from 'web3';
 import { IEthBlock } from './IEthBlock';
 import { IEthTransaction } from './IEthTransaction';
 import { IEthTransactionReceipt } from './IEthTransactionReceipt';
@@ -25,6 +24,10 @@ export class EthApi {
         item.createdDate = DateUtil.parseDate(Number(item.timestamp) * DateUtil.MILISECONDS_SECOND);
     }
 
+    private static get Web3(): any {
+        return GLOBAL_WEB3 as any;
+    }
+
     // --------------------------------------------------------------------------
     //
     // 	Private Properties
@@ -40,7 +43,7 @@ export class EthApi {
     // --------------------------------------------------------------------------
 
     constructor(settings: IEthApiSettings) {
-        this.client = new Web3(new Web3.providers.HttpProvider(settings.endpoint));
+        this.client = new EthApi.Web3(new EthApi.Web3.providers.HttpProvider(settings.endpoint));
     }
 
     // --------------------------------------------------------------------------
