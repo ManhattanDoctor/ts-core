@@ -1,6 +1,6 @@
 {
     "name": "@ts-core/frontend",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Classes and utils for frontend based on angular",
     "main": "index.js",
     "scripts": {},

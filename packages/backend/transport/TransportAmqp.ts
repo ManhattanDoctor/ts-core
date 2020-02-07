@@ -306,7 +306,9 @@ export class TransportAmqp extends Transport {
     // --------------------------------------------------------------------------
 
     protected transformError(data: any): ExtendedError {
-        return new ExtendedError(data.message, data.code, data.details, data.isFatal);
+        return !_.isNil(data)
+            ? new ExtendedError(data.message, data.code, data.details, data.isFatal)
+            : new ExtendedError(`Unknown error`, ExtendedError.DEFAULT_ERROR_CODE);
     }
 
     // --------------------------------------------------------------------------

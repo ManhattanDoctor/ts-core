@@ -114,7 +114,7 @@ const packageBuild = async (packageName: string): Promise<void> => {
 
     // Copy files
     await new Promise(resolve => {
-        src([`${projectDirectory}/.npmrc`, `${projectDirectory}/package.json`], { allowEmpty: true })
+        src([`${projectDirectory}/.npmrc`, `${projectDirectory}/package.json`, `${projectDirectory}/**/*.scss`], { allowEmpty: true })
             //.pipe(debug())
             .pipe(dest(outputDirectory))
             .on('finish', resolve);
