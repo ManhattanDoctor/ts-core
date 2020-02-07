@@ -214,7 +214,14 @@ export class TransportAmqp extends Transport {
                 });
             }
         } catch (error) {
-            this.parseError(error, item.reject);
+            if (!(error instanceof ExtendedError)) {
+                if (error.response) {
+                    error = new ExtendedError(error.response.status, error.response.statusText, error.response.data);
+                } else {
+                    error = ExtendedError.create(error);
+                }
+            }
+            item.reject(error);
         }
 
         return item.promise;
@@ -290,6 +297,16 @@ export class TransportAmqp extends Transport {
     public getRetryCount<U, V>(command: ITransportCommand<U>): number {
         let msg = this.getMessage(command);
         return this.getRetry(msg);
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    //  Protected Methods
+    //
+    // --------------------------------------------------------------------------
+
+    protected transformError(data: any): ExtendedError {
+        return new ExtendedError(data.message, data.code, data.details, data.isFatal);
     }
 
     // --------------------------------------------------------------------------
@@ -431,7 +448,7 @@ export class TransportAmqp extends Transport {
 
     private rejectError(msg: Message, data: any, promise: PromiseHandler<any, ExtendedError>) {
         if (msg.properties.headers && msg.properties.headers[RMQ_HEADER.GATEWAY_TRANSPORT_ERROR]) {
-            promise.reject(new ExtendedError(data.message, data.code, data.details, data.isFatal));
+            promise.reject(this.transformError(data));
         }
     }
 
@@ -558,20 +575,6 @@ export class TransportAmqp extends Transport {
         } catch (error) {
             return Promise.reject(error);
         }
-    }
-
-    private parseError(error: any, reject: (error: Error) => void): void {
-        let response: ExtendedError = null;
-        if (error instanceof ExtendedError) {
-            response = error;
-        } else if (error.response) {
-            error = error.response;
-            response = new ExtendedError(error.status, error.statusText, error.data);
-        } else {
-            response = ExtendedError.create(error);
-        }
-
-        reject(response);
     }
 
     private unsubscribeListeners() {
