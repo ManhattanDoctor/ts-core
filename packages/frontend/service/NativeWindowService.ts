@@ -10,8 +10,8 @@ export class NativeWindowService extends Loadable<NativeWindowServiceEvent, void
     //
     // --------------------------------------------------------------------------
 
-    private _isFocused: boolean = true;
     private timer: any;
+    private _isFocused: boolean = true;
 
     // --------------------------------------------------------------------------
     //

@@ -1,4 +1,5 @@
 import { Observable, Subject, Subscription } from 'rxjs';
+import { FilterableConditions, FilterableSort } from '../dto';
 import { LoadableEvent } from '../Loadable';
 import { ObservableData } from '../observer';
 import { DestroyableMapCollection } from './DestroyableMapCollection';
@@ -15,7 +16,7 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
     protected _isAllLoaded: boolean = false;
 
     protected reloadTimer: any;
-    protected reloadHandler: Function;
+    protected reloadHandler: () => void;
     protected isNeedCleanAfterLoad: boolean = false;
 
     protected subscription: Subscription;
@@ -29,6 +30,16 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
 
     constructor(uidPropertyName: keyof U) {
         super(uidPropertyName);
+        this.initialize();
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    //	Protected Methods
+    //
+    // --------------------------------------------------------------------------
+
+    protected initialize(): void {
         this.observer = new Subject();
         this.reloadHandler = this.reload.bind(this);
     }

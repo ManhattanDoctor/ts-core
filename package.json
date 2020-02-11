@@ -6,7 +6,7 @@
     "license": "ISC",
     "main": "index.js",
     "scripts": {
-        "example":"ts-node -r tsconfig-paths/register examples/main.ts",
+        "example": "ts-node -r tsconfig-paths/register examples/main.ts",
         "format": "prettier --ignore-path ./.prettierignore --check \"packages/**/*.{ts,js,json}\"",
         "format:fix": "prettier --ignore-path ./.prettierignore --write \"packages/**/*.{ts,js,json}\" --loglevel warn"
     },
@@ -31,7 +31,7 @@
         "prettier": "1.19.1",
         "tslint": "5.20.1",
         "ts-node": "8.6.2",
-        "typescript": "3.7.5",
+        "typescript": "3.4.5",
         "tsconfig-paths": "3.9.0",
         "ts-node-dev": "1.0.0-pre.44"
     },

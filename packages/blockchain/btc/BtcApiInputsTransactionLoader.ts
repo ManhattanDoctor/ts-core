@@ -1,4 +1,4 @@
-import * as spinner from 'cli-spinner';
+// import * as spinner from 'cli-spinner';
 import * as _ from 'lodash';
 import { SequienceExecutor } from '@ts-core/common/executor';
 import { PromiseReflector } from '@ts-core/common/promise';
@@ -27,8 +27,8 @@ export class BtcApiInputsTransactionLoader extends SequienceExecutor<Array<IBtcI
         if (!isNeedPreloader) {
             return;
         }
-        this.preloader = new spinner.Spinner();
-        this.preloader.setSpinnerString(18);
+        // this.preloader = new spinner.Spinner();
+        // this.preloader.setSpinnerString(18);
     }
 
     // --------------------------------------------------------------------------

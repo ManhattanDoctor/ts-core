@@ -1,11 +1,11 @@
-import * as _ from 'lodash';
 import { IDestroyable } from '@ts-core/common';
 import { ExtendedError } from '@ts-core/common/error';
 import { LoggerLevel } from '@ts-core/common/logger/ILogger';
 import { MapCollection } from '@ts-core/common/map';
 import { AbstractSettingsStorage } from '@ts-core/common/settings';
+import { UrlUtil } from '@ts-core/common/util';
+import * as _ from 'lodash';
 import { Language } from '../language/Language';
-import { UrlUtil } from '../util';
 
 export class SettingsBaseService extends AbstractSettingsStorage implements IDestroyable {
     // --------------------------------------------------------------------------

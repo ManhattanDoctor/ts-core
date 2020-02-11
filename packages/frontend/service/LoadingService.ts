@@ -1,7 +1,5 @@
-import { Injectable } from '@angular/core';
 import { Loadable, LoadableStatus } from '@ts-core/common';
 
-@Injectable()
 export class LoadingService extends Loadable<void, void> {
     // --------------------------------------------------------------------------
     //

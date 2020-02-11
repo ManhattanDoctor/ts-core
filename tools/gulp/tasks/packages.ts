@@ -16,10 +16,12 @@ const packages = {
     backend: createProject('packages/backend/tsconfig.json'),
     frontend: createProject('packages/frontend/tsconfig.json'),
     blockchain: createProject('packages/blockchain/tsconfig.json'),
-    'backend-nestjs': createProject('packages/backend-nestjs/tsconfig.json')
+    'backend-nestjs': createProject('packages/backend-nestjs/tsconfig.json'),
+    'frontend-angular': createProject('packages/frontend-angular/tsconfig.json')
 };
 
 const modules = Object.keys(packages);
+const angularModules = ['frontend-angular'];
 const output = `dist/@ts-core`;
 
 // --------------------------------------------------------------------------
@@ -53,11 +55,17 @@ const registryPrivateSet = async (): Promise<void> => {
 //
 // --------------------------------------------------------------------------
 
+const nodeModulesClean = async (directory: string): Promise<void> => {
+    // Remove node_modules
+    await del([`${directory}/node_modules`, `${directory}/package-lock.json`], { force: true });
+};
+
 const packageClean = async (packageName: string): Promise<void> => {
     const projectDirectory = `packages/${packageName}`;
 
     // Remove node_modules
-    await del([`${projectDirectory}/node_modules`, `${projectDirectory}/package-lock.json`], { force: true });
+    await nodeModulesClean(projectDirectory);
+    await nodeModulesClean(projectDirectory);
 
     // Remove compiled files
     await new Promise(resolve => {
@@ -81,15 +89,24 @@ const packageClean = async (packageName: string): Promise<void> => {
 
 const packageCompile = async (packageName: string): Promise<void> => {
     const project = packages[packageName];
+    const projectDirectory = project.projectDirectory;
     const outputDirectory = `${output}/${packageName}`;
 
-    await new Promise(resolve => {
-        project
-            .src()
-            .pipe(project())
-            .pipe(dest(outputDirectory))
-            .on('finish', resolve);
-    });
+    if (!angularModules.includes(packageName)) {
+        await new Promise(resolve => {
+            project
+                .src()
+                .pipe(project())
+                .pipe(dest(outputDirectory))
+                .on('finish', resolve);
+        });
+    } else {
+        await new Promise(resolve => {
+            src([`${projectDirectory}/**/*.scss`, `!${projectDirectory}/node_modules/**/*`])
+                .pipe(dest(outputDirectory))
+                .on('finish', resolve);
+        });
+    }
 };
 
 const packageBuild = async (packageName: string): Promise<void> => {
@@ -114,7 +131,9 @@ const packageBuild = async (packageName: string): Promise<void> => {
 
     // Copy files
     await new Promise(resolve => {
-        src([`${projectDirectory}/.npmrc`, `${projectDirectory}/package.json`, `${projectDirectory}/**/*.scss`], { allowEmpty: true })
+        src([`${projectDirectory}/.npmrc`, `${projectDirectory}/package.json`, `!${projectDirectory}/node_modules/**/*`], {
+            allowEmpty: true
+        })
             //.pipe(debug())
             .pipe(dest(outputDirectory))
             .on('finish', resolve);
@@ -125,7 +144,7 @@ const packagePublish = async (packageName: string, type: 'patch' | 'minor' | 'ma
     const projectDirectory = packages[packageName].projectDirectory;
     const outputDirectory = `${output}/${packageName}`;
 
-    // Build package
+    // Build package or copy files
     await packageBuild(packageName);
 
     // Update version of package.js
@@ -147,13 +166,14 @@ const packagePublish = async (packageName: string, type: 'patch' | 'minor' | 'ma
         task(`${packageName}:clean`, () => packageClean(packageName));
         task(`${packageName}:compile`, () => packageCompile(packageName));
         task(`${packageName}:build`, () => packageBuild(packageName));
+
         task(`${packageName}:publish:patch`, () => packagePublish(packageName, 'patch'));
         task(`${packageName}:publish:minor`, () => packagePublish(packageName, 'minor'));
         task(`${packageName}:publish:major`, () => packagePublish(packageName, 'major'));
-
         task(`${packageName}:publish`, series(`${packageName}:publish:patch`));
     }
 
+    task(`clean`, () => nodeModulesClean('./'));
     task(`registry:public`, () => registryPublicSet());
     task(`registry:private`, () => registryPrivateSet());
 })();

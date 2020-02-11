@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { UrlUtil } from '../util';
+import { UrlUtil } from '@ts-core/common/util';
 
 export class Assets {
     // --------------------------------------------------------------------------

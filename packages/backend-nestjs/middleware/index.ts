@@ -1,1 +1,1 @@
-export * from './DefaultHttpExceptionFilter';
+export * from './ExtendedErrorHttpExceptionFilter';
