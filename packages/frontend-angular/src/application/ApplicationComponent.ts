@@ -3,11 +3,11 @@ import { LoadableEvent } from '@ts-core/common';
 import { Api, ApiResponse } from '@ts-core/common/api';
 import { HttpApi } from '@ts-core/common/api/http';
 import { Assets } from '@ts-core/frontend/asset';
-import { Language } from '@ts-core/frontend/language';
+import { Language, LanguageService } from '@ts-core/frontend/language';
 import { SettingsBaseService } from '@ts-core/frontend/service';
+import { ThemeService } from '@ts-core/frontend/theme';
 import * as moment from 'moment';
-import { LanguageService } from '../language';
-import { ThemeService } from '../theme';
+import * as numeral from 'numeral';
 import { ViewUtil } from '../util';
 import { ApplicationBaseComponent } from './ApplicationBaseComponent';
 
@@ -118,5 +118,3 @@ export abstract class ApplicationComponent<S extends SettingsBaseService, A exte
     protected abstract get language(): LanguageService;
     protected abstract get renderer(): Renderer2;
 }
-
-declare let numeral: any;

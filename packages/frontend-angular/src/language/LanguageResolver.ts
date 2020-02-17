@@ -1,10 +1,8 @@
-import { Injectable } from '@angular/core';
 import { Resolve } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { LoadableEvent } from '@ts-core/common';
-import { LanguageService } from './LanguageService';
+import { LanguageService } from '@ts-core/frontend/language';
+import { Subscription } from 'rxjs';
 
-@Injectable()
 export class LanguageResolver implements Resolve<void> {
     // --------------------------------------------------------------------------
     //

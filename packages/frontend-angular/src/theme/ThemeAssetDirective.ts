@@ -1,11 +1,10 @@
 import { Directive, ElementRef, HostListener, Input, OnInit } from '@angular/core';
-import { Destroyable } from '@ts-core/common/Destroyable';
+import { Destroyable } from '@ts-core/common';
 import { Assets } from '@ts-core/frontend/asset';
+import { Theme, ThemeService, ThemeServiceEvent } from '@ts-core/frontend/theme';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
-import { ViewUtil } from '../util';
-import { Theme } from './Theme';
-import { ThemeService, ThemeServiceEvent } from './ThemeService';
+import { ViewUtil } from '../util/ViewUtil';
 
 @Directive({
     selector: '[vi-theme-asset]'

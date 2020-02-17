@@ -1,6 +1,6 @@
 {
     "name": "@ts-core/backend-nestjs",
-    "version": "1.0.5",
+    "version": "1.0.7",
     "description": "Classes and utils for backend based on nestjs",
     "main": "index.js",
     "scripts": {},
@@ -21,7 +21,7 @@
         "@nestjs/platform-ws": "6.10.11",
         "@nestjs/swagger": "4.0.9",
         "@nestjs/websockets": "6.10.11",
-        "@ts-core/backend": "^1.0.4",
+        "@ts-core/backend": "^1.0.6",
         "@types/socket.io": "2.1.4",
         "passport": "0.4.1",
         "passport-http-bearer": "1.0.1",

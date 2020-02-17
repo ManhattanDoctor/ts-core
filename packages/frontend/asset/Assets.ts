@@ -1,5 +1,5 @@
-import * as _ from 'lodash';
 import { UrlUtil } from '@ts-core/common/util';
+import * as _ from 'lodash';
 
 export class Assets {
     // --------------------------------------------------------------------------
@@ -56,7 +56,7 @@ export class Assets {
     private static getAssetUrl(name: string, folder: string, extension: string): string {
         let value = Assets.getAssetFolderUrl(folder) + name;
         if (!_.isNil(value)) {
-            value += '.' + extension;
+            value += `.${extension}`;
         }
         return value;
     }
@@ -72,7 +72,7 @@ export class Assets {
     // --------------------------------------------------------------------------
 
     public static get languagesUrl(): string {
-        return Assets.assetsUrl + 'language/';
+        return `${Assets.assetsUrl}language/`;
     }
 
     public static get assetsUrl(): string {

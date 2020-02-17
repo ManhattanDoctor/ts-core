@@ -1,5 +1,5 @@
-import { IDestroyable } from '@ts-core/common';
 import { Observable } from 'rxjs';
+import { IDestroyable } from '../IDestroyable';
 import { ApiResponse } from './ApiResponse';
 import { IApiRequestConfig } from './IApiRequestConfig';
 

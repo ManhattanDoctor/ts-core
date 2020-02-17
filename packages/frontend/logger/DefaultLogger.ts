@@ -1,5 +1,4 @@
-import { LoggerWrapper } from '@ts-core/common/logger';
-import { LoggerLevel } from '@ts-core/common/logger/ILogger';
+import { LoggerLevel, LoggerWrapper } from '@ts-core/common/logger';
 
 export class DefaultLogger extends LoggerWrapper {
     // --------------------------------------------------------------------------

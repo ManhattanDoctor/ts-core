@@ -1,10 +1,8 @@
-import { Injectable } from '@angular/core';
 import { MatPaginatorIntl } from '@angular/material';
-import { Subscription } from 'rxjs';
 import { LoadableEvent } from '@ts-core/common';
-import { LanguageService } from './LanguageService';
+import { LanguageService } from '@ts-core/frontend/language';
+import { Subscription } from 'rxjs';
 
-@Injectable()
 export class LanguageMatPaginatorIntl extends MatPaginatorIntl {
     // --------------------------------------------------------------------------
     //

@@ -3,13 +3,13 @@
     "compilerOptions": {
         "baseUrl": "./src",
         "sourceMap": true,
-        "declaration": false,
+        "declaration": true,
         "downlevelIteration": true,
         "experimentalDecorators": true,
         "module": "esnext",
+        "target": "es2015",
         "moduleResolution": "node",
         "importHelpers": true,
-        "target": "es2015",
         "lib": ["es2017", "dom"]
     },
     "angularCompilerOptions": {

@@ -1,19 +1,7 @@
 import { ExtendedError } from '@ts-core/common/error';
 import { ILogger } from '@ts-core/common/logger';
 import { PromiseHandler } from '@ts-core/common/promise';
-import {
-    ITransportCommand,
-    ITransportCommandAsync,
-    ITransportCommandOptions,
-    ITransportEvent,
-    Transport,
-    TransportCommand,
-    TransportCommandAsync,
-    TransportEvent,
-    TransportLogType,
-    TransportTimeoutError,
-    TransportWaitError
-} from '@ts-core/common/transport';
+import { ITransportCommand, ITransportCommandAsync, ITransportCommandOptions, ITransportEvent, Transport, TransportCommand, TransportCommandAsync, TransportEvent, TransportLogType, TransportTimeoutError, TransportWaitError } from '@ts-core/common/transport';
 import * as amqp from 'amqplib';
 import { Channel, Message, Options, Replies } from 'amqplib';
 import * as _ from 'lodash';

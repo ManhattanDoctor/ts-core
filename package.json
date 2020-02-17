@@ -10,10 +10,15 @@
         "format": "prettier --ignore-path ./.prettierignore --check \"packages/**/*.{ts,js,json}\"",
         "format:fix": "prettier --ignore-path ./.prettierignore --write \"packages/**/*.{ts,js,json}\" --loglevel warn"
     },
-    "devDependencies": {
+    "devDependencies1": {
         "@ts-core/common": "file:./packages/common",
-        "@ts-core/backend": "file:./packages/backend",
         "@ts-core/blockchain": "file:./packages/blockchain",
+        "@ts-core/backend": "file:./packages/backend",
+        "@ts-core/backend-nestjs": "file:./packages/blockchain-nestjs",
+        "@ts-core/frontend": "file:./packages/frontend",
+        "@ts-core/frontend-angular": "file:./packages/frontend-angular"
+    },
+    "devDependencies": {
         "@types/node": "12.12.18",
         "eslint": "6.8.0",
         "eslint-config-prettier": "6.10.0",

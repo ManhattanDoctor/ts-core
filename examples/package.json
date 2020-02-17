@@ -1,0 +1,11 @@
+{
+    "name": "examples",
+    "version": "1.0.0",
+    "author": "Renat Gubaev",
+    "license": "ISC",
+    "scripts": {
+        "format": "prettier --ignore-path ./.prettierignore --check \"packages/**/*.{ts,js,json}\"",
+        "format:fix": "prettier --ignore-path ./.prettierignore --write \"packages/**/*.{ts,js,json}\" --loglevel warn"
+    },
+    "devDependencies": {}
+}

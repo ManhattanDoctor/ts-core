@@ -8,7 +8,7 @@ import { WindowBase } from './WindowBase';
 import { WindowConfig } from './WindowConfig';
 import { WindowProperties } from './WindowProperties';
 
-export class Window extends WindowBase implements IWindow {
+export class WindowImpl extends WindowBase implements IWindow {
     // --------------------------------------------------------------------------
     //
     //  Constants
@@ -153,7 +153,7 @@ export class Window extends WindowBase implements IWindow {
             return;
         }
         clearTimeout(this.resizeTimer);
-        this.resizeTimer = setTimeout(this.emitResize, Window.RESIZE_DELAY);
+        this.resizeTimer = setTimeout(this.emitResize, WindowImpl.RESIZE_DELAY);
     };
 
     protected mouseDownHandler(event: MouseEvent): void {
@@ -216,7 +216,7 @@ export class Window extends WindowBase implements IWindow {
 
     public blink(): void {
         clearInterval(this.blinkTimer);
-        this.blinkTimer = setInterval(this.blinkToggle, Window.BLINK_DELAY);
+        this.blinkTimer = setInterval(this.blinkToggle, WindowImpl.BLINK_DELAY);
     }
 
     public shake(): void {
@@ -225,7 +225,7 @@ export class Window extends WindowBase implements IWindow {
         }
         this.isShaking = true;
         clearInterval(this.shakeTimer);
-        this.shakeTimer = setInterval(this.stopShaking, Window.SHAKE_DELAY);
+        this.shakeTimer = setInterval(this.stopShaking, WindowImpl.SHAKE_DELAY);
     }
 
     public setOnTop = (): void => {

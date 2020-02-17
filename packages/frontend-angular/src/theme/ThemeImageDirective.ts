@@ -1,6 +1,6 @@
 import { Directive, ElementRef } from '@angular/core';
+import { ThemeService } from '@ts-core/frontend/theme';
 import { ThemeAssetDirective } from './ThemeAssetDirective';
-import { ThemeService } from './ThemeService';
 
 @Directive({
     selector: '[vi-theme-image]'

@@ -1,0 +1,13 @@
+{
+    "name": "examples-backend",
+    "version": "1.0.0",
+    "author": "Renat Gubaev",
+    "license": "ISC",
+    "scripts": {
+        "start": "ts-node main.ts"
+    },
+    "dependencies": {
+        "@ts-core/blockchain": "file:./blockchain",
+        "@ts-core/backend-nestjs": "file:./backend-nestjs"
+    }
+}

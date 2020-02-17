@@ -1,14 +1,11 @@
-import { Injectable } from '@angular/core';
-import * as _ from 'lodash';
-import { Observable, Subject } from 'rxjs';
+import { Destroyable } from '@ts-core/common/Destroyable';
 import { ExtendedError } from '@ts-core/common/error';
 import { MapCollection } from '@ts-core/common/map';
-import { Destroyable } from '@ts-core/common/Destroyable';
-import { CookieService } from '../cookie';
-import { ViewUtil } from '../util';
+import * as _ from 'lodash';
+import { Observable, Subject } from 'rxjs';
+import { CookieStorageUtil, ICookieStorageOptions } from '../cookie';
 import { Theme } from './Theme';
 
-@Injectable()
 export class ThemeService extends Destroyable {
     // --------------------------------------------------------------------------
     //
@@ -22,42 +19,16 @@ export class ThemeService extends Destroyable {
     private isInitialized: boolean;
     private observer: Subject<string>;
 
-    public cookieStorageName: string = 'vi-theme';
-
     // --------------------------------------------------------------------------
     //
     //	Constructor
     //
     // --------------------------------------------------------------------------
 
-    constructor(protected cookies: CookieService) {
+    constructor(private options?: IThemeServiceOptions) {
         super();
         this.observer = new Subject();
         this._themes = new MapCollection('name');
-    }
-
-    // --------------------------------------------------------------------------
-    //
-    //	Protected Methods
-    //
-    // --------------------------------------------------------------------------
-
-    private removeTheme(value: Theme): void {
-        this.cookies.remove(this.cookieStorageName);
-        if (!value) {
-            return;
-        }
-        let element = document.body;
-        ViewUtil.removeClass(element, value.styleName);
-    }
-
-    private addTheme(value: Theme): void {
-        if (!value) {
-            return;
-        }
-        this.cookies.put(this.cookieStorageName, value.name);
-        let element = document.body;
-        ViewUtil.addClass(element, value.styleName);
     }
 
     // --------------------------------------------------------------------------
@@ -87,7 +58,7 @@ export class ThemeService extends Destroyable {
             throw new ExtendedError('Service in not initialized');
         }
 
-        let name = this.cookies.get(this.cookieStorageName) || defaultTheme;
+        let name = CookieStorageUtil.get(this.options) || defaultTheme;
         if (this.themes.has(name)) {
             this.theme = this.themes.get(name);
         } else if (this.themes.length > 0) {
@@ -129,13 +100,17 @@ export class ThemeService extends Destroyable {
         if (value === this._theme) {
             return;
         }
+
+        let element: HTMLElement = document.body;
         if (this._theme) {
-            this.removeTheme(this._theme);
+            element.classList.remove(this._theme.styleName);
         }
 
         this._theme = value;
+        CookieStorageUtil.put(this.options, this._theme ? this._theme.name : null);
+
         if (this._theme) {
-            this.addTheme(value);
+            element.classList.add(this._theme.styleName);
         }
         this.observer.next(ThemeServiceEvent.CHANGED);
     }
@@ -144,3 +119,5 @@ export class ThemeService extends Destroyable {
 export enum ThemeServiceEvent {
     CHANGED = 'CHANGED'
 }
+
+export interface IThemeServiceOptions extends ICookieStorageOptions {}

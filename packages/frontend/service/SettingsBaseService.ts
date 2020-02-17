@@ -1,6 +1,6 @@
 import { IDestroyable } from '@ts-core/common';
 import { ExtendedError } from '@ts-core/common/error';
-import { LoggerLevel } from '@ts-core/common/logger/ILogger';
+import { LoggerLevel } from '@ts-core/common/logger';
 import { MapCollection } from '@ts-core/common/map';
 import { AbstractSettingsStorage } from '@ts-core/common/settings';
 import { UrlUtil } from '@ts-core/common/util';
@@ -87,6 +87,7 @@ export class SettingsBaseService extends AbstractSettingsStorage implements IDes
     // --------------------------------------------------------------------------
 
     protected setParamsToCookies(): any {}
+
     protected getParamsFromCookies(): any {}
 
     protected parseLanguages(value: string): void {

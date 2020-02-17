@@ -1,7 +1,7 @@
 import { Directive, ElementRef } from '@angular/core';
+import { ThemeService } from '@ts-core/frontend/theme';
+import { ViewUtil } from '../util/ViewUtil';
 import { ThemeAssetDirective } from './ThemeAssetDirective';
-import { ThemeService } from './ThemeService';
-import { ViewUtil } from '../util';
 
 @Directive({
     selector: '[vi-theme-background]'

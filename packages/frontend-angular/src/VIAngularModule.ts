@@ -1,12 +1,13 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { Logger } from '@ts-core/common/logger';
-import { ILogger, LoggerLevel } from '@ts-core/common/logger/ILogger';
+import { ILogger, Logger, LoggerLevel } from '@ts-core/common/logger';
+import { ILanguageServiceOptions } from '@ts-core/frontend/language';
 import { DefaultLogger } from '@ts-core/frontend/logger';
-import { AssetModule } from './asset/AssetModule';
+import { LoadingService, NativeWindowService } from '@ts-core/frontend/service';
+import { IThemeServiceOptions } from '@ts-core/frontend/theme';
 import { CookieModule, CookieOptions } from './cookie';
 import {
-    AutoScrollBottomDirective,
     AspectRatioResizeDirective,
+    AutoScrollBottomDirective,
     ClickToCopyDirective,
     ClickToSelectDirective,
     FocusDirective,
@@ -14,9 +15,7 @@ import {
     ResizeDirective,
     ScrollDirective
 } from './directive';
-import { LanguageModule } from './language/LanguageModule';
-import { LoginGuard, LoginRedirectResolver, LoginResolver } from './login';
-import { NotificationModule } from './notification/NotificationModule';
+import { LanguageModule } from './language';
 import {
     CamelCasePipe,
     FinancePipe,
@@ -29,60 +28,34 @@ import {
     StartCasePipe,
     TruncatePipe
 } from './pipe';
-import { ThemeModule } from './theme/ThemeModule';
-import { WindowModule } from './window/WindowModule';
+import { ThemeModule } from './theme';
+
+const IMPORTS = [CookieModule, ThemeModule, LanguageModule];
+
+const DECLARATIONS = [
+    NgModelErrorPipe,
+    FinancePipe,
+    MomentDateAdaptivePipe,
+    MomentDatePipe,
+    MomentTimePipe,
+    MomentDateFromNowPipe,
+    SanitizePipe,
+    TruncatePipe,
+    CamelCasePipe,
+    StartCasePipe,
+
+    FocusDirective,
+    ResizeDirective,
+    ScrollDirective,
+    ClickToCopyDirective,
+    ClickToSelectDirective,
+    InfiniteScrollDirective,
+    AutoScrollBottomDirective,
+    AspectRatioResizeDirective
+];
 
 @NgModule({
-    declarations: [
-        NgModelErrorPipe,
-        FinancePipe,
-        MomentDateAdaptivePipe,
-        MomentDatePipe,
-        MomentTimePipe,
-        MomentDateFromNowPipe,
-        SanitizePipe,
-        TruncatePipe,
-        CamelCasePipe,
-        StartCasePipe,
-
-        FocusDirective,
-        ResizeDirective,
-        ScrollDirective,
-        ClickToCopyDirective,
-        ClickToSelectDirective,
-        InfiniteScrollDirective,
-        AutoScrollBottomDirective,
-        AspectRatioResizeDirective
-    ],
-    providers: [LoginResolver, LoginGuard, LoginRedirectResolver],
-    exports: [
-        
-        AssetModule,
-        LanguageModule,
-        WindowModule,
-        NotificationModule,
-        ThemeModule,
-
-        NgModelErrorPipe,
-        FinancePipe,
-        MomentDateAdaptivePipe,
-        MomentDatePipe,
-        MomentTimePipe,
-        MomentDateFromNowPipe,
-        SanitizePipe,
-        TruncatePipe,
-        CamelCasePipe,
-        StartCasePipe,
-
-        FocusDirective,
-        ResizeDirective,
-        ScrollDirective,
-        ClickToCopyDirective,
-        ClickToSelectDirective,
-        InfiniteScrollDirective,
-        AutoScrollBottomDirective,
-        AspectRatioResizeDirective
-    ]
+    declarations: DECLARATIONS
 })
 export class VIAngularModule {
     // --------------------------------------------------------------------------
@@ -95,9 +68,15 @@ export class VIAngularModule {
         return {
             ngModule: VIAngularModule,
             providers: [
+                LoadingService,
+                NativeWindowService,
+
+                { provide: VIAngularSettings, useValue: settings || {} },
+                { provide: Logger, deps: [VIAngularSettings], useFactory: loggerFactory },
+
                 ...CookieModule.forRoot(settings).providers,
-                { provide: VIAngularSettings, useValue: settings },
-                { provide: Logger, deps: [VIAngularSettings], useFactory: loggerFactory }
+                ...ThemeModule.forRoot(settings ? settings.themeOptions : null).providers,
+                ...LanguageModule.forRoot(settings ? settings.languageOptions : null).providers
             ]
         };
     }
@@ -105,6 +84,8 @@ export class VIAngularModule {
 
 export class VIAngularSettings extends CookieOptions {
     loggerLevel?: LoggerLevel = LoggerLevel.ALL;
+    themeOptions?: IThemeServiceOptions;
+    languageOptions?: ILanguageServiceOptions;
 }
 
 export function loggerFactory(settings: VIAngularSettings): ILogger {

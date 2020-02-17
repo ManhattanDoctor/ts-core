@@ -1,9 +1,9 @@
 import { EventEmitter, Input, Output } from '@angular/core';
 import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
 import { ObjectUtil } from '@ts-core/common/util';
+import { LanguageService } from '@ts-core/frontend/language';
 import * as _ from 'lodash';
 import { Row } from 'ng2-smart-table/lib/lib/data-set/row';
-import { LanguageService } from '../../language';
 import { TableMapCollection, TablePagedMapCollection } from '../../smart-table';
 
 export abstract class SmartTableComponent<V, U extends TableMapCollection<V, any> | TablePagedMapCollection<V, any>> extends DestroyableContainer {

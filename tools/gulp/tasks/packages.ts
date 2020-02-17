@@ -1,5 +1,5 @@
-import { FileUtil } from '@ts-core/backend/file';
 import * as del from 'del';
+import * as fs from 'fs';
 import { dest, series, src, task } from 'gulp';
 import * as clean from 'gulp-clean';
 import run from 'gulp-run-command';
@@ -21,8 +21,37 @@ const packages = {
 };
 
 const modules = Object.keys(packages);
-const angularModules = ['frontend-angular'];
 const output = `dist/@ts-core`;
+
+// --------------------------------------------------------------------------
+//
+//  Files Methods
+//
+// --------------------------------------------------------------------------
+
+const filesDelete = async (files: Array<string>, options?: any): Promise<void> => {
+    await new Promise(resolve => {
+        src(files, options || { read: false })
+            .pipe(clean())
+            .on('finish', resolve);
+    });
+};
+
+const filesCopy = async (files: Array<string>, destination: string, options?: any): Promise<void> => {
+    await new Promise(resolve => {
+        src(files, options || { allowEmpty: true })
+            .pipe(dest(destination))
+            .on('finish', resolve);
+    });
+};
+
+const isFileExist = async (file: string): Promise<boolean> => {
+    return new Promise(resolve => fs.exists(file, value => resolve(value)));
+};
+
+const isAngularPackage = (packageName: string): boolean => {
+    return packageName === 'frontend-angular';
+};
 
 // --------------------------------------------------------------------------
 //
@@ -31,21 +60,12 @@ const output = `dist/@ts-core`;
 // --------------------------------------------------------------------------
 
 const registryPublicSet = async (): Promise<void> => {
-    await new Promise(resolve => {
-        src([`packages/**/.npmrc`], {
-            read: false
-        })
-            .pipe(clean())
-            .on('finish', resolve);
-    });
+    await filesDelete([`packages/**/.npmrc`]);
 };
+
 const registryPrivateSet = async (): Promise<void> => {
     for (let packageName of modules) {
-        await new Promise(resolve => {
-            src([`.npmrc`])
-                .pipe(dest(packages[packageName].projectDirectory))
-                .on('finish', resolve);
-        });
+        await filesCopy([`.npmrc`], packages[packageName].projectDirectory);
     }
 };
 
@@ -65,48 +85,29 @@ const packageClean = async (packageName: string): Promise<void> => {
 
     // Remove node_modules
     await nodeModulesClean(projectDirectory);
-    await nodeModulesClean(projectDirectory);
 
     // Remove compiled files
-    await new Promise(resolve => {
-        src(
-            [
-                `${projectDirectory}/**/*.js`,
-                `${projectDirectory}/**/*.d.ts`,
-                `${projectDirectory}/**/*.js.map`,
-                `${projectDirectory}/**/*.d.ts.map`,
-                `!${projectDirectory}/**/package.json`,
-                `!${projectDirectory}/**/node_modules/**/*`
-            ],
-            {
-                read: false
-            }
-        )
-            .pipe(clean())
-            .on('finish', resolve);
-    });
+    await filesDelete([
+        `${projectDirectory}/**/*.js`,
+        `${projectDirectory}/**/*.d.ts`,
+        `${projectDirectory}/**/*.js.map`,
+        `${projectDirectory}/**/*.d.ts.map`,
+        `!${projectDirectory}/**/package.json`,
+        `!${projectDirectory}/**/node_modules/**/*`
+    ]);
 };
 
 const packageCompile = async (packageName: string): Promise<void> => {
     const project = packages[packageName];
-    const projectDirectory = project.projectDirectory;
     const outputDirectory = `${output}/${packageName}`;
 
-    if (!angularModules.includes(packageName)) {
-        await new Promise(resolve => {
-            project
-                .src()
-                .pipe(project())
-                .pipe(dest(outputDirectory))
-                .on('finish', resolve);
-        });
-    } else {
-        await new Promise(resolve => {
-            src([`${projectDirectory}/**/*.scss`, `!${projectDirectory}/node_modules/**/*`])
-                .pipe(dest(outputDirectory))
-                .on('finish', resolve);
-        });
-    }
+    await new Promise(resolve => {
+        project
+            .src()
+            .pipe(project())
+            .pipe(dest(outputDirectory))
+            .on('finish', resolve);
+    });
 };
 
 const packageBuild = async (packageName: string): Promise<void> => {
@@ -114,8 +115,8 @@ const packageBuild = async (packageName: string): Promise<void> => {
     const outputDirectory = `${output}/${packageName}`;
 
     // Update dependencies or install it
-    if (await FileUtil.isExists(`${projectDirectory}/package-lock.json`)) {
-        await run(`npm --prefix ${projectDirectory} update`)();
+    if (await isFileExist(`${projectDirectory}/package-lock.json`)) {
+        // await run(`npm --prefix ${projectDirectory} update`)();
     } else {
         await run(`npm --prefix ${projectDirectory} install`)();
     }
@@ -130,14 +131,13 @@ const packageBuild = async (packageName: string): Promise<void> => {
     await packageCompile(packageName);
 
     // Copy files
-    await new Promise(resolve => {
-        src([`${projectDirectory}/.npmrc`, `${projectDirectory}/package.json`, `!${projectDirectory}/node_modules/**/*`], {
-            allowEmpty: true
-        })
-            //.pipe(debug())
-            .pipe(dest(outputDirectory))
-            .on('finish', resolve);
-    });
+    if (!isAngularPackage(packageName)) {
+        await filesCopy([`${projectDirectory}/.npmrc`, `${projectDirectory}/package.json`, `!${projectDirectory}/node_modules/**/*`], outputDirectory);
+    } else {
+        await run(`npm --prefix ${projectDirectory} run build`)();
+        await filesCopy([`${projectDirectory}/src/style/**/*.scss`], `${outputDirectory}/style`);
+        await filesCopy([`${outputDirectory}/**/*`], `examples/frontend/node_modules/@ts-core/${packageName}`);
+    }
 };
 
 const packagePublish = async (packageName: string, type: 'patch' | 'minor' | 'major'): Promise<void> => {
@@ -148,14 +148,14 @@ const packagePublish = async (packageName: string, type: 'patch' | 'minor' | 'ma
     await packageBuild(packageName);
 
     // Update version of package.js
-    await run(`npm --prefix ${projectDirectory} version ${type}`)();
 
     // Copy package.js
-    await new Promise(resolve => {
-        src([`${projectDirectory}/package.json`])
-            .pipe(dest(outputDirectory))
-            .on('finish', resolve);
-    });
+    if (!isAngularPackage(packageName)) {
+        await run(`npm --prefix ${projectDirectory} version ${type}`)();
+        await filesCopy([`${projectDirectory}/package.json`], outputDirectory);
+    } else {
+        await run(`npm --prefix ${projectDirectory}/src version ${type}`)();
+    }
 
     // Publish to npm
     await run(`npm --prefix ${outputDirectory} --access public publish ${outputDirectory}`)();
@@ -173,7 +173,13 @@ const packagePublish = async (packageName: string, type: 'patch' | 'minor' | 'ma
         task(`${packageName}:publish`, series(`${packageName}:publish:patch`));
     }
 
+    task(`all:clean`, series(modules.map(packageName => `${packageName}:clean`)));
+    task(`all:compile`, series(modules.map(packageName => `${packageName}:compile`)));
+    task(`all:build`, series(modules.map(packageName => `${packageName}:build`)));
+
     task(`clean`, () => nodeModulesClean('./'));
     task(`registry:public`, () => registryPublicSet());
     task(`registry:private`, () => registryPrivateSet());
+
+    task(`frontend`, () => run(`npm --prefix examples/frontend run start`)());
 })();

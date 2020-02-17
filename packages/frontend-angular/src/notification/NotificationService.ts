@@ -1,11 +1,11 @@
 import { ComponentType } from '@angular/cdk/portal';
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import * as _ from 'lodash';
-import { Observable, Subject } from 'rxjs';
 import { ObservableData } from '@ts-core/common/observer';
 import { ArrayUtil } from '@ts-core/common/util';
-import { LanguageService } from '../language';
+import { LanguageService } from '@ts-core/frontend/language';
+import * as _ from 'lodash';
+import { Observable, Subject } from 'rxjs';
 import { IQuestion, IQuestionOptions, QuestionMode } from '../question';
 import { QuestionManager } from '../question/QuestionManager';
 import { WindowAlign, WindowEvent } from '../window';

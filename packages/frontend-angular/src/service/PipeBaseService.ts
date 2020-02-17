@@ -1,8 +1,8 @@
 import { DatePipe } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
 import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
-import { LanguageService } from '../language';
-import { CamelCasePipe, MomentDateAdaptivePipe, MomentDatePipe, MomentTimePipe, SanitizePipe, TruncatePipe, MomentDateFromNowPipe } from '../pipe';
+import { LanguageService } from '@ts-core/frontend/language';
+import { CamelCasePipe, MomentDateAdaptivePipe, MomentDateFromNowPipe, MomentDatePipe, MomentTimePipe, SanitizePipe, TruncatePipe } from '../pipe';
 import { FinancePipe } from '../pipe/FinancePipe';
 
 export class PipeBaseService extends DestroyableContainer {

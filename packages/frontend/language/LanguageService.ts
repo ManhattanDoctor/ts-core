@@ -1,20 +1,17 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
 import { Loadable, LoadableEvent, LoadableStatus } from '@ts-core/common';
 import { ExtendedError } from '@ts-core/common/error';
 import { MapCollection } from '@ts-core/common/map';
 import { ObservableData } from '@ts-core/common/observer';
+import { PromiseReflector } from '@ts-core/common/promise';
 import { CloneUtil } from '@ts-core/common/util';
-import { Language } from '@ts-core/frontend/language';
+import axios from 'axios';
 import * as _ from 'lodash';
-import { forkJoin, Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { CookieService } from '../cookie';
-import { ILanguageTranslator } from './ILanguageTranslator';
+import { CookieStorageUtil, ICookieStorageOptions } from '../cookie';
+import { ILanguageTranslator, LanguageTranslatorEvent } from './ILanguageTranslator';
+import { Language } from './Language';
 import { LanguageTranslator } from './LanguageTranslator';
 
-@Injectable()
-export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
+export class LanguageService extends Loadable<LanguageTranslatorEvent, Language> {
     // --------------------------------------------------------------------------
     //
     //	Properties
@@ -30,7 +27,6 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     private _rawTranslation: any;
 
     public filePrefixes: Array<string> = ['.json', 'Custom.json'];
-    public cookieStorageName: string = 'vi-language';
 
     // --------------------------------------------------------------------------
     //
@@ -38,17 +34,16 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     //
     // --------------------------------------------------------------------------
 
-    constructor(private http: HttpClient, private cookies: CookieService) {
+    constructor(private options?: ILanguageServiceOptions) {
         super();
         this._translator = new LanguageTranslator();
+
         this.addDestroyable(this.translator);
-        /*
-        this.parser.events.subscribe(data => {
-            if (data.type == LanguageServiceEvent.PARSE_ERROR) {
-                this.observer.next(new ObservableData(LanguageServiceEvent.PARSE_ERROR));
-            }
-        });
-        */
+        this.addSubscription(
+            this.translator.events.subscribe(data => {
+                this.observer.next(new ObservableData(data.type, this.language, data.error));
+            })
+        );
     }
 
     // --------------------------------------------------------------------------
@@ -57,7 +52,7 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     //
     // --------------------------------------------------------------------------
 
-    private load(locale?: string | Language): void {
+    private async load(locale?: string | Language): Promise<void> {
         if (locale instanceof Language) {
             locale = locale.locale;
         }
@@ -70,6 +65,32 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
         this.status = LoadableStatus.LOADING;
         this.observer.next(new ObservableData(LoadableEvent.STARTED, language));
 
+        let files = this.filePrefixes.map(item => PromiseReflector.create(axios.get(this.url + language.locale + item)));
+        let items = await Promise.all(files);
+        if (this.isDestroyed) {
+            return;
+        }
+        items = items.filter(item => item.isComplete);
+        if (_.isEmpty(items)) {
+            this.status = LoadableStatus.ERROR;
+            this.observer.next(new ObservableData(LoadableEvent.ERROR, language, new ExtendedError(`Can't to load language: ${language}`)));
+            this.observer.next(new ObservableData(LoadableEvent.FINISHED, language));
+        }
+
+        let translation = {};
+        items.forEach(item => CloneUtil.deepExtend(translation, item.value.data));
+
+        this._language = language;
+        this._rawTranslation = translation;
+        this._translator.setLocale(this._language.locale, this._rawTranslation);
+
+        CookieStorageUtil.put(this.options, this._language.locale);
+
+        this.status = LoadableStatus.LOADED;
+        this.observer.next(new ObservableData(LoadableEvent.COMPLETE, language));
+        this.observer.next(new ObservableData(LoadableEvent.FINISHED, language));
+
+        /*
         let files: Array<Observable<any>> = [];
         for (let prefix of this.filePrefixes) {
             files.push(this.http.get(this.url + language.locale + prefix).pipe(catchError(error => of(error))));
@@ -90,18 +111,7 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
                 this.observer.next(new ObservableData(LoadableEvent.FINISHED, language));
             }
         });
-    }
-
-    private setLanguage(language: Language, translation: Object): void {
-        this._language = language;
-        this._rawTranslation = translation;
-        this._translator.setLocale(language.locale, translation);
-
-        this.cookies.put(this.cookieStorageName, language.locale);
-
-        this.status = LoadableStatus.LOADED;
-        this.observer.next(new ObservableData(LoadableEvent.COMPLETE, language));
-        this.observer.next(new ObservableData(LoadableEvent.FINISHED, language));
+        */
     }
 
     // --------------------------------------------------------------------------
@@ -131,7 +141,7 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
         if (!this.isInitialized) {
             throw new ExtendedError('Service in not initialized');
         }
-        this.load(this.cookies.get(this.cookieStorageName) || defaultLocale);
+        this.load(CookieStorageUtil.get(this.options) || defaultLocale);
     }
 
     public compile(expression: string, params?: Object): string {
@@ -187,4 +197,4 @@ export class LanguageService extends Loadable<LanguageServiceEvent, Language> {
     }
 }
 
-export enum LanguageServiceEvent {}
+export interface ILanguageServiceOptions extends ICookieStorageOptions {}

@@ -1,10 +1,11 @@
-import * as _ from 'lodash';
-import { Observable, Subject } from 'rxjs';
 import { DestroyableContainer, IDestroyable } from '@ts-core/common';
 import { ExtendedError } from '@ts-core/common/error';
 import { DestroyableMapCollection } from '@ts-core/common/map';
 import { ObservableData } from '@ts-core/common/observer';
 import { ObjectUtil } from '@ts-core/common/util';
+import * as _ from 'lodash';
+import * as MessageFormat from 'messageformat';
+import { Observable, Subject } from 'rxjs';
 import { ILanguageTranslator, LanguageTranslatorEvent } from './ILanguageTranslator';
 
 export class LanguageTranslator extends DestroyableContainer implements ILanguageTranslator {
@@ -57,6 +58,10 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
     // --------------------------------------------------------------------------
 
     public translate(key: string, params?: any): string {
+        if (_.isNil(this.locale)) {
+            this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_LOCALE, new ExtendedError(`Locale is undefined`, null, key)));
+            return null;
+        }
         if (_.isNil(key)) {
             this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_KEY, new ExtendedError(`Key is undefined`, null, key)));
             return null;
@@ -161,4 +166,4 @@ export class LocaleContainer extends IDestroyable {
     }
 }
 
-declare let MessageFormat: any;
+// declare let MessageFormat: any;

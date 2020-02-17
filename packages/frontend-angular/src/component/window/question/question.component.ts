@@ -1,5 +1,5 @@
 import { Component, ViewContainerRef } from '@angular/core';
-import { LanguageService } from '../../../language';
+import { LanguageService } from '@ts-core/frontend/language';
 import { ViewUtil } from '../../../util';
 import { WindowQuestionBaseComponent } from '../WindowQuestionBaseComponent';
 

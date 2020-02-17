@@ -1,0 +1,147 @@
+{
+    "general":
+    {
+        "footer": "<a href='https://coin.monitor' target='_blank' tabindex='-1'>Coin Monitor</a> © 2018"
+    },
+    "tab": {
+        "dashboard": "Панель",
+        "profile": "Профиль",
+        "coin": "Валюты",
+        "coinBlock": "Блоки",
+        "user": "Пользователи",
+        "webhookAddress": "Адреса",
+        "webhookAddressNotification": "Уведомления о адресах",
+        "webhookTransaction": "Транзакции",
+        "webhookTransactionNotification": "Уведомления о транзакциях",
+        "permission": "Права и роли",
+        "transaction": "Транзакции",
+        "wallet": "Кошельки",
+        "extra": "Сервисы",
+        "test": "Тесты"
+    },
+    "user": {
+        "createdDate":"Создан",
+        "account":
+        {
+            "FREE":"Бесплатный",
+            "PROTOTYPE":"Простой",
+            "PRODUCTION":"Профессиональный",
+            "VIP":"Особый",
+            "ADMINISTRATOR":"Администратор"
+        },
+        "limit":
+        {
+            "limit":"Лимиты аккаунта",
+            "webhookAddresses":"{current} из {max} адресов на прослушке",
+            "webhookTransactions":"{current} из {max} транзакций на прослушке",
+            "requestsDay":"{current} из {max} запросов в сутках ",
+            "requestsHour":"{current} из {max} запросов в час"
+        },
+        "status": {
+            "status": "Статус",
+            "ACTIVE": "Активен",
+            "NON_ACTIVE": "Не активен"
+        },
+        "preferences": {
+            "preferences": "Настройки",
+            "name": "ФИО",
+            "phone": "Телефон",
+            "email": "E-mail"
+        }
+    },
+    "extra": {
+        "balance":"Баланс",
+        "nonce":"Нонс",
+        "transaction":"Транзакция",
+        "rawTransaction":"Сырая транзакция",
+        "address":"Адрес",
+        "blockParse":"Парсинг блоков",
+        "blockParseNotification":"Блок успешно отправлен на парсинг"
+    },
+    "coin": {
+        "name": "Название",
+        "decimal": "Разрядность",
+        "coinId": "Тип",
+        "editConfirmation": "Вы уверены, что хотите отредактировать валюту?",
+        "editNotification": "Валюта успешно изменена",
+        "details": "Детализация",
+        "blockchain": {
+            "synchronized": "Синхронизирован",
+            "notSynchronized": "Не синхронизирован",
+            "notSynchronizedDescription": "{delta} = {blockHeightParsed} - {blockHeight}",
+            "blockLast": "Последний блок",
+            "blockHeight": "Текущая высота блокчейна",
+            "blockFrequency": "Частота генерация блока",
+            "blockHeightParsed": "Последний обработанный блок",
+            "isCheckEnabled": "Проверка включена"
+        },
+
+        "coin": {
+            "ETH":"Ethereum",
+            "ETC":"Ethereum Classic",
+            "BTC":"Bitcoin",
+            "LTC":"Litecoin",
+            "XRP":"Ripple",
+            "USDC":"USD Coin",
+            "TETHER_USD":"Tether USD",
+            "TRUE_USD":"True USD"
+        },
+        "block": {
+            "block":"Блок",
+            "last":"Последний блок",
+            "createdDate":"Создан",
+            "parsedDate":"Разобран",
+            "addresses":"Адресов",
+            "transactions":"Транзакций",
+            "description":"В <b>списке поддерживаемых валют</b> вы можете видеть синхронизацию наших мониторов с различными блокчейнами и время обработки последних блоков"
+        },
+        "status":
+        {
+            "status": "Статус",
+            "ACTIVE":"Активен",
+            "NON_ACTIVE":"Не активна"
+        }
+    },
+    "webhook": {
+        "webhook": "Вебхук",
+        "webhookAddress": "Адрес",
+        "webhookTransaction": "Транзакция",
+        "id": "#",
+        "coinId": "Валюта",
+        "createdDate": "Создан",
+        "param": "Параметр",
+        "isRemoveIfExist": "Перезаписать если уже существует?",
+        "address": "Адрес",
+        "transaction": "Транзакция",
+        "requiredConfirmations":"Необходимо подтверждений",
+        "callbackUrl": "Колбек",
+        "addedNotification": "Колбек успешно добавлен",
+        "removeConfirmation": "Вы уверены что хотите удалить колбек?",
+        "removedNotification": "Колбек успешно удален",
+        "notification":
+        {
+            "try": "Вызвать вручную",
+            "tryConfirmation": "Вы уверены что хотите вручную вызывать колбек?",
+            "triedNotification": "Колбек был успешно вызван",
+            "removeConfirmation": "Вы уверены что хотите удалить уведомление?",
+            "removedNotification": "Уведомление успешно удален",
+            "notification": "Уведомление",
+            "attempts": "Попыток",
+            "attemptNextDate": "Следующая попытка",
+            "blockHeight": "Высота блока",
+            "details": "Детализация",
+            "notificatedDate": "Уведомление",
+            "status":
+            {
+                "status": "Статус",
+                "ACTIVE":"Активен",
+                "PENDING":"В процессе",
+                "ERROR":"Ошибка",
+                "COMPLETE":"Завершен"
+            }
+        }
+    },
+    "error": {
+        "socketDisconnected": "Потеряно подключение к сокет-серверу. Вы хотите переподключиться?"
+    }
+}

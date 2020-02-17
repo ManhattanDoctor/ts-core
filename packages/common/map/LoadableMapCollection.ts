@@ -1,5 +1,4 @@
 import { Observable, Subject, Subscription } from 'rxjs';
-import { FilterableConditions, FilterableSort } from '../dto';
 import { LoadableEvent } from '../Loadable';
 import { ObservableData } from '../observer';
 import { DestroyableMapCollection } from './DestroyableMapCollection';

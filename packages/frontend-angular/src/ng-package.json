@@ -1,0 +1,11 @@
+{
+    "$schema": "../node_modules/ng-packagr/ng-package.schema.json",
+    "dest": "../../../dist/@ts-core/frontend-angular",
+    "lib": {
+        "entryFile": "public-api.ts",
+        "umdModuleIds": {
+            "lodash": "_"
+        }
+    },
+    "whitelistedNonPeerDependencies": []
+}

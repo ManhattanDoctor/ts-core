@@ -1,7 +1,7 @@
-import { LoadableMapCollection } from '@ts-core/common/map';
 import { Method } from 'axios';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
+import { LoadableMapCollection } from '../../../map';
 import { ApiResponse } from '../../ApiResponse';
 import { HttpApi } from '../HttpApi';
 

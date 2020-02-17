@@ -1,6 +1,6 @@
 export * from './IWindow';
 export * from './IWindowContent';
-export * from './Window';
+export * from './WindowImpl';
 export * from './WindowBase';
 export * from './WindowConfig';
 export * from './WindowFactory';

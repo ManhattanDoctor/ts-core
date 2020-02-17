@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
-import { LanguageService } from './LanguageService';
+import { LanguageService } from '@ts-core/frontend/language';
 
 @Pipe({
     name: 'viTranslate',

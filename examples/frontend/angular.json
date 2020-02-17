@@ -1,0 +1,77 @@
+{
+    "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+    "version": 1,
+    "newProjectRoot": "projects",
+    "projects": {
+        "example": {
+            "root": "",
+            "sourceRoot": "packages/example/src",
+            "projectType": "application",
+            "prefix": "app",
+            "schematics": {
+                "@schematics/angular:component": {
+                    "styleext": "scss"
+                }
+            },
+            "architect": {
+                "build": {
+                    "builder": "@angular-devkit/build-angular:browser",
+                    "options": {
+                        "outputPath": "build",
+                        "index": "packages/example/src/index.html",
+                        "main": "packages/example/src/main.ts",
+                        "polyfills": "polyfills.ts",
+                        "tsConfig": "tsconfig.json",
+                        "assets": [
+                            {
+                                "glob": "**/*",
+                                "input": "htdocs",
+                                "output": "/"
+                            }
+                        ],
+                        "scripts": [
+                            "node_modules/css-element-queries/src/ResizeSensor.js",
+                            "node_modules/interactjs/dist/interact.min.js",
+                            "node_modules/numeral/numeral.js",
+                            "node_modules/numeral/locales/ru.js",
+                            "node_modules/moment/min/moment.min.js",
+                            "node_modules/moment/locale/ru.js",
+                            "node_modules/messageformat/messageformat.js"
+                        ]
+                    },
+                    "configurations": {
+                        "production": {
+                            "optimization": true,
+                            "outputHashing": "none",
+                            "sourceMap": false,
+                            "extractCss": true,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": false,
+                            "vendorChunk": false,
+                            "buildOptimizer": true,
+                            "budgets": [
+                                {
+                                    "type": "initial",
+                                    "maximumWarning": "2mb",
+                                    "maximumError": "5mb"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "serve": {
+                    "builder": "@angular-devkit/build-angular:dev-server",
+                    "options": {
+                        "browserTarget": "example:build"
+                    },
+                    "configurations": {
+                        "production": {
+                            "browserTarget": "example:build:production"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

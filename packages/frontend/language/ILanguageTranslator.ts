@@ -1,6 +1,6 @@
-import { Observable } from 'rxjs';
 import { IDestroyable } from '@ts-core/common';
 import { ObservableData } from '@ts-core/common/observer';
+import { Observable } from 'rxjs';
 
 export interface ILanguageTranslator extends IDestroyable {
     compile(expression: string, params?: any): string;
@@ -13,6 +13,7 @@ export interface ILanguageTranslator extends IDestroyable {
 
 export enum LanguageTranslatorEvent {
     INVALID_KEY = 'INVALID_KEY',
+    INVALID_LOCALE = 'INVALID_LOCALE',
     INVALID_EXPRESSION = 'INVALID_EXPRESSION',
     COMPILE_ERROR = 'COMPILE_ERROR'
 }

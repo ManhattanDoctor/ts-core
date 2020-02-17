@@ -9,7 +9,7 @@ export class ViewUtil {
     //
     // --------------------------------------------------------------------------
 
-    private static RENDEDER: Renderer2 = null;
+    private static RENDERER: Renderer2 = null;
 
     // --------------------------------------------------------------------------
     //
@@ -30,7 +30,7 @@ export class ViewUtil {
     // --------------------------------------------------------------------------
 
     public static initialize(renderer: Renderer2): void {
-        ViewUtil.RENDEDER = renderer;
+        ViewUtil.RENDERER = renderer;
     }
 
     public static parseElement(element: any): HTMLElement {
@@ -106,7 +106,7 @@ export class ViewUtil {
     // --------------------------------------------------------------------------
 
     public static createElement(name: string, className?: string, innerHTML?: string): any {
-        let element = ViewUtil.RENDEDER.createElement(name);
+        let element = ViewUtil.RENDERER.createElement(name);
         if (!_.isNil(name)) {
             ViewUtil.setProperty(element, 'className', className);
         }
@@ -117,14 +117,14 @@ export class ViewUtil {
     }
 
     public static appendChild(parent: any, child: any): void {
-        if (!_.isNil(parent) && !_.isNil(child)) {
-            ViewUtil.RENDEDER.appendChild(parent, child);
+        if (!_.isNil(parent) && !_.isNil(child) && !_.isNil(ViewUtil.RENDERER)) {
+            ViewUtil.RENDERER.appendChild(parent, child);
         }
     }
 
     public static removeChild(parent: any, child: any): void {
-        if (!_.isNil(parent) && !_.isNil(child)) {
-            ViewUtil.RENDEDER.removeChild(parent, child);
+        if (!_.isNil(parent) && !_.isNil(child) && !_.isNil(ViewUtil.RENDERER)) {
+            ViewUtil.RENDERER.removeChild(parent, child);
         }
     }
 
@@ -311,8 +311,8 @@ export class ViewUtil {
             return;
         }
         container = ViewUtil.parseElement(container);
-        if (!_.isNil(container)) {
-            ViewUtil.RENDEDER.addClass(container, name);
+        if (!_.isNil(container) && !_.isNil(ViewUtil.RENDERER)) {
+            ViewUtil.RENDERER.addClass(container, name);
         }
     }
 
@@ -328,8 +328,8 @@ export class ViewUtil {
             return;
         }
         container = ViewUtil.parseElement(container);
-        if (!_.isNil(container)) {
-            ViewUtil.RENDEDER.removeClass(container, name);
+        if (!_.isNil(container) && !_.isNil(ViewUtil.RENDERER)) {
+            ViewUtil.RENDERER.removeClass(container, name);
         }
     }
 
@@ -370,8 +370,8 @@ export class ViewUtil {
         }
 
         container = ViewUtil.parseElement(container);
-        if (!_.isNil(container)) {
-            ViewUtil.RENDEDER.setProperty(container, name, value);
+        if (!_.isNil(container) && !_.isNil(ViewUtil.RENDERER)) {
+            ViewUtil.RENDERER.setProperty(container, name, value);
         }
     }
 
@@ -384,8 +384,8 @@ export class ViewUtil {
             return;
         }
         container = ViewUtil.parseElement(container);
-        if (!_.isNil(container)) {
-            ViewUtil.RENDEDER.removeAttribute(container, name);
+        if (!_.isNil(container) && !_.isNil(ViewUtil.RENDERER)) {
+            ViewUtil.RENDERER.removeAttribute(container, name);
         }
     }
 
@@ -394,8 +394,8 @@ export class ViewUtil {
             return;
         }
         container = ViewUtil.parseElement(container);
-        if (!_.isNil(container)) {
-            ViewUtil.RENDEDER.setAttribute(container, name, value);
+        if (!_.isNil(container) && !_.isNil(ViewUtil.RENDERER)) {
+            ViewUtil.RENDERER.setAttribute(container, name, value);
         }
     }
 
@@ -412,8 +412,8 @@ export class ViewUtil {
             return;
         }
         container = ViewUtil.parseElement(container);
-        if (!_.isNil(container)) {
-            ViewUtil.RENDEDER.setStyle(container, name, value);
+        if (!_.isNil(container) && !_.isNil(ViewUtil.RENDERER)) {
+            ViewUtil.RENDERER.setStyle(container, name, value);
         }
     }
 
@@ -422,8 +422,8 @@ export class ViewUtil {
             return;
         }
         container = ViewUtil.parseElement(container);
-        if (!_.isNil(container)) {
-            ViewUtil.RENDEDER.removeStyle(container, name);
+        if (!_.isNil(container) && !_.isNil(ViewUtil.RENDERER)) {
+            ViewUtil.RENDERER.removeStyle(container, name);
         }
     }
 

@@ -1,6 +1,6 @@
 import { Directive, HostListener } from '@angular/core';
 import { Destroyable } from '@ts-core/common/Destroyable';
-import { ThemeService } from './ThemeService';
+import { ThemeService } from '@ts-core/frontend/theme';
 
 @Directive({
     selector: '[vi-theme-toggle]'

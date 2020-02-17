@@ -1,12 +1,12 @@
 import { ComponentType } from '@angular/cdk/portal';
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Destroyable } from '@ts-core/common/Destroyable';
+import { ObservableData } from '@ts-core/common/observer';
+import { LanguageService } from '@ts-core/frontend/language';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
-import { ObservableData } from '@ts-core/common/observer';
-import { Destroyable } from '@ts-core/common/Destroyable';
 import { CookieService } from '../cookie';
-import { LanguageService } from '../language';
 import { IQuestion, IQuestionOptions, QuestionMode } from '../question';
 import { QuestionManager } from '../question/QuestionManager';
 import { ViewUtil } from '../util';

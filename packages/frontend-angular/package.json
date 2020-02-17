@@ -1,9 +1,9 @@
 {
-    "name": "@ts-core/frontend-angular",
-    "version": "1.0.8",
-    "description": "Classes and utils for frontend based on angular",
-    "main": "index.js",
-    "scripts": {},
+    "name": "local",
+    "version": "0.0.0",
+    "scripts": {
+        "build": "ng build --prod"
+    },
     "author": {
         "name": "Renat Gubaev",
         "email": "renat.gubaev@gmail.com"
@@ -23,12 +23,11 @@
         "@angular/platform-browser-dynamic": "8.0.3",
         "@angular/platform-server": "8.0.3",
         "@angular/router": "8.0.3",
-        "@ts-core/frontend": "^1.0.6",
+        "@ts-core/frontend": "^1.0.20",
         "@types/numeral": "0.0.25",
         "css-element-queries": "1.2.0",
         "csshake": "1.5.3",
         "interactjs": "1.4.10",
-        "messageformat": "2.2.1",
         "moment": "2.24.0",
         "ng2-completer": "3.0.2",
         "ng2-smart-table": "1.5.0",
@@ -39,10 +38,10 @@
         "zone.js": "0.9.1"
     },
     "devDependencies": {
-        "@angular-devkit/build-angular": "0.800.6",
-        "@angular-devkit/build-ng-packagr": "0.803.25",
-        "@angular/cli": "8.0.6",
+        "@angular-devkit/build-angular": "^0.801.3",
+        "@angular/cli": "^8.3.25",
         "@angular/compiler-cli": "8.0.3",
+        "@angular-devkit/build-ng-packagr": "^0.801.3",
         "ng-packagr": "5.7.1"
     }
 }

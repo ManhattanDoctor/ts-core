@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { ValidationErrors } from '@angular/forms';
+import { LanguageService } from '@ts-core/frontend/language';
 import * as _ from 'lodash';
-import { LanguageService } from '../language';
 
 @Pipe({
     name: 'viNgModelError'
