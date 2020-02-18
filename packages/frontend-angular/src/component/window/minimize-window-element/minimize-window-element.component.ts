@@ -1,6 +1,6 @@
 import { Component, ElementRef } from '@angular/core';
-import { ViewUtil } from '../../../util';
-import { WindowEvent } from '../../../window';
+import { ViewUtil } from '../../../util/ViewUtil';
+import { WindowEvent } from '../../../window/IWindow';
 import { WindowElement } from '../WindowElement';
 
 @Component({

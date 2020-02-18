@@ -1,5 +1,5 @@
 import { DraggableOptions, InteractEvent } from '@interactjs/types/types';
-import { ViewUtil } from '../../util';
+import { ViewUtil } from '../../util/ViewUtil';
 import { WindowResizeable } from './WindowResizeable';
 
 export class WindowDragable extends WindowResizeable {

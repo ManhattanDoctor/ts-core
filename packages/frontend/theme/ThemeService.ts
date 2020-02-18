@@ -1,4 +1,4 @@
-import { Destroyable } from '@ts-core/common/Destroyable';
+import { Destroyable } from '@ts-core/common';
 import { ExtendedError } from '@ts-core/common/error';
 import { MapCollection } from '@ts-core/common/map';
 import * as _ from 'lodash';

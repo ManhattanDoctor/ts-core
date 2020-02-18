@@ -1,6 +1,6 @@
 import { LoadableEvent } from '@ts-core/common';
 import { ApiResponse } from '@ts-core/common/api';
-import { Destroyable } from '@ts-core/common/Destroyable';
+import { Destroyable } from '@ts-core/common';
 import { ObservableData } from '@ts-core/common/observer';
 import { Observable, Subject } from 'rxjs';
 

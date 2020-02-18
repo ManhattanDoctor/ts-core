@@ -1,7 +1,7 @@
 import { AfterViewInit, ElementRef } from '@angular/core';
 import { DestroyableContainer } from '@ts-core/common';
-import { ViewUtil } from '../../util';
-import { IWindow } from '../../window';
+import { ViewUtil } from '../../util/ViewUtil';
+import { IWindow } from '../../window/IWindow';
 
 export class WindowElement extends DestroyableContainer implements AfterViewInit {
     // --------------------------------------------------------------------------

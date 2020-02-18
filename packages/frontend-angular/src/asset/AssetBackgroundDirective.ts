@@ -1,8 +1,8 @@
 import { Directive, ElementRef, Input } from '@angular/core';
-import { Destroyable } from '@ts-core/common/Destroyable';
+import { Destroyable } from '@ts-core/common';
 import { Assets } from '@ts-core/frontend/asset';
 import * as _ from 'lodash';
-import { ViewUtil } from '../util';
+import { ViewUtil } from '../util/ViewUtil';
 
 @Directive({
     selector: '[vi-asset-background]'

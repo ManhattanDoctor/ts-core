@@ -5,7 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { Api } from '@ts-core/common/api';
 import { HttpApi } from '@ts-core/common/api/http';
-import { PipeBaseService, RouterBaseService, VIAngularModule } from '@ts-core/frontend-angular';
+import { PipeBaseService, RouterBaseService, VICommonModule, VIComponentModule } from '@ts-core/frontend-angular';
 import { SettingsBaseService } from '@ts-core/frontend/service';
 import { RootComponent } from './component/root/root.component';
 import { ApiService } from './service/ApiService';
@@ -20,7 +20,8 @@ export const imports: any[] = [
     ReactiveFormsModule,
 
     RouterModule.forRoot([]),
-    VIAngularModule.forRoot({ themeOptions: { name: 'theme' }, languageOptions: { name: 'language' } })
+    VIComponentModule,
+    VICommonModule.forRoot({ themeOptions: { name: 'theme' }, languageOptions: { name: 'language' } })
 ];
 
 export const providers: any[] = [

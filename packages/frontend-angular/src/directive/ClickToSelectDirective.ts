@@ -1,6 +1,6 @@
 import { Directive, ElementRef, HostListener } from '@angular/core';
-import { Destroyable } from '@ts-core/common/Destroyable';
-import { ViewUtil } from '../util';
+import { Destroyable } from '@ts-core/common';
+import { ViewUtil } from '../util/ViewUtil';
 
 @Directive({
     selector: '[vi-click-to-select]'

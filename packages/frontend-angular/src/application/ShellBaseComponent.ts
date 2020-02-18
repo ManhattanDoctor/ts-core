@@ -1,10 +1,12 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { DestroyableContainer } from '@ts-core/common';
 import * as _ from 'lodash';
 import { filter } from 'rxjs/operators';
-import { DestroyableContainer } from '@ts-core/common';
-import { MenuItems, NavigationMenuItem } from '../menu';
-import { NotificationConfig, NotificationService, NotificationServiceEvent } from '../notification';
-import { RouterBaseService, RouterBaseServiceEvent } from '../router';
+import { MenuItems } from '../menu/MenuItems';
+import { NavigationMenuItem } from '../menu/NavigationMenuItem';
+import { NotificationConfig } from '../notification/NotificationConfig';
+import { NotificationService, NotificationServiceEvent } from '../notification/NotificationService';
+import { RouterBaseService, RouterBaseServiceEvent } from '../service/RouterBaseService';
 
 export abstract class ShellBaseComponent extends DestroyableContainer {
     // --------------------------------------------------------------------------

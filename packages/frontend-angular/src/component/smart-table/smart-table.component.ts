@@ -4,7 +4,8 @@ import { ObjectUtil } from '@ts-core/common/util';
 import { LanguageService } from '@ts-core/frontend/language';
 import * as _ from 'lodash';
 import { Row } from 'ng2-smart-table/lib/lib/data-set/row';
-import { TableMapCollection, TablePagedMapCollection } from '../../smart-table';
+import { TableMapCollection } from '../../smart-table/TableMapCollection';
+import { TablePagedMapCollection } from '../../smart-table/TablePagedMapCollection';
 
 export abstract class SmartTableComponent<V, U extends TableMapCollection<V, any> | TablePagedMapCollection<V, any>> extends DestroyableContainer {
     // --------------------------------------------------------------------------

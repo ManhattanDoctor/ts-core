@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { Destroyable } from '@ts-core/common/Destroyable';
+import { Destroyable } from '@ts-core/common';
 import { IWindowContent } from './IWindowContent';
 import { WindowConfig } from './WindowConfig';
 

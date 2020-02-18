@@ -125,7 +125,7 @@ const packageBuild = async (packageName: string): Promise<void> => {
     await del(outputDirectory, { force: true });
 
     // Format and fix code
-    await run(`prettier --write '${projectDirectory}/**/*.{ts,js,json}'`)();
+    // await run(`prettier --write '${projectDirectory}/**/*.{ts,js,json}'`)();
 
     // Compile project
     await packageCompile(packageName);

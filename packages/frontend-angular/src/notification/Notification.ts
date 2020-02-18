@@ -1,8 +1,9 @@
 import { MatDialogRef } from '@angular/material/dialog';
 import { Observable, Subject } from 'rxjs';
 import { filter } from 'rxjs/internal/operators';
-import { ViewUtil } from '../util';
-import { WindowBase, WindowEvent } from '../window';
+import { ViewUtil } from '../util/ViewUtil';
+import { WindowEvent } from '../window/IWindow';
+import { WindowBase } from '../window/WindowBase';
 import { INotification, NotificationEvent } from './INotification';
 import { INotificationContent } from './INotificationContent';
 import { NotificationConfig } from './NotificationConfig';

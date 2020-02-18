@@ -2,8 +2,14 @@ import { DatePipe } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
 import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
 import { LanguageService } from '@ts-core/frontend/language';
-import { CamelCasePipe, MomentDateAdaptivePipe, MomentDateFromNowPipe, MomentDatePipe, MomentTimePipe, SanitizePipe, TruncatePipe } from '../pipe';
+import { CamelCasePipe } from '../pipe/CamelCasePipe';
 import { FinancePipe } from '../pipe/FinancePipe';
+import { MomentDateAdaptivePipe } from '../pipe/MomentDateAdaptivePipe';
+import { MomentDateFromNowPipe } from '../pipe/MomentDateFromNowPipe';
+import { MomentDatePipe } from '../pipe/MomentDatePipe';
+import { MomentTimePipe } from '../pipe/MomentTimePipe';
+import { SanitizePipe } from '../pipe/SanitizePipe';
+import { TruncatePipe } from '../pipe/TruncatePipe';
 
 export class PipeBaseService extends DestroyableContainer {
     // --------------------------------------------------------------------------

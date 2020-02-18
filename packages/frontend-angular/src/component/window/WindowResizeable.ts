@@ -1,6 +1,6 @@
 import { EdgeOptions, Interactable, InteractEvent, ResizableOptions } from '@interactjs/types/types';
 import * as interact from 'interactjs';
-import { ViewUtil } from '../../util';
+import { ViewUtil } from '../../util/ViewUtil';
 import { WindowImpl } from '../../window/WindowImpl';
 
 export class WindowResizeable extends WindowImpl {

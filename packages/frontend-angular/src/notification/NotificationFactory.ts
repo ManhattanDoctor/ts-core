@@ -1,6 +1,4 @@
-import { QuestionMode } from '../question';
 import { INotification } from './INotification';
-import { NotificationConfig } from './NotificationConfig';
 import { NotificationProperties } from './NotificationProperties';
 
 export class NotificationFactory<U extends INotification> {

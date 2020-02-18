@@ -1,6 +1,6 @@
 {
     "name": "@ts-core/backend-nestjs",
-    "version": "1.0.7",
+    "version": "6.0.1",
     "description": "Classes and utils for backend based on nestjs",
     "main": "index.js",
     "scripts": {},
@@ -9,7 +9,7 @@
         "email": "renat.gubaev@gmail.com"
     },
     "license": "ISC",
-    "dependencies": {
+    "peerDependencies": {
         "@nestjs/common": "6.10.11",
         "@nestjs/core": "6.10.11",
         "@nestjs/jwt": "6.1.1",

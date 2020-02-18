@@ -8,7 +8,7 @@ import { SettingsBaseService } from '@ts-core/frontend/service';
 import { ThemeService } from '@ts-core/frontend/theme';
 import * as moment from 'moment';
 import * as numeral from 'numeral';
-import { ViewUtil } from '../util';
+import { ViewUtil } from '../util/ViewUtil';
 import { ApplicationBaseComponent } from './ApplicationBaseComponent';
 
 export abstract class ApplicationComponent<S extends SettingsBaseService, A extends Api> extends ApplicationBaseComponent {

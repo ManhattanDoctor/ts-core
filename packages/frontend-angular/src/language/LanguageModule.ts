@@ -1,7 +1,8 @@
 import { InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
 import { ICookieService } from '@ts-core/frontend/cookie';
 import { ILanguageServiceOptions, LanguageService } from '@ts-core/frontend/language';
-import { CookieModule, CookieService } from '../cookie';
+import { CookieModule } from '../cookie/CookieModule';
+import { CookieService } from '../cookie/CookieService';
 import { LanguageMatPaginatorIntl } from './LanguageMatPaginatorIntl';
 import { LanguagePipe } from './LanguagePipe';
 import { LanguagePurePipe } from './LanguagePurePipe';
@@ -24,12 +25,12 @@ export class LanguageModule {
             ngModule: LanguageModule,
             providers: [
                 {
-                    provide: LANGUAGE_OPTIONS_TOKEN,
-                    useValue: options
+                    provide: LANGUAGE_OPTIONS,
+                    useValue: options || {}
                 },
                 {
                     provide: LanguageService,
-                    deps: [CookieService, LANGUAGE_OPTIONS_TOKEN],
+                    deps: [CookieService, LANGUAGE_OPTIONS],
                     useFactory: languageServiceFactory
                 },
                 {
@@ -47,11 +48,11 @@ export class LanguageModule {
     }
 }
 
-export const LANGUAGE_OPTIONS_TOKEN = new InjectionToken<ILanguageServiceOptions>(`Language options`);
-
-export function languageServiceFactory(cookie: ICookieService, settings?: ILanguageServiceOptions): LanguageService {
-    if (settings && !settings.service) {
-        settings.service = cookie;
+export function languageServiceFactory(cookie: ICookieService, options?: ILanguageServiceOptions): LanguageService {
+    if (options && !options.service) {
+        options.service = cookie;
     }
-    return new LanguageService(settings);
+    return new LanguageService(options);
 }
+
+export const LANGUAGE_OPTIONS = new InjectionToken<ILanguageServiceOptions>(`LANGUAGE_OPTIONS`);

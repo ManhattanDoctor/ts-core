@@ -1,7 +1,7 @@
 import { MatDialogRef } from '@angular/material/dialog';
 import * as _ from 'lodash';
 import { DestroyableContainer } from '@ts-core/common';
-import { ViewUtil } from '../util';
+import { ViewUtil } from '../util/ViewUtil';
 import { WindowAlign, WindowConfig } from './WindowConfig';
 
 export abstract class WindowBase extends DestroyableContainer {

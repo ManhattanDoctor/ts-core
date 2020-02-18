@@ -1,5 +1,5 @@
 import { Component, ElementRef } from '@angular/core';
-import { ViewUtil } from '../../../util';
+import { ViewUtil } from '../../../util/ViewUtil';
 import { WindowElement } from '../WindowElement';
 
 @Component({

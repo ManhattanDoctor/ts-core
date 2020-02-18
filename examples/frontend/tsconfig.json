@@ -12,5 +12,6 @@
         "importHelpers": true,
         "target": "es2015",
         "lib": ["esnext", "dom"]
-    }
+    },
+    "files": ["./packages/example/src/main.ts","polyfills.ts"]
 }

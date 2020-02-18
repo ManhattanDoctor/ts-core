@@ -1,6 +1,6 @@
 import { Component, ViewContainerRef } from '@angular/core';
 import { LanguageService } from '@ts-core/frontend/language';
-import { ViewUtil } from '../../../util';
+import { ViewUtil } from '../../../util/ViewUtil';
 import { WindowQuestionBaseComponent } from '../WindowQuestionBaseComponent';
 
 @Component({

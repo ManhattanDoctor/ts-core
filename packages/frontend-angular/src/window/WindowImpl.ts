@@ -1,7 +1,7 @@
 import { MatDialogRef } from '@angular/material/dialog';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { filter } from 'rxjs/internal/operators';
-import { ViewUtil } from '../util';
+import { ViewUtil } from '../util/ViewUtil';
 import { IWindow, WindowEvent } from './IWindow';
 import { IWindowContent } from './IWindowContent';
 import { WindowBase } from './WindowBase';

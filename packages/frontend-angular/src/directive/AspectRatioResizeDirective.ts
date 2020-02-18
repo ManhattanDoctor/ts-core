@@ -1,8 +1,8 @@
 import { AfterViewInit, Directive, ElementRef, Input } from '@angular/core';
-import * as _ from 'lodash';
 import { DestroyableContainer } from '@ts-core/common';
-import { ResizeManager } from '../manager';
-import { ViewUtil } from '../util';
+import * as _ from 'lodash';
+import { ResizeManager } from '../manager/ResizeManager';
+import { ViewUtil } from '../util/ViewUtil';
 
 @Directive({
     selector: '[vi-aspect-ratio]'

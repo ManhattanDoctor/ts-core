@@ -1,7 +1,7 @@
 import { Component, ViewContainerRef } from '@angular/core';
 import { LanguageService } from '@ts-core/frontend/language';
-import { NotificationService } from '../../../notification';
-import { ViewUtil } from '../../../util';
+import { NotificationService } from '../../../notification/NotificationService';
+import { ViewUtil } from '../../../util/ViewUtil';
 import { NotificationQuestionBaseComponent } from '../NotificationQuestionBaseComponent';
 
 @Component({

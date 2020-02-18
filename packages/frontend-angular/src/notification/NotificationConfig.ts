@@ -1,4 +1,4 @@
-import { WindowConfig } from '../window';
+import { WindowConfig } from '../window/WindowConfig';
 
 export class NotificationConfig<T = any> extends WindowConfig<T> {
     // --------------------------------------------------------------------------

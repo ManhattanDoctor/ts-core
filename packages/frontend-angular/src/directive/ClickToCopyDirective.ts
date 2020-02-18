@@ -1,7 +1,7 @@
 import { Directive, HostListener, Input } from '@angular/core';
-import { Destroyable } from '@ts-core/common/Destroyable';
+import { Destroyable } from '@ts-core/common';
 import { DateUtil } from '@ts-core/common/util';
-import { ViewUtil } from '../util';
+import { ViewUtil } from '../util/ViewUtil';
 
 @Directive({
     selector: '[vi-click-to-copy]'

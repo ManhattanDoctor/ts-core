@@ -1,6 +1,6 @@
 import { ComponentFactoryResolver, ComponentRef } from '@angular/core';
 import { APPLICATION_INJECTOR } from '../../ApplicationInjector';
-import { ViewUtil } from '../../util';
+import { ViewUtil } from '../../util/ViewUtil';
 import { CloseWindowElementComponent } from './close-window-element/close-window-element.component';
 import { MinimizeWindowElementComponent } from './minimize-window-element/minimize-window-element.component';
 import { ResizeWindowElementComponent } from './resize-window-element/resize-window-element.component';

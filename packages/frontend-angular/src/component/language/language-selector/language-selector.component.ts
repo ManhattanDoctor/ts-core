@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input } from '@angular/core';
 import { DestroyableContainer } from '@ts-core/common';
 import { LanguageService } from '@ts-core/frontend/language';
-import { ViewUtil } from '../../../util';
+import { ViewUtil } from '../../../util/ViewUtil';
 
 @Component({
     selector: 'language-selector',

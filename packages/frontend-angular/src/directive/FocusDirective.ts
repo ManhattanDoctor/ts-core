@@ -1,7 +1,7 @@
 import { Directive, ElementRef, Input } from '@angular/core';
+import { Destroyable } from '@ts-core/common';
 import * as _ from 'lodash';
-import { Destroyable } from '@ts-core/common/Destroyable';
-import { FocusManager } from '../manager';
+import { FocusManager } from '../manager/FocusManager';
 
 @Directive({
     selector: '[vi-focus]'

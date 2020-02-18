@@ -6,29 +6,29 @@
     "scripts": {
         "start": "npm run example:serve",
         "postinstall": "gulp frontend-angular:build",
-        "example:serve": "ng serve example",
-        "example:build": "ng build example --prod"
+        "serve": "ng serve example",
+        "build": "ng build example --prod"
     },
     "dependencies": {
-        "@angular/animations": "8.0.3",
-        "@angular/cdk": "8.0.1",
-        "@angular/cli": "8.0.6",
-        "@angular/common": "8.0.3",
-        "@angular/compiler": "8.0.3",
-        "@angular/core": "8.0.3",
-        "@angular/forms": "8.0.3",
-        "@angular/material": "8.0.1",
-        "@angular/material-moment-adapter": "8.0.1",
-        "@angular/platform-browser": "8.0.3",
-        "@angular/platform-browser-dynamic": "8.0.3",
-        "@angular/platform-server": "8.0.3",
-        "@angular/router": "8.0.3",
-        "@ts-core/frontend": "^1.0.18",
+        "@angular/animations": "8.2.14",
+        "@angular/cdk": "8.2.3",
+        "@angular/cli": "8.3.24",
+        "@angular/common": "8.2.14",
+        "@angular/compiler": "8.2.14",
+        "@angular/core": "8.2.14",
+        "@angular/forms": "8.2.14",
+        "@angular/material": "8.2.3",
+        "@angular/material-moment-adapter": "8.2.3",
+        "@angular/platform-browser": "8.2.14",
+        "@angular/platform-browser-dynamic": "8.2.14",
+        "@angular/platform-server": "8.2.14",
+        "@angular/router": "8.2.14",
+        "@ts-core/frontend": "^1.0.20",
         "@types/numeral": "0.0.25",
+        "bootstrap": "4.3.1",
         "css-element-queries": "1.2.0",
         "csshake": "1.5.3",
         "interactjs": "1.4.10",
-        "messageformat": "2.2.1",
         "moment": "2.24.0",
         "ng2-completer": "3.0.2",
         "ng2-smart-table": "1.5.0",
@@ -39,8 +39,10 @@
         "zone.js": "0.9.1"
     },
     "devDependencies": {
-        "@angular-devkit/build-angular": "^0.801.3",
-        "@angular/cli": "^8.3.25",
-        "@angular/compiler-cli": "8.0.3"
+        "@angular/compiler-cli": "~8.2.14",
+        "@angular-devkit/architect": "~0.803.20",
+        "@angular-devkit/build-angular": "~0.803.20",
+        "@angular-devkit/core": "~8.3.20",
+        "@angular-devkit/schematics": "~8.3.20"
     }
 }

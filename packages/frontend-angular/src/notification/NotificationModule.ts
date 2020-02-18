@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
-import { LanguageModule } from '../language';
+import { LanguageModule } from '../language/LanguageModule';
 import { NotificationService } from './NotificationService';
 @NgModule({
     imports: [MatDialogModule, LanguageModule],

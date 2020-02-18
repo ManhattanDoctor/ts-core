@@ -1,8 +1,22 @@
 import { Component, ElementRef, Renderer2 } from '@angular/core';
 import { ApiResponse } from '@ts-core/common/api';
-import { ApplicationComponent, PipeBaseService, RouterBaseService, ViewUtil } from '@ts-core/frontend-angular';
+import {
+    ApplicationComponent,
+    LoginResolver,
+    NotificationBaseComponent,
+    NotificationComponent,
+    NotificationFactory,
+    NotificationService,
+    PipeBaseService,
+    QuestionComponent,
+    RouterBaseService,
+    ViewUtil,
+    WindowBaseComponent,
+    WindowFactory,
+    WindowService
+} from '@ts-core/frontend-angular';
 import { Language, LanguageService } from '@ts-core/frontend/language';
-import { NativeWindowService } from '@ts-core/frontend/service';
+import { LoadingService, LoadingServiceManager, NativeWindowService } from '@ts-core/frontend/service';
 import { ThemeService } from '@ts-core/frontend/theme';
 import { ApiService } from '../../service/ApiService';
 import { SettingsService } from '../../service/SettingsService';
@@ -19,10 +33,13 @@ export class RootComponent extends ApplicationComponent<SettingsService, ApiServ
     //--------------------------------------------------------------------------
 
     constructor(
-        element: ElementRef,
-        private pipe: PipeBaseService,
+        private windows: WindowService,
         private router: RouterBaseService,
+        private notifications: NotificationService,
+        public loading: LoadingService,
+        private pipe: PipeBaseService,
         private nativeWindow: NativeWindowService,
+        element: ElementRef,
         protected renderer: Renderer2,
         protected settings: SettingsService,
         protected language: LanguageService,
@@ -39,12 +56,30 @@ export class RootComponent extends ApplicationComponent<SettingsService, ApiServ
     //--------------------------------------------------------------------------
 
     protected initialize(): void {
+        this.windows.factory = new WindowFactory(WindowBaseComponent);
+        this.windows.questionComponent = QuestionComponent;
+
+        this.notifications.factory = new NotificationFactory(NotificationBaseComponent);
+        this.notifications.questionComponent = NotificationComponent;
+
         super.initialize();
 
         ViewUtil.addClasses(this.element, 'h-100 d-block');
+        this.initializeObservers();
 
         this.theme.loadIfExist(this.settings.theme);
         this.language.loadIfExist(this.settings.language);
+    }
+
+    private initializeObservers(): void {
+        let manager = this.addDestroyable(new LoadingServiceManager(this.loading));
+        manager.addLoadable(this.api);
+        manager.addLoadable(this.language);
+    }
+
+    private async redirect(): Promise<void> {
+        let url = LoginResolver.redirectUrl;
+        this.router.navigate(url);
     }
 
     //--------------------------------------------------------------------------
@@ -55,11 +90,14 @@ export class RootComponent extends ApplicationComponent<SettingsService, ApiServ
 
     protected async apiLoadingError(item: ApiResponse): Promise<void> {}
 
-    protected languageLoadingError(item: Language, error: Error): void {}
-
-    protected readyHandler(): void {
-        console.log(this.pipe.finance.transform(1000));
+    protected languageLoadingError(item: Language, error: Error): void {
+        let message = `Unable to load language ${item.locale}`;
+        if (error) {
+            message += `, error: ${error}`;
+        }
     }
+
+    protected readyHandler(): void {}
 
     //--------------------------------------------------------------------------
     //
