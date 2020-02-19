@@ -1,6 +1,5 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, plainToClass } from 'class-transformer';
 import { ExtendedError } from '../error';
-import { ObjectUtil } from '../util';
 import { ITransportCommandAsync } from './ITransport';
 import { TransportCommand } from './TransportCommand';
 
@@ -23,8 +22,13 @@ export class TransportCommandAsync<U, V> extends TransportCommand<U> implements 
     // --------------------------------------------------------------------------
 
     public response(value: V | ExtendedError | Error): void {
-        if (value instanceof ExtendedError || ObjectUtil.hasOwnProperties(value, ['code', 'message', 'details'])) {
+        if (value instanceof ExtendedError) {
             this._error = value as ExtendedError;
+            return;
+        }
+
+        if (ExtendedError.instanceOf(value)) {
+            this._error = plainToClass(ExtendedError, value);
             return;
         }
 

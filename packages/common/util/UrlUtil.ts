@@ -1,4 +1,3 @@
-// import { HttpParams } from '@angular/common/http';
 import * as _ from 'lodash';
 
 export class UrlUtil {

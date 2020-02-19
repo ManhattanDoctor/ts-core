@@ -3,7 +3,8 @@ import { IAmqpSettings } from '@ts-core/backend/settings';
 import { TransportAmqp } from '@ts-core/backend/transport';
 import { ExtendedError } from '@ts-core/common/error';
 import { Logger } from '@ts-core/common/logger';
-import { Transport, TransportLocal } from '@ts-core/common/transport';
+import { Transport } from '@ts-core/common/transport';
+import { TransportLocal } from '@ts-core/common/transport/local';
 
 @Global()
 export class TransportModule {

@@ -1,5 +1,6 @@
 import { Component, ElementRef, Renderer2 } from '@angular/core';
 import { ApiResponse } from '@ts-core/common/api';
+import { Logger } from '@ts-core/common/logger';
 import {
     ApplicationComponent,
     LoginResolver,
@@ -20,6 +21,8 @@ import { LoadingService, LoadingServiceManager, NativeWindowService } from '@ts-
 import { ThemeService } from '@ts-core/frontend/theme';
 import { ApiService } from '../../service/ApiService';
 import { SettingsService } from '../../service/SettingsService';
+import { TransportHttp } from '../../transport/TransportHttp';
+import { TransportHttpCommandAsync } from '../../transport/TransportHttpCommandAsync';
 
 @Component({
     selector: 'root',
@@ -44,9 +47,35 @@ export class RootComponent extends ApplicationComponent<SettingsService, ApiServ
         protected settings: SettingsService,
         protected language: LanguageService,
         protected theme: ThemeService,
+        protected logger: Logger,
         protected api: ApiService
     ) {
         super(element, 0);
+
+        this.test();
+    }
+
+    private async test() {
+        let transport = new TransportHttp(this.logger);
+        transport.defaults = { baseURL: `http://localhost:3000/api` };
+
+        try {
+            console.log(
+                await transport.sendListen(
+                    new TransportHttpCommandAsync({
+                        name: `login`,
+                        data: {
+                            login: 'admin@n-t.io',
+                            password:
+                                'ab9b12dd97c259eab7a26909a9eb5b2ba46e43604d8d412f66bf8ef3de03923117fc1d98477e503e82a3897c338f5f9cb9b91695eb2a677344b0e903fc888d67'
+                        },
+                        method: 'post'
+                    })
+                )
+            );
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     //--------------------------------------------------------------------------

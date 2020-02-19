@@ -1,5 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, InternalServerErrorException } from '@nestjs/common';
 import { ExtendedError } from '@ts-core/common/error';
+import { classToPlain } from 'class-transformer';
 import * as _ from 'lodash';
 
 @Catch(ExtendedError)
@@ -31,6 +32,6 @@ export class ExtendedErrorHttpExceptionFilter implements ExceptionFilter<Extende
             status = code;
         }
 
-        response.status(status).json({ code, message, isError: true });
+        response.status(status).json(classToPlain(exception));
     }
 }

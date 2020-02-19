@@ -1,4 +1,4 @@
-import { isObservable, Observable } from 'rxjs';
+import { from, isObservable, Observable, of } from 'rxjs';
 import { IDestroyable } from '../IDestroyable';
 
 export class PromiseHandler<U = any, V = string> implements IDestroyable {
@@ -23,6 +23,16 @@ export class PromiseHandler<U = any, V = string> implements IDestroyable {
             promise.resolve();
         }, timeout);
         return promise.promise;
+    }
+
+    public static fromPromise<U>(result: U | Promise<U> | Observable<U>): Observable<U> {
+        if (isObservable(result)) {
+            return result;
+        }
+        if (result instanceof Promise) {
+            return from(result);
+        }
+        return of(result);
     }
 
     public static toPromise<U>(result: U | Promise<U> | Observable<U>): Promise<U> {

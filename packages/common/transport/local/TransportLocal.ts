@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
-import { ExtendedError } from '../error';
-import { ILogger } from '../logger';
-import { PromiseHandler } from '../promise';
-import { ITransportCommand, ITransportCommandAsync, ITransportCommandOptions, ITransportEvent } from './ITransport';
-import { Transport, TransportLogType } from './Transport';
-import { TransportTimeoutError } from './TransportTimeoutError';
+import { ExtendedError } from '../../error';
+import { ILogger } from '../../logger';
+import { PromiseHandler } from '../../promise';
+import { ITransportCommand, ITransportCommandAsync, ITransportCommandOptions, ITransportEvent } from '../ITransport';
+import { Transport, TransportLogType } from '../Transport';
+import { TransportTimeoutError } from '../TransportTimeoutError';
 
 export class TransportLocal extends Transport {
     // --------------------------------------------------------------------------

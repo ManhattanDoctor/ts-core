@@ -1,4 +1,6 @@
+import { Exclude, Transform } from 'class-transformer';
 import * as _ from 'lodash';
+import { ObjectUtil } from '../util';
 
 export class ExtendedError<T = any> implements Error {
     // --------------------------------------------------------------------------
@@ -7,7 +9,7 @@ export class ExtendedError<T = any> implements Error {
     //
     // --------------------------------------------------------------------------
 
-    public static DEFAULT_ERROR_CODE = -1;
+    public static DEFAULT_ERROR_CODE = -1000;
 
     // --------------------------------------------------------------------------
     //
@@ -15,12 +17,25 @@ export class ExtendedError<T = any> implements Error {
     //
     // --------------------------------------------------------------------------
 
-    public static create(error: Error, code: number = -1): ExtendedError {
+    public static create(error: Error | ExtendedError, code?: number): ExtendedError {
+        if (!(error instanceof Error)) {
+            throw new ExtendedError(`Is not instance of error`);
+        }
+
+        if (error instanceof ExtendedError) {
+            return error;
+        }
+
         let message = error.message;
         if (error.name) {
-            message = '[' + error.name + '] ' + message;
+            message = `[${error.name}'] ${message}`;
         }
-        return new ExtendedError(message, code, error.stack);
+
+        return new ExtendedError(message, _.isNil(code) ? ExtendedError.DEFAULT_ERROR_CODE : code, error.stack);
+    }
+
+    public static instanceOf(data: any): boolean {
+        return ObjectUtil.instanceOf(data, ['code', 'message', 'details', 'isFatal']);
     }
 
     // --------------------------------------------------------------------------
@@ -31,8 +46,11 @@ export class ExtendedError<T = any> implements Error {
 
     public code: number;
     public message: string;
-    public details: any;
     public isFatal: boolean;
+
+    @Transform(value => (_.isObject(value) ? JSON.stringify(value) : value), { toPlainOnly: true })
+    @Transform(value => (ObjectUtil.isJSON(value) ? JSON.parse(value) : value), { toClassOnly: true })
+    public details: any;
 
     // --------------------------------------------------------------------------
     //
@@ -57,6 +75,12 @@ export class ExtendedError<T = any> implements Error {
     //
     // --------------------------------------------------------------------------
 
+    public deserialize(data: any): void {
+        this.code = data.code;
+        this.message = data.message;
+        this.isFatal = data.isFatal;
+    }
+
     public toString(): string {
         let value = this.message;
         if (_.isNumber(this.code)) {
@@ -74,6 +98,7 @@ export class ExtendedError<T = any> implements Error {
     //
     // --------------------------------------------------------------------------
 
+    @Exclude()
     public get name(): string {
         return this.code.toString();
     }

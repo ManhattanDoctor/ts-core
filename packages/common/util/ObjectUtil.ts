@@ -99,4 +99,15 @@ export class ObjectUtil {
         }
         return to;
     }
+
+    public static isJSON(data: string): boolean {
+        if (!_.isString(data)) {
+            return false;
+        }
+        try {
+            return !_.isNil(JSON.parse(data));
+        } catch {
+            return false;
+        }
+    }
 }
