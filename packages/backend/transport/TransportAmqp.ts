@@ -1,13 +1,26 @@
 import { ExtendedError } from '@ts-core/common/error';
 import { ILogger } from '@ts-core/common/logger';
 import { PromiseHandler } from '@ts-core/common/promise';
-import { ITransportCommand, ITransportCommandAsync, ITransportCommandOptions, ITransportEvent, Transport, TransportCommand, TransportCommandAsync, TransportEvent, TransportLogType, TransportTimeoutError, TransportWaitError } from '@ts-core/common/transport';
+import {
+    ITransportCommand,
+    ITransportCommandAsync,
+    ITransportCommandOptions,
+    ITransportEvent,
+    Transport,
+    TransportCommand,
+    TransportCommandAsync,
+    TransportEvent,
+    TransportLogType,
+    TransportTimeoutError,
+    TransportWaitError
+} from '@ts-core/common/transport';
 import * as amqp from 'amqplib';
 import { Channel, Message, Options, Replies } from 'amqplib';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 import * as uuid from 'uuid';
 import { IAmqpSettings } from '../settings/IAmqpSettings';
+import { TransportInvalidHeadersError } from './TransportInvalidHeadersError';
 
 export class TransportAmqp extends Transport {
     // --------------------------------------------------------------------------
@@ -150,27 +163,7 @@ export class TransportAmqp extends Transport {
         this.listening.add(commandName);
 
         const observer = new Subject<any>();
-
-        this.listenQueue(
-            commandName,
-            (msg: Message) => {
-                let headers = msg.properties.headers as ICommandHeaders;
-                let messageId = msg.properties.messageId;
-                if (_.isNil(headers) || _.isNil(headers.IS_NEED_REPLY) || _.isNil(headers.IS_ASYNC_COMMAND)) {
-                    throw new ExtendedError(`Invalid headers`);
-                }
-                this.messages.set(messageId, msg);
-                const requestJson = JSON.parse(msg.content.toString()) as U;
-                const command = headers.IS_ASYNC_COMMAND
-                    ? new TransportCommandAsync(commandName, requestJson, messageId)
-                    : new TransportCommand(commandName, requestJson, messageId);
-
-                this.logCommand(command, TransportLogType.REQUEST_RECEIVE);
-                observer.next(command);
-            },
-            { consumerTag: uuid() }
-        ).then();
-
+        this.listenQueue(commandName, observer);
         return observer.asObservable();
     }
 
@@ -345,7 +338,9 @@ export class TransportAmqp extends Transport {
             message += `:\n${error.message}`;
         }
 
-        this.connectionIPromise.reject(message);
+        if (!_.isNil(this.connectionIPromise)) {
+            this.connectionIPromise.reject(message);
+        }
         this.connectionIPromise = null;
         this.connectionPromise = null;
         this.connection = null;
@@ -410,15 +405,48 @@ export class TransportAmqp extends Transport {
         return msg;
     }
 
-    private async listenQueue(queue: string, callback: (msg: Message) => void, options?: Options.Consume): Promise<Replies.Consume> {
+    private async listenQueue(queue: string, observer: Subject<any>): Promise<Replies.Consume> {
         await this.assert(queue);
         return this.channel.consume(
             queue,
             (msg: Message) => {
-                callback(msg);
+                try {
+                    this.processIncomeMessage(queue, msg, observer);
+                } catch (error) {
+                    if (error instanceof TransportInvalidHeadersError) {
+                        this.error('Got invalid message from amqp: invalid headers. Can not convert message to command');
+                        this.error('Message deleted from queue ' + queue);
+                        this.error({
+                            message: 'Invalid AMQP message',
+                            reason: 'Invalid Headers',
+                            msgHeaders: msg.properties.headers,
+                            msgContent: msg.content.toString(),
+                            msgProperties: msg.properties
+                        });
+                        this.channel.reject(msg, false);
+                    } else {
+                        throw error;
+                    }
+                }
             },
-            options
+            { consumerTag: uuid() }
         );
+    }
+
+    private processIncomeMessage(commandName: string, msg: Message, observer: Subject<any>) {
+        let headers = msg.properties.headers as ICommandHeaders;
+        let messageId = msg.properties.messageId;
+        if (_.isNil(headers) || _.isNil(headers.IS_NEED_REPLY) || _.isNil(headers.IS_ASYNC_COMMAND)) {
+            throw new TransportInvalidHeadersError(`Invalid headers`);
+        }
+        this.messages.set(messageId, msg);
+        const requestJson = JSON.parse(msg.content.toString());
+        const command = headers.IS_ASYNC_COMMAND
+            ? new TransportCommandAsync(commandName, requestJson, messageId)
+            : new TransportCommand(commandName, requestJson, messageId);
+
+        this.logCommand(command, TransportLogType.REQUEST_RECEIVE);
+        observer.next(command);
     }
 
     private ack(msg: Message): void {
