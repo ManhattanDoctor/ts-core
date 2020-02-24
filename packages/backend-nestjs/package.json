@@ -21,7 +21,7 @@
         "@nestjs/platform-ws": "6.10.11",
         "@nestjs/swagger": "4.0.9",
         "@nestjs/websockets": "6.10.11",
-        "@ts-core/common": "^1.0.19",
+        "@ts-core/common": "^1.0.26",
         "@ts-core/backend": "^1.0.7",
         "@types/socket.io": "2.1.4",
         "passport": "0.4.1",

@@ -3,7 +3,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { PipeBaseService } from '@ts-core/frontend-angular';
 import { LanguageService } from '@ts-core/frontend/language';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class PipeService extends PipeBaseService {
     //--------------------------------------------------------------------------
     //

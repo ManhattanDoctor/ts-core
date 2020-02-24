@@ -1,0 +1,31 @@
+@import 'mat-base';
+
+/*--------------------------------------------------------------------------
+//
+//  Light Theme
+//
+//-------------------------------------------------------------------------*/
+
+$light-primary: mat-palette($mat-purple, 600, 100, 900);
+$light-accent: mat-palette($mat-blue, 400, 200, 600);
+$light-warn: mat-palette($mat-red, 600);
+$light-theme: mat-light-theme($light-primary, $light-accent, $light-warn);
+
+.light-theme {
+    @include theme-apply($light-theme, 700, 500);
+}
+
+/*--------------------------------------------------------------------------
+//
+//  Dark Theme
+//
+//-------------------------------------------------------------------------*/
+
+$dark-primary: mat-palette($mat-purple,300,100,500);
+$dark-accent: mat-palette($mat-green,300,200,500);
+$dark-warn: mat-palette($mat-red,400);
+$dark-theme: mat-dark-theme($dark-primary,$dark-accent,$dark-warn);
+
+.dark-theme {
+    @include theme-apply($dark-theme, 700, 500);
+}

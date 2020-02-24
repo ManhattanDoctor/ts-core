@@ -1,4 +1,4 @@
-import { destroyIfCan } from '../IDestroyable';
+import { IDestroyable } from '../IDestroyable';
 import { MapCollection } from './MapCollection';
 
 export class DestroyableMapCollection<U> extends MapCollection<U> {
@@ -9,7 +9,7 @@ export class DestroyableMapCollection<U> extends MapCollection<U> {
     // --------------------------------------------------------------------------
 
     protected destroyItem(item: U): U {
-        destroyIfCan(item);
+        IDestroyable.destroy(item);
         return item;
     }
 

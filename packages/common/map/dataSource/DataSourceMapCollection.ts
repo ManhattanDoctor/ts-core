@@ -1,9 +1,21 @@
+import * as _ from 'lodash';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { LoadableEvent } from '../Loadable';
-import { ObservableData } from '../observer/ObservableData';
-import { DestroyableMapCollection } from './DestroyableMapCollection';
+import { ExtendedError } from '../../error/ExtendedError';
+import { LoadableEvent } from '../../Loadable';
+import { ObservableData } from '../../observer/ObservableData';
+import { DestroyableMapCollection } from '../DestroyableMapCollection';
 
-export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollection<U> {
+export abstract class DataSourceMapCollection<U, V = any> extends DestroyableMapCollection<U> {
+    // --------------------------------------------------------------------------
+    //
+    //  Static Methods
+    //
+    // --------------------------------------------------------------------------
+
+    public static getResponseItems<V>(response: V): Array<any> {
+        return _.isArray(response) ? (response as any) : null;
+    }
+
     // --------------------------------------------------------------------------
     //
     //  Properties
@@ -19,7 +31,7 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
     protected isNeedCleanAfterLoad: boolean = false;
 
     protected subscription: Subscription;
-    protected observer: Subject<ObservableData<LoadableEvent | LoadableMapCollectionEvent, V>>;
+    protected observer: Subject<ObservableData<LoadableEvent | DataSourceMapCollectionEvent, V | Array<U>>>;
 
     // --------------------------------------------------------------------------
     //
@@ -43,21 +55,32 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
         this.reloadHandler = this.reload.bind(this);
     }
 
-    // --------------------------------------------------------------------------
-    //
-    //	Protected Abstract Methods
-    //
-    // --------------------------------------------------------------------------
+    protected parseResponse(response: V): void {
+        let items = this.getResponseItems(response);
+        if (!_.isEmpty(items)) {
+            this.parseItems(items);
+        }
+        this._isAllLoaded = true;
+    }
 
-    protected abstract parseItem(item: any): U;
+    protected parseItems(items: Array<any>): void {
+        let parsedItems: Array<U> = new Array();
+        for (let item of items) {
+            let value: U = this.parseItem(item);
+            if (_.isNil(value)) {
+                continue;
+            }
+            this.add(value);
+            parsedItems.push(value);
+        }
+        this.observer.next(new ObservableData(DataSourceMapCollectionEvent.DATA_LOADED_AND_PARSED, parsedItems));
+    }
 
-    protected abstract makeRequest(): Observable<V>;
+    protected parseError(error: ExtendedError): void {}
 
-    protected abstract isErrorResponse(response: V): boolean;
-
-    protected abstract parseResponse(response: V): void;
-
-    protected abstract parseErrorResponse(response: V): void;
+    protected getResponseItems(response: V): Array<any> {
+        return DataSourceMapCollection.getResponseItems(response);
+    }
 
     protected isAbleToLoad(): boolean {
         return true;
@@ -68,8 +91,18 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
             return;
         }
         this._length = value;
-        this.observer.next(new ObservableData(LoadableMapCollectionEvent.MAP_LENGTH_CHANGED));
+        this.observer.next(new ObservableData(DataSourceMapCollectionEvent.MAP_LENGTH_CHANGED));
     }
+
+    // --------------------------------------------------------------------------
+    //
+    //	Protected Abstract Methods
+    //
+    // --------------------------------------------------------------------------
+
+    protected abstract request(): Promise<V>;
+
+    protected abstract parseItem(item: any): U;
 
     // --------------------------------------------------------------------------
     //
@@ -77,7 +110,7 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
     //
     // --------------------------------------------------------------------------
 
-    public reload(): void {
+    public async reload(): Promise<void> {
         if (this.reloadTimer) {
             clearTimeout(this.reloadTimer);
             this.reloadTimer = null;
@@ -85,7 +118,7 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
         this._isDirty = true;
         this._isAllLoaded = false;
         this.isNeedCleanAfterLoad = true;
-        this.load();
+        return this.load();
     }
 
     public reloadDefer(delay: number = 500): void {
@@ -93,7 +126,7 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
         this.reloadTimer = setTimeout(this.reloadHandler, delay);
     }
 
-    public load(): void {
+    public async load(): Promise<void> {
         if (this.isLoading || this.isAllLoaded || !this.isAbleToLoad()) {
             return;
         }
@@ -102,23 +135,22 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
         this._isLoading = true;
         this.observer.next(new ObservableData(LoadableEvent.STARTED));
 
-        let subscription = this.makeRequest().subscribe(response => {
-            subscription.unsubscribe();
-            this._isLoading = false;
-
+        try {
+            let response = await this.request();
             if (this.isNeedCleanAfterLoad) {
                 this.isNeedCleanAfterLoad = false;
                 this.clear();
             }
-            if (!this.isErrorResponse(response)) {
-                this.parseResponse(response);
-                this.observer.next(new ObservableData(LoadableEvent.COMPLETE, response));
-            } else {
-                this.parseErrorResponse(response);
-                this.observer.next(new ObservableData(LoadableEvent.ERROR, response));
-            }
-            this.observer.next(new ObservableData(LoadableEvent.FINISHED));
-        });
+            this.parseResponse(response);
+            this.observer.next(new ObservableData(LoadableEvent.COMPLETE, response));
+        } catch (error) {
+            error = ExtendedError.create(error);
+            this.parseError(error);
+            this.observer.next(new ObservableData(LoadableEvent.ERROR, null, error));
+        }
+
+        this._isLoading = false;
+        this.observer.next(new ObservableData(LoadableEvent.FINISHED));
     }
 
     public reset(): void {
@@ -135,8 +167,13 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
 
     public destroy(): void {
         super.destroy();
+        if (this.observer) {
+            this.observer.complete();
+            this.observer = null;
+        }
+
+        this._length = null;
         this.reloadHandler = null;
-        this.observer = null;
     }
 
     // --------------------------------------------------------------------------
@@ -145,7 +182,7 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
     //
     // --------------------------------------------------------------------------
 
-    public get events(): Observable<ObservableData<LoadableEvent | DataSourseMapCollectionEvent, V>> {
+    public get events(): Observable<ObservableData<LoadableEvent | DataSourceMapCollectionEvent, V | Array<U>>> {
         return this.observer.asObservable();
     }
 
@@ -162,6 +199,7 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
     }
 }
 
-export enum DataSourseMapCollectionEvent {
-    MAP_LENGTH_CHANGED = 'MAP_LENGTH_CHANGED'
+export enum DataSourceMapCollectionEvent {
+    MAP_LENGTH_CHANGED = 'MAP_LENGTH_CHANGED',
+    DATA_LOADED_AND_PARSED = 'DATA_LOADED_AND_PARSED'
 }

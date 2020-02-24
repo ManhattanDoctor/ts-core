@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { RouterBaseService } from '@ts-core/frontend-angular';
 import { NativeWindowService } from '@ts-core/frontend/service';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class RouterService extends RouterBaseService {
     //--------------------------------------------------------------------------
     //

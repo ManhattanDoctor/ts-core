@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { LoginBaseService } from './LoginBaseService';
 import { LoginRequireResolver } from './LoginRequireResolver';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class LoginResolver extends LoginRequireResolver {
     // --------------------------------------------------------------------------
     //

@@ -116,7 +116,7 @@ const packageBuild = async (packageName: string): Promise<void> => {
 
     // Update dependencies or install it
     if (await isFileExist(`${projectDirectory}/package-lock.json`)) {
-        // await run(`npm --prefix ${projectDirectory} update`)();
+        await run(`npm --prefix ${projectDirectory} update`)();
     } else {
         await run(`npm --prefix ${projectDirectory} install`)();
     }
@@ -125,7 +125,7 @@ const packageBuild = async (packageName: string): Promise<void> => {
     await del(outputDirectory, { force: true });
 
     // Format and fix code
-    // await run(`prettier --write '${projectDirectory}/**/*.{ts,js,json}'`)();
+    await run(`prettier --write '${projectDirectory}/**/*.{ts,js,json}'`)();
 
     // Compile project
     await packageCompile(packageName);
@@ -136,9 +136,15 @@ const packageBuild = async (packageName: string): Promise<void> => {
     } else {
         await run(`npm --prefix ${projectDirectory} run build`)();
         await filesCopy([`${projectDirectory}/src/style/**/*.scss`], `${outputDirectory}/style`);
-        await filesCopy([`${outputDirectory}/**/*`], `examples/frontend/node_modules/@ts-core/${packageName}`);
     }
+    await packageCopyToExamples(packageName);
 };
+
+const packageCopyToExamples = async (packageName:string): Promise<void> => {
+    const outputDirectory = `${output}/${packageName}`;
+    await filesCopy([`${outputDirectory}/**/*`], `examples/frontend/node_modules/@ts-core/${packageName}`);
+    await filesCopy([`${outputDirectory}/**/*`], `examples/backend/node_modules/@ts-core/${packageName}`);
+}
 
 const packagePublish = async (packageName: string, type: 'patch' | 'minor' | 'major'): Promise<void> => {
     const projectDirectory = packages[packageName].projectDirectory;

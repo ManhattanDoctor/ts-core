@@ -29,6 +29,9 @@
                                 "output": "/"
                             }
                         ],
+                        "styles": [
+                            "packages/example/src/style/mat.scss"
+                        ],
                         "scripts": [
                             "node_modules/css-element-queries/src/ResizeSensor.js",
                             "node_modules/interactjs/dist/interact.min.js",

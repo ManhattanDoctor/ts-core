@@ -15,7 +15,7 @@ import { INotificationContent } from './INotificationContent';
 import { NotificationConfig, NotificationConfigOptions } from './NotificationConfig';
 import { NotificationFactory } from './NotificationFactory';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class NotificationService {
     // --------------------------------------------------------------------------
     //

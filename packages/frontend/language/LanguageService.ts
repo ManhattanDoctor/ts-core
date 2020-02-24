@@ -89,29 +89,6 @@ export class LanguageService extends Loadable<LanguageTranslatorEvent, Language>
         this.status = LoadableStatus.LOADED;
         this.observer.next(new ObservableData(LoadableEvent.COMPLETE, language));
         this.observer.next(new ObservableData(LoadableEvent.FINISHED, language));
-
-        /*
-        let files: Array<Observable<any>> = [];
-        for (let prefix of this.filePrefixes) {
-            files.push(this.http.get(this.url + language.locale + prefix).pipe(catchError(error => of(error))));
-        }
-
-        forkJoin(...files).subscribe(results => {
-            if (this.isDestroyed) {
-                return;
-            }
-            let items = results.filter(item => !(item instanceof Error) && !(item instanceof HttpErrorResponse));
-            if (!_.isEmpty(items)) {
-                let translation = {} as any;
-                items.forEach(item => CloneUtil.deepExtend(translation, item));
-                this.setLanguage(language, translation);
-            } else {
-                this.status = LoadableStatus.ERROR;
-                this.observer.next(new ObservableData(LoadableEvent.ERROR, language, new ExtendedError(`Can't to load language: ${language}`)));
-                this.observer.next(new ObservableData(LoadableEvent.FINISHED, language));
-            }
-        });
-        */
     }
 
     // --------------------------------------------------------------------------

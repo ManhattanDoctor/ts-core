@@ -1,8 +1,8 @@
-import * as _ from 'lodash';
 import { FilterableConditionType, FilterableDataType, IFilterableCondition } from '@ts-core/common/dto';
 import { DateUtil, ObjectUtil } from '@ts-core/common/util';
+import * as _ from 'lodash';
 
-export class TableDataColumn<U> {
+export class SmartTableDataColumn<U> {
     // --------------------------------------------------------------------------
     //
     // 	Static Methods
@@ -84,12 +84,13 @@ export class TableDataColumn<U> {
     //
     //--------------------------------------------------------------------------
 
-    public clone(properties: { [P in keyof TableDataColumn<U>]?: any }): TableDataColumn<U> {
+    public clone(properties: { [P in keyof SmartTableDataColumn<U>]?: any }): SmartTableDataColumn<U> {
         if (_.isNil(properties)) {
             properties = {};
         }
-        let item = new TableDataColumn(this.name);
-        for (let name of ['sort', 'class', 'filter', 'filterFunction', 'valuePrepareFunction', 'titleId', 'titleTranslation']) {
+        let item = new SmartTableDataColumn(this.name);
+        let copyProperties = ['sort', 'class', 'filter', 'filterFunction', 'valuePrepareFunction', 'titleId', 'titleTranslation'];
+        for (let name of copyProperties) {
             item[name] = ObjectUtil.hasOwnProperty(properties, name) ? properties[name] : this[name];
         }
         return item;

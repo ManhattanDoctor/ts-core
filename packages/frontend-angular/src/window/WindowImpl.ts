@@ -197,7 +197,11 @@ export class WindowImpl extends WindowBase implements IWindow {
         this.container.removeEventListener('click', this.mouseClickHandlerProxy, true);
         this.container.removeEventListener('mousedown', this.mouseDownHandlerProxy);
 
-        this.observer = null;
+        if (this.observer) {
+            this.observer.complete();
+            this.observer = null;
+        }
+
         this.properties = null;
 
         this._wrapper = null;

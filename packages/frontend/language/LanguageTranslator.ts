@@ -111,7 +111,7 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
     //
     // --------------------------------------------------------------------------
 
-    public get events(): Observable<ObservableData<LanguageTranslatorEvent, Error>> {
+    public get events(): Observable<ObservableData<LanguageTranslatorEvent, ExtendedError>> {
         return this.observer.asObservable();
     }
 }

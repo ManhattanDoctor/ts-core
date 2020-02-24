@@ -1,6 +1,6 @@
 import { Observable, Subject, Subscription } from 'rxjs';
 import { LoadableEvent } from '../Loadable';
-import { ObservableData } from '../observer';
+import { ObservableData } from '../observer/ObservableData';
 import { DestroyableMapCollection } from './DestroyableMapCollection';
 
 export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollection<U> {
@@ -135,8 +135,12 @@ export abstract class LoadableMapCollection<U, V> extends DestroyableMapCollecti
 
     public destroy(): void {
         super.destroy();
+
+        if (this.observer) {
+            this.observer.complete();
+            this.observer = null;
+        }
         this.reloadHandler = null;
-        this.observer = null;
     }
 
     // --------------------------------------------------------------------------

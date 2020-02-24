@@ -1,4 +1,4 @@
-export interface TableDataFilter {
+export interface SmartTableDataFilter {
     titleId: string;
     value: any;
     title?: string;

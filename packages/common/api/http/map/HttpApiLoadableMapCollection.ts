@@ -1,7 +1,7 @@
 import { Method } from 'axios';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
-import { LoadableMapCollection } from '../../../map';
+import { LoadableMapCollection } from '../../../map/LoadableMapCollection';
 import { ApiResponse } from '../../ApiResponse';
 import { HttpApi } from '../HttpApi';
 

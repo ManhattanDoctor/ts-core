@@ -1,0 +1,126 @@
+@import '~@ts-core/frontend-angular/style/mat/vi-mat';
+@import 'mat-variables';
+
+/*--------------------------------------------------------------------------
+//
+//  Font And Icons
+//
+//-------------------------------------------------------------------------*/
+
+@import url('//fonts.googleapis.com/css?family=Roboto:300,400,500&subset=latin,cyrillic');
+@import url("//use.fontawesome.com/80d4c23023.css");
+
+/*--------------------------------------------------------------------------
+//
+//  Bootstrap
+//
+//-------------------------------------------------------------------------*/
+
+$border-radius: 4px;
+@import '~bootstrap/scss/bootstrap.scss';
+
+/*--------------------------------------------------------------------------
+//
+//  Core
+//
+//-------------------------------------------------------------------------*/
+
+@include mat-core($typography);
+@include vi-mat-core($typography);
+@include vi-mat-core-bootstrap($typography);
+@include vi-mat-core-ng2-smart-table($typography);
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    overflow: hidden;
+}
+
+a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+body {
+    padding: 0;
+    margin: 0;
+}
+
+/*--------------------------------------------------------------------------
+//
+//  Methods
+//
+//-------------------------------------------------------------------------*/
+
+@mixin theme-apply($theme, $text-primary-default: 800, $text-accent-default: 800) {
+    @include angular-material-theme($theme);
+
+    @include vi-mat-theme($theme);
+    @include vi-mat-theme-bootstrap($theme, $text-primary-default, $text-accent-default);
+    @include vi-mat-theme-ng2-smart-table($theme, $text-primary-default, $text-accent-default);
+
+    $warn: map-get($theme, warn);
+    $accent: map-get($theme, accent);
+    $primary: map-get($theme, primary);
+    $is-dark: map-get($theme, is-dark);
+    $background: map-get($theme, background);
+    $foreground: map-get($theme, foreground);
+    $text-primary: mat-color($primary, $text-primary-default);
+
+    @if $is-dark {
+        $text-accent: mat-color($accent);
+        $text-primary: mat-color($primary);
+    }
+
+    mat-form-field {
+        &.mat-form-field-disabled {
+            .mat-form-field-underline {
+                background-image: none !important;
+            }
+        }
+    }
+
+    mat-accordion {
+        .mat-expansion-panel {
+            background: transparent;
+            border-bottom: 1px solid map-get($foreground, divider);
+            &:last-child {
+                border-bottom: none;
+            }
+        }
+        .mat-expansion-panel:not([class*=mat-elevation-z]) {
+			box-shadow: none;
+        }
+        .mat-expansion-panel-spacing {
+			margin: 0;
+        }
+        .mat-expansion-panel-body {
+            padding: 0;
+        }
+    }
+
+    mat-list-item {
+        &.active {
+            color: $text-primary !important;
+            background-color: map-get($background, hover) !important;
+        }
+    }
+
+    mat-sidenav {
+        .mat-drawer-inner-container {
+            @include scroll-no();
+            @include flex-vertical();
+        }
+    }
+    
+}

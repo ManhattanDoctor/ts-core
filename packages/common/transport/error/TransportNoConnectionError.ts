@@ -1,13 +1,14 @@
-import { ExtendedError } from '../error';
+import { ExtendedError } from '../../error';
+import { ITransportCommand } from '../ITransport';
 
-export class TransportWaitError extends ExtendedError<void> {
+export class TransportNoConnectionError<U> extends ExtendedError<ITransportCommand<U>> {
     // --------------------------------------------------------------------------
     //
     //  Constants
     //
     // --------------------------------------------------------------------------
 
-    public static ERROR_CODE = 5000;
+    public static ERROR_CODE = 5002;
 
     // --------------------------------------------------------------------------
     //
@@ -15,7 +16,7 @@ export class TransportWaitError extends ExtendedError<void> {
     //
     // --------------------------------------------------------------------------
 
-    constructor(message: string) {
-        super(message, TransportWaitError.ERROR_CODE);
+    constructor(command: ITransportCommand<U>) {
+        super(`${command.name} (${command.id}) no connection `, TransportNoConnectionError.ERROR_CODE, command);
     }
 }

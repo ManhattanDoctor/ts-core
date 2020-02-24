@@ -1,0 +1,62 @@
+@import '~@angular/material/theming';
+
+/*--------------------------------------------------------------------------
+//
+//  Typography
+//
+//-------------------------------------------------------------------------*/
+
+$typography: mat-typography-config(
+    $font-family: 'Roboto, Microsoft Yahei, Helvetica Neue, sans-serif',
+    $display-4: mat-typography-level(72px, 1.4, 300),
+    $display-3: mat-typography-level(56px, 1.4, 300),
+    $display-2: mat-typography-level(45px, 1.4, 300),
+    $display-1: mat-typography-level(34px, 1.4, 300),
+    $headline: mat-typography-level(24px, 1.4, 300),
+    $title: mat-typography-level(20px, 1.4, 300),
+    $subheading-2: mat-typography-level(16px, 1.4, 300),
+    $subheading-1: mat-typography-level(15px, 1.4, 300),
+    $body-2: mat-typography-level(14px, 1.4, 500),
+    $body-1: mat-typography-level(14px, 1.4, 300),
+    $caption: mat-typography-level(12px, 1.4, 300),
+    $button: mat-typography-level(14px, 1.4, 400),
+    $input: mat-typography-level(16px, 1.4, 400)
+);
+
+/*--------------------------------------------------------------------------
+//
+//  Light Theme
+//
+//-------------------------------------------------------------------------*/
+
+$mat-light-theme-foreground: map-merge($mat-light-theme-foreground,(text: rgba(black, 0.8)));
+$mat-light-theme-foreground: map-merge($mat-light-theme-foreground,(disabled-text: rgba(black, 0.8)));
+$mat-light-theme-foreground: map-merge($mat-light-theme-foreground,(active-text: black));
+$mat-light-theme-foreground: map-merge($mat-light-theme-foreground,(secondary-text: rgba(black, 0.64)));
+$mat-light-theme-foreground: map-merge($mat-light-theme-foreground,(success-text: map-get($mat-green, 800)));
+$mat-light-theme-foreground: map-merge($mat-light-theme-foreground,(danger-text: map-get($mat-red, 800)));
+$mat-light-theme-foreground: map-merge($mat-light-theme-foreground,(warning-text: map-get($mat-orange, 600)));
+
+$mat-light-theme-background: map-merge($mat-light-theme-background,(body: mat-color($mat-grey, 200)));
+$mat-light-theme-background: map-merge($mat-light-theme-background,(dialog: #efefef));
+$mat-light-theme-background: map-merge($mat-light-theme-background,(card: mat-color($mat-grey, 50)));
+$mat-light-theme-background: map-merge($mat-light-theme-background,(row-hover: rgba(black, 0.02)));
+
+/*--------------------------------------------------------------------------
+//
+//  Dark Theme
+//
+//-------------------------------------------------------------------------*/
+
+$mat-dark-theme-foreground: map-merge($mat-dark-theme-foreground,(text:rgba(white,0.64)));
+$mat-dark-theme-foreground: map-merge($mat-dark-theme-foreground,(disabled-text:rgba(white,0.64)));
+$mat-dark-theme-foreground: map-merge($mat-dark-theme-foreground,(active-text:white));
+$mat-dark-theme-foreground: map-merge($mat-dark-theme-foreground,(secondary-text:rgba(white,0.44)));
+$mat-dark-theme-foreground: map-merge($mat-dark-theme-foreground,(success-text:#789865));
+$mat-dark-theme-foreground: map-merge($mat-dark-theme-foreground,(danger-text:#dc5e5e));
+$mat-dark-theme-foreground: map-merge($mat-dark-theme-foreground,(warning-text:map-get($mat-orange, 400)));
+
+$mat-dark-theme-background: map-merge($mat-dark-theme-background,(body:mat-color($mat-grey,900)));
+$mat-dark-theme-background: map-merge($mat-dark-theme-background,(dialog:#303030));
+$mat-dark-theme-background: map-merge($mat-dark-theme-background,(card:#404040));
+$mat-dark-theme-background: map-merge($mat-dark-theme-background,(row-hover:rgba(white,0.02)));

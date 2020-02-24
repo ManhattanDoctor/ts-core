@@ -1,13 +1,12 @@
 import { EventEmitter, Input, Output } from '@angular/core';
 import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
+import { DataSourceMapCollection } from '@ts-core/common/map/dataSource';
 import { ObjectUtil } from '@ts-core/common/util';
 import { LanguageService } from '@ts-core/frontend/language';
 import * as _ from 'lodash';
 import { Row } from 'ng2-smart-table/lib/lib/data-set/row';
-import { TableMapCollection } from '../../smart-table/TableMapCollection';
-import { TablePagedMapCollection } from '../../smart-table/TablePagedMapCollection';
 
-export abstract class SmartTableComponent<V, U extends TableMapCollection<V, any> | TablePagedMapCollection<V, any>> extends DestroyableContainer {
+export abstract class SmartTableBaseComponent<U, V extends DataSourceMapCollection<U>> extends DestroyableContainer {
     // --------------------------------------------------------------------------
     //
     // 	Properties
@@ -26,19 +25,19 @@ export abstract class SmartTableComponent<V, U extends TableMapCollection<V, any
     public hiddenColumns: Array<string>;
 
     @Output()
-    public createClick: EventEmitter<void> = new EventEmitter<void>();
+    public createClick = new EventEmitter<void>();
 
     @Output()
-    public editClick: EventEmitter<V> = new EventEmitter<V>();
+    public editClick = new EventEmitter<U>();
 
     @Output()
-    public deleteClick: EventEmitter<V> = new EventEmitter<V>();
+    public deleteClick = new EventEmitter<U>();
 
     @Output()
-    public rowClick: EventEmitter<V> = new EventEmitter<V>();
+    public rowClick = new EventEmitter<U>();
 
     private _settings: any;
-    private _table: U;
+    private _table: V;
 
     // --------------------------------------------------------------------------
     //
@@ -64,7 +63,7 @@ export abstract class SmartTableComponent<V, U extends TableMapCollection<V, any
     // --------------------------------------------------------------------------
 
     protected commitTableProperties(): void {
-        this._settings = this.getTableSettings(this.table);
+        this._settings = this.table ? this.getTableSettings(this.table) : 0;
     }
 
     protected checkSettings(settings: any): void {
@@ -105,7 +104,7 @@ export abstract class SmartTableComponent<V, U extends TableMapCollection<V, any
         }
     }
 
-    protected abstract getTableSettings(table: U): any;
+    protected abstract getTableSettings(table: V): any;
 
     protected getColumnTranslateId(key: string): string {
         return key;
@@ -129,15 +128,15 @@ export abstract class SmartTableComponent<V, U extends TableMapCollection<V, any
         return this._settings;
     }
 
-    public get table(): U {
+    public get table(): V {
         return this._table;
     }
+
     @Input()
-    public set table(value: U) {
+    public set table(value: V) {
         if (value === this._table) {
             return;
         }
-
         this._table = value;
         if (this._table) {
             this.commitTableProperties();

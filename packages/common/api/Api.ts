@@ -119,7 +119,10 @@ export abstract class Api extends Destroyable implements IApi {
     }
 
     public destroy(): void {
-        this.observer = null;
+        if (this.observer) {
+            this.observer.complete();
+            this.observer = null;
+        }
     }
 
     // --------------------------------------------------------------------------

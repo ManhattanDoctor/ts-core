@@ -1,14 +1,13 @@
-import { ExtendedError } from '../error';
-import { ITransportCommand } from './ITransport';
+import { ExtendedError } from '../../error';
 
-export class TransportTimeoutError<U> extends ExtendedError<ITransportCommand<U>> {
+export class TransportWaitError extends ExtendedError<void> {
     // --------------------------------------------------------------------------
     //
     //  Constants
     //
     // --------------------------------------------------------------------------
 
-    public static ERROR_CODE = 5001;
+    public static ERROR_CODE = 5000;
 
     // --------------------------------------------------------------------------
     //
@@ -16,7 +15,7 @@ export class TransportTimeoutError<U> extends ExtendedError<ITransportCommand<U>
     //
     // --------------------------------------------------------------------------
 
-    constructor(command: ITransportCommand<U>) {
-        super(`${command.name} (${command.id}) is timed out`, TransportTimeoutError.ERROR_CODE, command);
+    constructor(message: string) {
+        super(message, TransportWaitError.ERROR_CODE);
     }
 }

@@ -1,10 +1,10 @@
-import { LoadableEvent } from '@ts-core/common';
-import { ApiResponse } from '@ts-core/common/api';
-import { Destroyable } from '@ts-core/common';
+import { Destroyable, LoadableEvent } from '@ts-core/common';
+import { ExtendedError } from '@ts-core/common/error';
 import { ObservableData } from '@ts-core/common/observer';
+import { TransportNoConnectionError, TransportTimeoutError } from '@ts-core/common/transport';
 import { Observable, Subject } from 'rxjs';
 
-export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
+export abstract class LoginBaseService<E = any, U = any, V = any> extends Destroyable {
     // --------------------------------------------------------------------------
     //
     // 	Properties
@@ -12,13 +12,13 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
     // --------------------------------------------------------------------------
 
     protected _sid: string;
-
     protected _resource: string;
+
     protected _loginData: V;
     protected _isLoading: boolean = false;
     protected _isLoggedIn: boolean = false;
 
-    protected observer: Subject<ObservableData<U | LoadableEvent | LoginBaseServiceEvent, ApiResponse>>;
+    protected observer: Subject<ObservableData<E | LoadableEvent | LoginBaseServiceEvent, U | V>>;
 
     // --------------------------------------------------------------------------
     //
@@ -37,7 +37,7 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
     //
     // --------------------------------------------------------------------------
 
-    protected loginByParam(param?: any): void {
+    protected async loginByParam(param?: any): Promise<void> {
         if (this.isLoggedIn || this.isLoading) {
             return;
         }
@@ -46,47 +46,45 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
         this.observer.next(new ObservableData(LoadableEvent.STARTED));
         this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_STARTED));
 
-        let subscription = this.makeLoginRequest(param).subscribe(response => {
-            subscription.unsubscribe();
-            this._isLoading = false;
-
-            if (response.isHasError) {
-                this.parseLoginErrorResponse(response);
-                this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_ERROR, response));
-
-                this.observer.next(new ObservableData(LoadableEvent.FINISHED));
-                this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_FINISHED, response));
-                return;
-            }
-
-            this.parseLoginResponse(response);
+        try {
+            this.parseLoginResponse(await this.loginRequest(param));
             if (this.isCanLoginWithSid()) {
                 this.loginBySid();
             }
-        });
+        } catch (error) {
+            error = ExtendedError.create(error);
+            this.parseLoginErrorResponse(error);
+            this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_ERROR, null, error));
+
+            this.observer.next(new ObservableData(LoadableEvent.FINISHED));
+            this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_FINISHED));
+        }
     }
 
-    protected loginBySid(isNeedHandleError: boolean = true, isHandleLoading: boolean = false): void {
+    protected async loginBySid(): Promise<void> {
         if (!this.sid) {
             this._sid = this.getSavedSid();
         }
 
         this._isLoading = true;
-        let subscription = this.makeLoginSidRequest(isNeedHandleError, isHandleLoading).subscribe(response => {
-            subscription.unsubscribe();
-            this._isLoading = false;
-            this._isLoggedIn = !response.isHasError;
 
-            if (!response.isHasError) {
-                this.parseLoginSidResponse(response);
-                this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_COMPLETE, response));
-            } else {
-                this.parseLoginSidErrorResponse(response);
-                this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_ERROR, response));
-            }
-            this.observer.next(new ObservableData(LoadableEvent.FINISHED));
-            this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_FINISHED, response));
-        });
+        try {
+            let response = await this.loginSidRequest();
+            this.parseLoginSidResponse(response);
+
+            this._isLoggedIn = true;
+            this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_COMPLETE, response));
+        } catch (error) {
+            error = ExtendedError.create(error);
+            this.parseLoginSidErrorResponse(error);
+
+            this._isLoggedIn = false;
+            this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_ERROR, null, error));
+        }
+
+        this._isLoading = false;
+        this.observer.next(new ObservableData(LoadableEvent.FINISHED));
+        this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_FINISHED));
     }
 
     protected reset(): void {
@@ -94,10 +92,10 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
         this._resource = null;
     }
 
-    protected abstract makeLoginRequest(param: any): Observable<ApiResponse>;
-    protected abstract makeLoginSidRequest(isNeedHandleError: boolean, isHandleLoading: boolean): Observable<ApiResponse>;
-    protected abstract makeLogoutRequest(): Observable<ApiResponse>;
+    protected abstract loginRequest(param: any): Promise<U>;
+    protected abstract loginSidRequest(): Promise<V>;
 
+    protected abstract logoutRequest(): Promise<void>;
     protected abstract getSavedSid(): string;
 
     // --------------------------------------------------------------------------
@@ -106,18 +104,19 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
     //
     // --------------------------------------------------------------------------
 
-    protected abstract parseLoginResponse<T>(response: ApiResponse<T>): void;
+    protected abstract parseLoginResponse(response: U): void;
 
-    protected parseLoginErrorResponse<T>(response: ApiResponse<T>): void {}
+    protected parseLoginErrorResponse(error: ExtendedError): void {}
 
-    protected parseLoginSidResponse<T>(response: ApiResponse<T>): void {
-        this._loginData = response.data as any;
+    protected parseLoginSidResponse(response: V): void {
+        this._loginData = response;
     }
 
-    protected parseLoginSidErrorResponse<T>(response: ApiResponse<T>): void {
-        if (!response.error.isSystem) {
-            this.reset();
+    protected parseLoginSidErrorResponse(error: ExtendedError): void {
+        if (error instanceof TransportTimeoutError || error instanceof TransportNoConnectionError) {
+            return;
         }
+        this.reset();
     }
 
     // --------------------------------------------------------------------------
@@ -130,7 +129,7 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
 
     public abstract registration(param: any): void;
 
-    public tryLoginBySid(isNeedHandleError: boolean = true, isHandleLoading: boolean = false): boolean {
+    public tryLoginBySid(): boolean {
         if (!this.isCanLoginWithSid()) {
             return false;
         }
@@ -138,7 +137,7 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
         if (!this.isLoggedIn && !this.isLoading) {
             this.observer.next(new ObservableData(LoadableEvent.STARTED));
             this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_STARTED));
-            this.loginBySid(isNeedHandleError, isHandleLoading);
+            this.loginBySid();
         }
         return true;
     }
@@ -147,7 +146,7 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
         this.observer.next(new ObservableData(LoadableEvent.STARTED));
         this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGOUT_STARTED));
         if (this.isLoggedIn) {
-            this.makeLogoutRequest();
+            this.logoutRequest();
         }
 
         this.reset();
@@ -161,7 +160,10 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
     }
 
     public destroy(): void {
-        this.observer = null;
+        if (this.observer) {
+            this.observer.complete();
+            this.observer = null;
+        }
         this._loginData = null;
     }
 
@@ -171,7 +173,7 @@ export abstract class LoginBaseService<U = any, V = any> extends Destroyable {
     //
     // --------------------------------------------------------------------------
 
-    public get events(): Observable<ObservableData<U | LoadableEvent | LoginBaseServiceEvent, ApiResponse>> {
+    public get events(): Observable<ObservableData<E | LoadableEvent | LoginBaseServiceEvent, any>> {
         return this.observer.asObservable();
     }
 

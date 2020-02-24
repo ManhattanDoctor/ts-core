@@ -106,10 +106,11 @@ export class Notification extends WindowBase implements INotification {
 
     public destroy(): void {
         super.destroy();
-
-        this.observer = null;
+        if (this.observer) {
+            this.observer.complete();
+            this.observer = null;
+        }
         this.properties = null;
-
         this._container = null;
     }
 

@@ -5,8 +5,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { Api } from '@ts-core/common/api';
 import { HttpApi } from '@ts-core/common/api/http';
+import { LoggerLevel } from '@ts-core/common/logger';
 import { PipeBaseService, RouterBaseService, VICommonModule, VIComponentModule } from '@ts-core/frontend-angular';
 import { SettingsBaseService } from '@ts-core/frontend/service';
+import { Ng2SmartTableModule } from 'ng2-smart-table';
+import { CoinBlockTableComponent } from './component/coin-block-table.component';
+import { CoinTableComponent } from './component/coin-table.component';
 import { RootComponent } from './component/root/root.component';
 import { ApiService } from './service/ApiService';
 import { PipeService } from './service/PipeService';
@@ -19,9 +23,11 @@ export const imports: any[] = [
     FormsModule,
     ReactiveFormsModule,
 
+    Ng2SmartTableModule,
+
     RouterModule.forRoot([]),
     VIComponentModule,
-    VICommonModule.forRoot({ themeOptions: { name: 'theme' }, languageOptions: { name: 'language' } })
+    VICommonModule.forRoot({ loggerLevel: LoggerLevel.DEBUG, themeOptions: { name: 'theme' }, languageOptions: { name: 'language' } })
 ];
 
 export const providers: any[] = [
@@ -37,7 +43,7 @@ export const providers: any[] = [
     { provide: SettingsBaseService, useClass: SettingsService }
 ];
 
-export const declarations: Array<any> = [RootComponent];
+export const declarations: Array<any> = [RootComponent, CoinTableComponent, CoinBlockTableComponent];
 
 export const entryComponents: any[] = [RootComponent];
 

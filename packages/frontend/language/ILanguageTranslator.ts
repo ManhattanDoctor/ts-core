@@ -1,4 +1,5 @@
 import { IDestroyable } from '@ts-core/common';
+import { ExtendedError } from '@ts-core/common/error';
 import { ObservableData } from '@ts-core/common/observer';
 import { Observable } from 'rxjs';
 
@@ -8,7 +9,7 @@ export interface ILanguageTranslator extends IDestroyable {
     setLocale(locale: string, rawTranslation: any): void;
     isHasTranslation(key: string): boolean;
 
-    readonly events: Observable<ObservableData<LanguageTranslatorEvent, Error>>;
+    readonly events: Observable<ObservableData<LanguageTranslatorEvent, ExtendedError>>;
 }
 
 export enum LanguageTranslatorEvent {

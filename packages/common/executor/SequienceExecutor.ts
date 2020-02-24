@@ -217,8 +217,12 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
         this.stop();
         clearTimeout(this.timeoutTimer);
 
+        if (this.observer) {
+            this.observer.complete();
+            this.observer = null;
+        }
+
         this.inputs = null;
-        this.observer = null;
         this.isDestroyed = true;
 
         this.index = NaN;

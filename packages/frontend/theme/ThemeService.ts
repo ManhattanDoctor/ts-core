@@ -68,7 +68,10 @@ export class ThemeService extends Destroyable {
 
     public destroy(): void {
         this._theme = null;
-        this.observer = null;
+        if (this.observer) {
+            this.observer.complete();
+            this.observer = null;
+        }
         if (this._themes) {
             this._themes.destroy();
             this._themes = null;

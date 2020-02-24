@@ -1,8 +1,9 @@
 import { Exclude, Expose } from 'class-transformer';
 import * as uuid from 'uuid';
 import { ITransportCommand } from './ITransport';
+import { ITransportRequest } from './ITransportRequest';
 
-export class TransportCommand<U> implements ITransportCommand<U> {
+export class TransportCommand<T extends ITransportRequest> implements ITransportCommand<T> {
     // --------------------------------------------------------------------------
     //
     //  Properties
@@ -14,7 +15,7 @@ export class TransportCommand<U> implements ITransportCommand<U> {
     @Exclude()
     protected _name: string;
     @Exclude()
-    protected _request: U;
+    protected _request: T;
 
     // --------------------------------------------------------------------------
     //
@@ -22,16 +23,10 @@ export class TransportCommand<U> implements ITransportCommand<U> {
     //
     // --------------------------------------------------------------------------
 
-    constructor(name: string, request?: U, id?: string) {
+    constructor(name: string, request?: T, id?: string) {
         this._name = name;
         this._id = id || uuid();
-
-        if (!request) {
-            request = {} as any;
-        }
-
-        this.validateRequest(request);
-        this._request = request;
+        this._request = this.validateRequest(request || ({} as any));
     }
 
     // --------------------------------------------------------------------------
@@ -40,7 +35,9 @@ export class TransportCommand<U> implements ITransportCommand<U> {
     //
     // --------------------------------------------------------------------------
 
-    protected validateRequest(value: U): void {}
+    protected validateRequest(value: T): T {
+        return value;
+    }
 
     // --------------------------------------------------------------------------
     //
@@ -59,7 +56,17 @@ export class TransportCommand<U> implements ITransportCommand<U> {
     }
 
     @Expose()
-    public get request(): U {
+    public get request(): T {
         return this._request;
+    }
+
+    @Expose()
+    public get isHandleError(): boolean {
+        return this.request ? this.request.isHandleError : false;
+    }
+
+    @Expose()
+    public get isHandleLoading(): boolean {
+        return this.request ? this.request.isHandleLoading : false;
     }
 }

@@ -1,7 +1,5 @@
 import { Renderer2 } from '@angular/core';
 import { LoadableEvent } from '@ts-core/common';
-import { Api, ApiResponse } from '@ts-core/common/api';
-import { HttpApi } from '@ts-core/common/api/http';
 import { Assets } from '@ts-core/frontend/asset';
 import { Language, LanguageService } from '@ts-core/frontend/language';
 import { SettingsBaseService } from '@ts-core/frontend/service';
@@ -11,7 +9,7 @@ import * as numeral from 'numeral';
 import { ViewUtil } from '../util/ViewUtil';
 import { ApplicationBaseComponent } from './ApplicationBaseComponent';
 
-export abstract class ApplicationComponent<S extends SettingsBaseService, A extends Api> extends ApplicationBaseComponent {
+export abstract class ApplicationComponent<T extends SettingsBaseService> extends ApplicationBaseComponent {
     // --------------------------------------------------------------------------
     //
     // 	Properties
@@ -38,21 +36,6 @@ export abstract class ApplicationComponent<S extends SettingsBaseService, A exte
 
         // Theme
         this.theme.initialize(this.settings.themes);
-
-        // Api Error
-        if (this.api instanceof HttpApi) {
-            this.api.url = this.settings.apiUrl;
-        }
-
-        this.addSubscription(
-            this.api.events.subscribe(data => {
-                switch (data.type) {
-                    case LoadableEvent.ERROR:
-                        this.apiLoadingError(data.data as ApiResponse);
-                        break;
-                }
-            })
-        );
 
         // Language
         this.language.initialize(Assets.languagesUrl, this.settings.languages);
@@ -83,7 +66,6 @@ export abstract class ApplicationComponent<S extends SettingsBaseService, A exte
     protected languageLoadingComplete(item: Language): void {
         moment.locale(item.locale);
         numeral.locale(item.locale);
-        this.api.locale = item.locale;
         this.isLanguageLoaded = true;
         this.checkReady();
     }
@@ -91,8 +73,6 @@ export abstract class ApplicationComponent<S extends SettingsBaseService, A exte
     protected viewReadyHandler(): void {
         this.initialize();
     }
-
-    protected abstract apiLoadingError(item: ApiResponse): void;
 
     protected abstract languageLoadingError(item: Language, error: Error): void;
 
@@ -111,8 +91,7 @@ export abstract class ApplicationComponent<S extends SettingsBaseService, A exte
     //
     // --------------------------------------------------------------------------
 
-    protected abstract get api(): A;
-    protected abstract get settings(): S;
+    protected abstract get settings(): T;
 
     protected abstract get theme(): ThemeService;
     protected abstract get language(): LanguageService;

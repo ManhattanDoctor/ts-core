@@ -42,7 +42,12 @@ export * from './component/language/language-selector/language-selector.componen
 export * from './component/notification/notification/notification.component';
 export * from './component/notification/NotificationBaseComponent';
 export * from './component/notification/NotificationQuestionBaseComponent';
-export * from './component/smart-table/smart-table.component';
+export * from './component/smart-table/SmartTableBaseComponent';
+export * from './component/smart-table/SmartTableDataColumn';
+export * from './component/smart-table/SmartTableDataFilter';
+export * from './component/smart-table/SmartTableDataSource';
+export * from './component/smart-table/SmartTableFilterableMapCollection';
+export * from './component/smart-table/SmartTablePaginableMapCollection';
 export * from './component/VIComponentModule';
 export * from './component/window/close-window-element/close-window-element.component';
 export * from './component/window/minimize-window-element/minimize-window-element.component';
@@ -116,9 +121,6 @@ export * from './question/QuestionManager';
 export * from './service/PipeBaseService';
 /* ======= */
 export * from './service/RouterBaseService';
-/* ======= */
-export * from './smart-table/TableDataColumn';
-export * from './smart-table/TableDataFilter';
 export * from './smart-table/TableDataSource';
 export * from './smart-table/TableMapCollection';
 export * from './smart-table/TablePagedDataSource';
@@ -145,4 +147,3 @@ export * from './window/WindowImpl';
 export * from './window/WindowModule';
 export * from './window/WindowProperties';
 export * from './window/WindowService';
-

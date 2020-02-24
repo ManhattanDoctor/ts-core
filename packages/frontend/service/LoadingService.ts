@@ -47,6 +47,9 @@ export class LoadingService extends Loadable<void, void> {
 
     public destroy(): void {
         super.destroy();
-        this.observer = null;
+        if (this.observer) {
+            this.observer.complete();
+            this.observer = null;
+        }
     }
 }

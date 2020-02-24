@@ -1,6 +1,10 @@
 import { Component, ElementRef, Renderer2 } from '@angular/core';
 import { ApiResponse } from '@ts-core/common/api';
 import { Logger } from '@ts-core/common/logger';
+import { PromiseHandler } from '@ts-core/common/promise';
+import { TransportCommandAsync } from '@ts-core/common/transport';
+import { TransportHttp, TransportHttpCommandAsync } from '@ts-core/common/transport/http';
+import { TransportLocal } from '@ts-core/common/transport/local';
 import {
     ApplicationComponent,
     LoginResolver,
@@ -19,16 +23,22 @@ import {
 import { Language, LanguageService } from '@ts-core/frontend/language';
 import { LoadingService, LoadingServiceManager, NativeWindowService } from '@ts-core/frontend/service';
 import { ThemeService } from '@ts-core/frontend/theme';
-import { ApiService } from '../../service/ApiService';
+import { CoinBlockMapCollection } from '../../service/CoinBlockMapCollection';
 import { SettingsService } from '../../service/SettingsService';
-import { TransportHttp } from '../../transport/TransportHttp';
-import { TransportHttpCommandAsync } from '../../transport/TransportHttpCommandAsync';
 
 @Component({
     selector: 'root',
-    template: ''
+    template: '<coin-block-table [table]="table"></coin-block-table>'
 })
-export class RootComponent extends ApplicationComponent<SettingsService, ApiService> {
+export class RootComponent extends ApplicationComponent<SettingsService> {
+    //--------------------------------------------------------------------------
+    //
+    // 	Properties
+    //
+    //--------------------------------------------------------------------------
+
+    public table: CoinBlockMapCollection;
+
     //--------------------------------------------------------------------------
     //
     // 	Constructor
@@ -47,8 +57,7 @@ export class RootComponent extends ApplicationComponent<SettingsService, ApiServ
         protected settings: SettingsService,
         protected language: LanguageService,
         protected theme: ThemeService,
-        protected logger: Logger,
-        protected api: ApiService
+        protected logger: Logger
     ) {
         super(element, 0);
 
@@ -56,9 +65,40 @@ export class RootComponent extends ApplicationComponent<SettingsService, ApiServ
     }
 
     private async test() {
-        let transport = new TransportHttp(this.logger);
-        transport.defaults = { baseURL: `http://localhost:3000/api` };
+        let http = new TransportHttp(this.logger);
+        http.defaults.baseURL = `http://localhost:3000/api`;
 
+        console.log(
+            await http.sendListen(
+                new TransportHttpCommandAsync(`login`, {
+                    data: {
+                        login: 'admin@n-t.io',
+                        password:
+                            'b9b12dd97c259eab7a26909a9eb5b2ba46e43604d8d412f66bf8ef3de03923117fc1d98477e503e82a3897c338f5f9cb9b91695eb2a677344b0e903fc888d67'
+                    },
+                    method: 'post'
+                })
+            )
+        );
+
+        let transport = new TransportLocal(this.logger);
+        transport.listen<any>('Hello').subscribe(async command => {
+            await PromiseHandler.delay(1000);
+            transport.complete(command, { name: 321 });
+        });
+
+        let value = await transport.sendListen(new TransportCommandAsync(`Hello`, { name: 123 }));
+        console.log(value);
+
+        
+        this.table = new CoinBlockMapCollection(http);
+        this.table.events.subscribe(data => {
+            console.log(data);
+        });
+        
+
+ 
+        /*
         try {
             console.log(
                 await transport.sendListen(
@@ -76,6 +116,7 @@ export class RootComponent extends ApplicationComponent<SettingsService, ApiServ
         } catch (error) {
             console.log(error);
         }
+        */
     }
 
     //--------------------------------------------------------------------------
@@ -102,7 +143,6 @@ export class RootComponent extends ApplicationComponent<SettingsService, ApiServ
 
     private initializeObservers(): void {
         let manager = this.addDestroyable(new LoadingServiceManager(this.loading));
-        manager.addLoadable(this.api);
         manager.addLoadable(this.language);
     }
 

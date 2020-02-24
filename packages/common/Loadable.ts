@@ -2,7 +2,7 @@ import { Observable, Subject } from 'rxjs';
 import { DestroyableContainer } from './DestroyableContainer';
 import { ObservableData } from './observer';
 
-export abstract class Loadable<U, V> extends DestroyableContainer {
+export abstract class Loadable<U = any, V = any> extends DestroyableContainer {
     // --------------------------------------------------------------------------
     //
     //  Properties
@@ -43,7 +43,10 @@ export abstract class Loadable<U, V> extends DestroyableContainer {
     // --------------------------------------------------------------------------
 
     public destroy(): void {
-        this.observer = null;
+        if (this.observer) {
+            this.observer.complete();
+            this.observer = null;
+        }
         this.isDestroyed = true;
     }
 
@@ -84,6 +87,8 @@ export abstract class Loadable<U, V> extends DestroyableContainer {
         return this.status === LoadableStatus.LOADING;
     }
 }
+
+export interface ILoadable {}
 
 export enum LoadableEvent {
     ERROR = 'ERROR',

@@ -1,8 +1,8 @@
 import { Exclude, Transform } from 'class-transformer';
 import * as _ from 'lodash';
-import { ObjectUtil } from '../util';
+import { ObjectUtil, TransformUtil } from '../util';
 
-export class ExtendedError<T = any> implements Error {
+export class ExtendedError<T = any> extends Error {
     // --------------------------------------------------------------------------
     //
     //  Constants
@@ -19,7 +19,7 @@ export class ExtendedError<T = any> implements Error {
 
     public static create(error: Error | ExtendedError, code?: number): ExtendedError {
         if (!(error instanceof Error)) {
-            throw new ExtendedError(`Is not instance of error`);
+            throw new ExtendedError(`Object isn't instance of error`);
         }
 
         if (error instanceof ExtendedError) {
@@ -48,9 +48,9 @@ export class ExtendedError<T = any> implements Error {
     public message: string;
     public isFatal: boolean;
 
-    @Transform(value => (_.isObject(value) ? JSON.stringify(value) : value), { toPlainOnly: true })
-    @Transform(value => (ObjectUtil.isJSON(value) ? JSON.parse(value) : value), { toClassOnly: true })
-    public details: any;
+    @Transform(TransformUtil.toJSON, { toClassOnly: true })
+    @Transform(TransformUtil.fromJSON, { toPlainOnly: true })
+    public details: T;
 
     // --------------------------------------------------------------------------
     //
@@ -59,6 +59,8 @@ export class ExtendedError<T = any> implements Error {
     // --------------------------------------------------------------------------
 
     constructor(message: string, code: number = null, details: T = null, isFatal: boolean = true) {
+        super(message);
+
         if (!_.isNumber(code)) {
             code = ExtendedError.DEFAULT_ERROR_CODE;
         }
@@ -74,12 +76,6 @@ export class ExtendedError<T = any> implements Error {
     //  Public Methods
     //
     // --------------------------------------------------------------------------
-
-    public deserialize(data: any): void {
-        this.code = data.code;
-        this.message = data.message;
-        this.isFatal = data.isFatal;
-    }
 
     public toString(): string {
         let value = this.message;

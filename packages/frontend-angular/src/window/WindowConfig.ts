@@ -1,6 +1,6 @@
 import { MatDialogConfig } from '@angular/material/dialog';
 import * as _ from 'lodash';
-import { destroyIfCan, IDestroyable } from '@ts-core/common';
+import { IDestroyable } from '@ts-core/common';
 import { ViewUtil } from '../util/ViewUtil';
 
 export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestroyable {
@@ -114,7 +114,7 @@ export class WindowConfig<T = any> extends MatDialogConfig<T> implements IDestro
     }
 
     public destroy(): void {
-        destroyIfCan(this.data);
+        IDestroyable.destroy(this.data);
         this.data = null;
     }
 

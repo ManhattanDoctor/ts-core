@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot } from '@angular/router';
 import { LoginResolver } from './LoginResolver';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class LoginRedirectResolver implements CanActivate {
     // --------------------------------------------------------------------------
     //

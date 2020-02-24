@@ -78,8 +78,9 @@ export class TypeormUtil {
             case FilterableConditionType.CONTAINS:
             case FilterableConditionType.CONTAINS_SENSITIVE:
                 return 'like';
+            default:
+                throw new ExtendedError(`Invalid condition type ${item}`);
         }
-        throw new ExtendedError(`Invalid condition type ${item}`);
     }
 
     private static applySort<U, T>(query: SelectQueryBuilder<U>, sort: FilterableSort<T>): SelectQueryBuilder<U> {

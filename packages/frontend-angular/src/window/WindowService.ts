@@ -15,7 +15,7 @@ import { IWindowContent } from './IWindowContent';
 import { WindowAlign, WindowConfig, WindowConfigOptions } from './WindowConfig';
 import { WindowFactory } from './WindowFactory';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class WindowService extends Destroyable {
     // --------------------------------------------------------------------------
     //
@@ -303,13 +303,17 @@ export class WindowService extends Destroyable {
     public destroy(): void {
         this.removeAll();
 
+        if (this.observer) {
+            this.observer.complete();
+            this.observer = null;
+        }
+
         if (this.properties) {
             this.properties.destroy();
             this.properties = null;
         }
 
         this.factory = null;
-        this.observer = null;
         this.properties = null;
         this.questionComponent = null;
 

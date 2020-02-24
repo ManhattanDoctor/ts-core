@@ -1,6 +1,7 @@
+import * as _ from 'lodash';
 import { ExtendedError } from '../error';
 
-export class ObservableData<U, V> {
+export class ObservableData<U, V, E = any> {
     // --------------------------------------------------------------------------
     //
     //	Properties
@@ -9,7 +10,7 @@ export class ObservableData<U, V> {
 
     protected _type: U;
     protected _data: V;
-    protected _error: ExtendedError;
+    protected _error: ExtendedError<E>;
 
     // --------------------------------------------------------------------------
     //
@@ -17,11 +18,11 @@ export class ObservableData<U, V> {
     //
     // --------------------------------------------------------------------------
 
-    constructor(type: U, data?: V, error?: Error | ExtendedError) {
+    constructor(type: U, data?: V, error?: Error | ExtendedError<E>) {
         this._type = type;
         this._data = data;
-        if (error) {
-            this._error = error instanceof ExtendedError ? error : ExtendedError.create(error);
+        if (!_.isNil(error)) {
+            this._error = ExtendedError.create(error);
         }
     }
 
@@ -39,7 +40,7 @@ export class ObservableData<U, V> {
         return this._data;
     }
 
-    public get error(): Error {
+    public get error(): ExtendedError<E> {
         return this._error;
     }
 }

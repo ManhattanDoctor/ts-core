@@ -1,8 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
 
-export interface ITransportHttpRequest<T> extends AxiosRequestConfig {
-    name: string;
-    data?: T;
+export interface ITransportHttpSettings extends AxiosRequestConfig {
     isHandleError?: boolean;
     isHandleLoading?: boolean;
 }

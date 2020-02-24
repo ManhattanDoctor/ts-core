@@ -1,9 +1,12 @@
-import { Exclude, Expose, plainToClass } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { ExtendedError } from '../error';
+import { TransformUtil } from '../util';
 import { ITransportCommandAsync } from './ITransport';
+import { ITransportRequest } from './ITransportRequest';
+import { ITransportResponse } from './ITransportResponse';
 import { TransportCommand } from './TransportCommand';
 
-export class TransportCommandAsync<U, V> extends TransportCommand<U> implements ITransportCommandAsync<U, V> {
+export class TransportCommandAsync<U extends ITransportRequest, V> extends TransportCommand<U> implements ITransportResponse<V>, ITransportCommandAsync<U, V> {
     // --------------------------------------------------------------------------
     //
     //  Properties
@@ -22,28 +25,12 @@ export class TransportCommandAsync<U, V> extends TransportCommand<U> implements 
     // --------------------------------------------------------------------------
 
     public response(value: V | ExtendedError | Error): void {
-        if (value instanceof ExtendedError) {
-            this._error = value as ExtendedError;
-            return;
-        }
-
-        if (ExtendedError.instanceOf(value)) {
-            this._error = plainToClass(ExtendedError, value);
-            return;
-        }
-
-        if (value instanceof Error) {
-            this._error = ExtendedError.create(value);
-            return;
-        }
-
         try {
-            this.validateResponse(value);
+            this._data = this.validateResponse(value);
             this._error = null;
-            this._data = value;
         } catch (error) {
-            this._error = ExtendedError.create(error);
             this._data = null;
+            this._error = error;
         }
     }
 
@@ -53,7 +40,21 @@ export class TransportCommandAsync<U, V> extends TransportCommand<U> implements 
     //
     // --------------------------------------------------------------------------
 
-    protected validateResponse(value: V): void {}
+    protected validateResponse(value: V | ExtendedError | Error): V {
+        if (ExtendedError.instanceOf(value)) {
+            throw TransformUtil.toClass(ExtendedError, value);
+        }
+
+        if (value instanceof ExtendedError) {
+            throw value;
+        }
+
+        if (value instanceof Error) {
+            throw ExtendedError.create(value);
+        }
+
+        return value;
+    }
 
     // --------------------------------------------------------------------------
     //
