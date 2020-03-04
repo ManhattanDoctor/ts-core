@@ -1,6 +1,7 @@
 import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
 import { ArrayUtil } from '@ts-core/common/util';
 import { LanguageService } from '@ts-core/frontend/language';
+import { takeUntil } from 'rxjs/operators';
 import { MenuItem } from './MenuItem';
 import { MenuItemBase } from './MenuItemBase';
 
@@ -28,13 +29,11 @@ export class MenuItems extends DestroyableContainer {
         this._enabledItems = [];
         this.filterFunction = filterFunction;
 
-        this.addSubscription(
-            language.events.subscribe(data => {
-                if (data.type === LoadableEvent.COMPLETE && isAutoTranslate) {
-                    this.translateItems(this._items);
-                }
-            })
-        );
+        language.events.pipe(takeUntil(this.destroyed)).subscribe(data => {
+            if (data.type === LoadableEvent.COMPLETE && isAutoTranslate) {
+                this.translateItems(this._items);
+            }
+        });
     }
 
     // --------------------------------------------------------------------------

@@ -2,7 +2,7 @@ import { Exclude, Transform } from 'class-transformer';
 import * as _ from 'lodash';
 import { ObjectUtil, TransformUtil } from '../util';
 
-export class ExtendedError<T = any> extends Error {
+export class ExtendedError<T = any> extends Error implements Error {
     // --------------------------------------------------------------------------
     //
     //  Constants
@@ -18,12 +18,12 @@ export class ExtendedError<T = any> extends Error {
     // --------------------------------------------------------------------------
 
     public static create(error: Error | ExtendedError, code?: number): ExtendedError {
-        if (!(error instanceof Error)) {
-            throw new ExtendedError(`Object isn't instance of error`);
-        }
-
         if (error instanceof ExtendedError) {
             return error;
+        }
+
+        if (!(error instanceof Error)) {
+            throw new ExtendedError(`Object isn't instance of error`);
         }
 
         let message = error.message;
@@ -48,6 +48,9 @@ export class ExtendedError<T = any> extends Error {
     public message: string;
     public isFatal: boolean;
 
+    @Exclude({ toPlainOnly: true })
+    public stack: string;
+
     @Transform(TransformUtil.toJSON, { toClassOnly: true })
     @Transform(TransformUtil.fromJSON, { toPlainOnly: true })
     public details: T;
@@ -60,10 +63,12 @@ export class ExtendedError<T = any> extends Error {
 
     constructor(message: string, code: number = null, details: T = null, isFatal: boolean = true) {
         super(message);
-
         if (!_.isNumber(code)) {
             code = ExtendedError.DEFAULT_ERROR_CODE;
         }
+
+        Object.defineProperty(this, 'stack', { enumerable: true, writable: true });
+        Object.defineProperty(this, 'message', { enumerable: true, writable: true });
 
         this.code = code;
         this.message = message;
@@ -86,16 +91,5 @@ export class ExtendedError<T = any> extends Error {
             value += `\n${this.details}`;
         }
         return value;
-    }
-
-    // --------------------------------------------------------------------------
-    //
-    //  Public Properties
-    //
-    // --------------------------------------------------------------------------
-
-    @Exclude()
-    public get name(): string {
-        return this.code.toString();
     }
 }

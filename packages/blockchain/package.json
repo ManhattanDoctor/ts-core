@@ -10,7 +10,7 @@
     },
     "license": "ISC",
     "dependencies": {
-        "@ts-core/common": "^1.0.17",
+        "@ts-core/common": "^1.0.50",
         "bignumber.js": "9.0.0",
         "bitcoind-rpc": "0.8.1",
         "eosjs": "20.0.0",

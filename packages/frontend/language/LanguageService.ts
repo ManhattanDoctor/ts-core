@@ -6,6 +6,7 @@ import { PromiseReflector } from '@ts-core/common/promise';
 import { CloneUtil } from '@ts-core/common/util';
 import axios from 'axios';
 import * as _ from 'lodash';
+import { takeUntil } from 'rxjs/operators';
 import { CookieStorageUtil, ICookieStorageOptions } from '../cookie';
 import { ILanguageTranslator, LanguageTranslatorEvent } from './ILanguageTranslator';
 import { Language } from './Language';
@@ -39,11 +40,9 @@ export class LanguageService extends Loadable<LanguageTranslatorEvent, Language>
         this._translator = new LanguageTranslator();
 
         this.addDestroyable(this.translator);
-        this.addSubscription(
-            this.translator.events.subscribe(data => {
-                this.observer.next(new ObservableData(data.type, this.language, data.error));
-            })
-        );
+        this.translator.events.pipe(takeUntil(this.destroyed)).subscribe(data => {
+            this.observer.next(new ObservableData(data.type, this.language, data.error));
+        });
     }
 
     // --------------------------------------------------------------------------

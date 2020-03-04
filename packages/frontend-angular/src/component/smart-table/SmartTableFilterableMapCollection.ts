@@ -27,21 +27,12 @@ export abstract class SmartTableFilterableMapCollection<U, V> extends Filterable
         return new SmartTableDataSource(this);
     }
 
-    /*
-    protected parseResponse(response: V): void {
-        this.clear();
-        super.parseResponse(response);
-        this._isAllLoaded = false;
-    }
-    */
-
     // --------------------------------------------------------------------------
     //
     // 	Public Methods
     //
     // --------------------------------------------------------------------------
 
-    /*
     public async reload(): Promise<void> {
         this.isNeedTableRefresh = true;
         super.reload();
@@ -55,7 +46,6 @@ export abstract class SmartTableFilterableMapCollection<U, V> extends Filterable
             return super.load();
         }
     }
-    */
 
     public destroy(): void {
         super.destroy();

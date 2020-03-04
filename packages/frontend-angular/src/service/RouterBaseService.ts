@@ -4,6 +4,7 @@ import { ObservableData } from '@ts-core/common/observer';
 import { NativeWindowService } from '@ts-core/frontend/service/NativeWindowService';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 export class RouterBaseService extends DestroyableContainer {
     // --------------------------------------------------------------------------
@@ -42,15 +43,13 @@ export class RouterBaseService extends DestroyableContainer {
     // --------------------------------------------------------------------------
 
     protected initializeObservers(): void {
-        this.addSubscription(
-            this.router.events.subscribe(event => {
-                if (event instanceof NavigationStart) {
-                    this.setLoading(true);
-                } else if (event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError) {
-                    this.setLoading(false);
-                }
-            })
-        );
+        this.router.events.pipe(takeUntil(this.destroyed)).subscribe(event => {
+            if (event instanceof NavigationStart) {
+                this.setLoading(true);
+            } else if (event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError) {
+                this.setLoading(false);
+            }
+        });
     }
 
     protected applyParams(extras?: NavigationExtras): void {
@@ -137,8 +136,8 @@ export class RouterBaseService extends DestroyableContainer {
         return this.map.has(name);
     }
 
-    public getParam(name: string, defaultValue?: string): string {
-        return this.hasParam(name) ? this.map.get(name) : defaultValue;
+    public getParam<T = string>(name: string, defaultValue?: T): T {
+        return this.hasParam(name) ? (this.map.get(name) as any) : defaultValue;
     }
 
     public setParam(name: string, value: any, extras?: NavigationExtras): void {

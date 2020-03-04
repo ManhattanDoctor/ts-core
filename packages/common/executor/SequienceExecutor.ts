@@ -15,7 +15,6 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
     protected timeoutTimer: any;
 
     protected inputs: Array<U>;
-    protected isDestroyed: boolean;
 
     private index: number = NaN;
 
@@ -214,18 +213,20 @@ export abstract class SequienceExecutor<U, V> extends Loadable<LoadableEvent, Se
     }
 
     public destroy(): void {
+        super.destroy();
         this.stop();
+
         clearTimeout(this.timeoutTimer);
+        this.timeoutTimer = null;
 
         if (this.observer) {
             this.observer.complete();
             this.observer = null;
         }
 
-        this.inputs = null;
-        this.isDestroyed = true;
-
         this.index = NaN;
+        this.inputs = null;
+
         this._totalIndex = NaN;
         this._totalLength = NaN;
     }

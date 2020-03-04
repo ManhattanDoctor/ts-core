@@ -17,6 +17,6 @@ export class TransportTimeoutError<U> extends ExtendedError<ITransportCommand<U>
     // --------------------------------------------------------------------------
 
     constructor(command: ITransportCommand<U>) {
-        super(`${command.name} (${command.id}) is timed out`, TransportTimeoutError.ERROR_CODE, command);
+        super(`${command.name} (${command.id}) is timed out`, TransportTimeoutError.ERROR_CODE);
     }
 }

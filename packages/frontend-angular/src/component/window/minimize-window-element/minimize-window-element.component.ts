@@ -1,4 +1,5 @@
 import { Component, ElementRef } from '@angular/core';
+import { takeUntil } from 'rxjs/operators';
 import { ViewUtil } from '../../../util/ViewUtil';
 import { WindowEvent } from '../../../window/IWindow';
 import { WindowElement } from '../WindowElement';
@@ -48,13 +49,11 @@ export class MinimizeWindowElementComponent extends WindowElement {
 
     protected commitWindowProperties(): void {
         super.commitWindowProperties();
-        this.addSubscription(
-            this.window.events.subscribe(event => {
-                if (event === WindowEvent.MINIMIZED_CHANGED) {
-                    this.commitIconProperties();
-                }
-            })
-        );
+        this.window.events.pipe(takeUntil(this.destroyed)).subscribe(event => {
+            if (event === WindowEvent.MINIMIZED_CHANGED) {
+                this.commitIconProperties();
+            }
+        });
     }
 
     protected createChildren(): void {

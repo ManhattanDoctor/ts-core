@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { IDestroyable } from '../IDestroyable';
 import { ILogger, LoggerLevel } from '../logger';
+import { ObjectUtil } from '../util';
 
 export class LoggerWrapper implements ILogger, IDestroyable {
     // --------------------------------------------------------------------------
@@ -11,7 +12,7 @@ export class LoggerWrapper implements ILogger, IDestroyable {
 
     protected _level: LoggerLevel;
     protected _logger: ILogger;
-    protected context: string;
+    protected context: any;
 
     // --------------------------------------------------------------------------
     //
@@ -19,7 +20,7 @@ export class LoggerWrapper implements ILogger, IDestroyable {
     //
     // --------------------------------------------------------------------------
 
-    constructor(logger?: ILogger, context?: string, level?: LoggerLevel) {
+    constructor(logger?: ILogger, context?: any, level?: LoggerLevel) {
         this._level = !_.isNil(level) ? level : LoggerLevel.ALL;
         this._logger = logger;
         this.context = context || this.constructor.name;
@@ -31,9 +32,29 @@ export class LoggerWrapper implements ILogger, IDestroyable {
     //
     // --------------------------------------------------------------------------
 
-    protected commitLevelProperties(): void {}
+    protected commitLevelProperties(): void {
+        if (!_.isString(this.level)) {
+            return;
+        }
+
+        let value = this.level.toString().toUpperCase();
+        if (value in LoggerLevel) {
+            this._level = LoggerLevel[value];
+        }
+    }
 
     protected commitLoggerProperties(): void {}
+
+    protected parseContext(context: any): any {
+        if (!_.isObject(context)) {
+            return context;
+        }
+        let property = 'caller';
+        if (!ObjectUtil.hasOwnProperty(context, property)) {
+            context[property] = this.constructor.name;
+        }
+        return context;
+    }
 
     protected isLevelSatisfy(level: LoggerLevel): boolean {
         if (this.level === LoggerLevel.NONE) {
@@ -45,23 +66,23 @@ export class LoggerWrapper implements ILogger, IDestroyable {
         return this.level <= level;
     }
 
-    protected logAdd(message: any, context: string): void {
+    protected logAdd(message: any, context: any): void {
         this.currentLogger.log(message, context);
     }
 
-    protected errorAdd(message: any, trace: string, context: string): void {
+    protected errorAdd(message: any, trace: string, context: any): void {
         this.currentLogger.error(message, trace, context);
     }
 
-    protected warnAdd(message: any, context: string): void {
+    protected warnAdd(message: any, context: any): void {
         this.currentLogger.warn(message, context);
     }
 
-    protected debugAdd(message: any, context: string): void {
+    protected debugAdd(message: any, context: any): void {
         this.currentLogger.debug(message, context);
     }
 
-    protected verboseAdd(message: any, context: string): void {
+    protected verboseAdd(message: any, context: any): void {
         this.currentLogger.verbose(message, context);
     }
 
@@ -71,14 +92,15 @@ export class LoggerWrapper implements ILogger, IDestroyable {
     //
     // --------------------------------------------------------------------------
 
-    public log(message: any, context: string = this.context): void {
+    public log(message: any, context: any = this.context): void {
         if (!this.isLevelSatisfy(LoggerLevel.LOG)) {
             return;
         }
+        context = this.parseContext(context);
         this.logAdd(message, context);
     }
 
-    public error(message: any, trace?: string, context: string = this.context): void {
+    public error(message: any, trace?: string, context: any = this.context): void {
         if (!this.isLevelSatisfy(LoggerLevel.ERROR)) {
             return;
         }
@@ -89,31 +111,34 @@ export class LoggerWrapper implements ILogger, IDestroyable {
         if (message instanceof Error) {
             message = message.toString();
         }
+        context = this.parseContext(context);
         this.errorAdd(message, trace, context);
     }
 
-    public warn(message: any, context: string = this.context): void {
+    public warn(message: any, context: any = this.context): void {
         if (!this.isLevelSatisfy(LoggerLevel.WARN)) {
             return;
         }
-
         if (message instanceof Error) {
             message = message.toString();
         }
+        context = this.parseContext(context);
         this.warnAdd(message, context);
     }
 
-    public debug(message: any, context: string = this.context): void {
+    public debug(message: any, context: any = this.context): void {
         if (!this.isLevelSatisfy(LoggerLevel.DEBUG)) {
             return;
         }
+        context = this.parseContext(context);
         this.debugAdd(message, context);
     }
 
-    public verbose(message: any, context: string = this.context): void {
+    public verbose(message: any, context: any = this.context): void {
         if (!this.isLevelSatisfy(LoggerLevel.VERBOSE)) {
             return;
         }
+        context = this.parseContext(context);
         this.verboseAdd(message, context);
     }
 

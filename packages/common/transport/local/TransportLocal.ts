@@ -1,56 +1,33 @@
 import * as _ from 'lodash';
-import { Observable, Subject } from 'rxjs';
 import { ExtendedError } from '../../error';
 import { LoadableEvent } from '../../Loadable';
-import { ILogger } from '../../logger';
 import { ObservableData } from '../../observer';
 import { PromiseHandler } from '../../promise';
-import { TransportTimeoutError } from '../error';
 import { ITransportCommand, ITransportCommandAsync, ITransportCommandOptions, ITransportEvent } from '../ITransport';
 import { Transport, TransportLogType } from '../Transport';
 
 export class TransportLocal extends Transport {
     // --------------------------------------------------------------------------
     //
-    //  Properties
-    //
-    // --------------------------------------------------------------------------
-
-    private listeners: Map<string, Subject<any>>;
-    private dispatchers: Map<string, Subject<any>>;
-
-    // --------------------------------------------------------------------------
-    //
-    //  Constructor
-    //
-    // --------------------------------------------------------------------------
-
-    constructor(logger: ILogger, context?: string) {
-        super(logger, context);
-        this.listeners = new Map();
-        this.dispatchers = new Map();
-    }
-
-    // --------------------------------------------------------------------------
-    //
     //  Public Methods
     //
     // --------------------------------------------------------------------------
 
-    public send<U>(command: ITransportCommand<U>): void {
-        this.requestSend(command);
+    public send<U>(command: ITransportCommand<U>, options?: ITransportCommandOptions): void {
+        this.requestSend(command, this.getCommandOptions(command, options));
     }
 
     public sendListen<U, V>(command: ITransportCommandAsync<U, V>, options?: ITransportCommandOptions): Promise<V> {
-        let promise = this.promises.get(command.id);
-        if (promise) {
-            return promise.promise;
+        if (this.promises.has(command.id)) {
+            return this.promises.get(command.id).handler.promise;
         }
 
-        promise = PromiseHandler.create();
-        this.promises.set(command.id, promise);
+        options = this.getCommandOptions(command, options);
+
+        let handler = PromiseHandler.create<V, ExtendedError>();
+        this.promises.set(command.id, { command, handler, options });
         this.requestSend(command, options);
-        return promise.promise;
+        return handler.promise;
     }
 
     public complete<U, V>(command: ITransportCommand<U>, result?: V | Error): void {
@@ -69,33 +46,13 @@ export class TransportLocal extends Transport {
         throw new ExtendedError(`Method doesn't implemented`);
     }
 
-    public listen<U>(name: string): Observable<U> {
-        if (this.listeners.has(name)) {
-            throw new ExtendedError(`Command "${name}" already listening`);
-        }
-        let item = new Subject<U>();
-        this.listeners.set(name, item);
-
-        this.logListen(name);
-        return item.asObservable();
-    }
-
     public dispatch<T>(event: ITransportEvent<T>): void {
         let item = this.dispatchers.get(name);
         if (_.isNil(item)) {
             return;
         }
-        this.logDispatch(event);
+        this.logEvent(event, TransportLogType.EVENT_SENDED);
         item.next(event);
-    }
-
-    public getDispatcher<T>(name: string): Observable<T> {
-        let item = this.dispatchers.get(name);
-        if (_.isNil(item)) {
-            let item = new Subject<T>();
-            this.dispatchers.set(name, item);
-        }
-        return item.asObservable();
     }
 
     // --------------------------------------------------------------------------
@@ -104,24 +61,18 @@ export class TransportLocal extends Transport {
     //
     // --------------------------------------------------------------------------
 
-    private async requestSend<U, V>(command: ITransportCommand<U>, options?: ITransportCommandOptions): Promise<void> {
-        this.logCommand(command, TransportLogType.REQUEST_SENDED);
-        this.observer.next(new ObservableData(LoadableEvent.STARTED, command.request));
+    protected async requestSend<U>(command: ITransportCommand<U>, options: ITransportCommandOptions): Promise<void> {
+        this.logCommand(command, this.isCommandAsync(command) ? TransportLogType.REQUEST_SENDED : TransportLogType.REQUEST_NO_REPLY);
+        this.observer.next(new ObservableData(LoadableEvent.STARTED, command));
 
+        if (this.isCommandAsync(command)) {
+            this.commandTimeout(command as ITransportCommandAsync<U, any>, options);
+        }
         // Immediately receive the same command
         this.requestReceived(command);
-        if (!this.isCommandAsync(command)) {
-            return;
-        }
-
-        this.options.set(command.id, options);
-        await PromiseHandler.delay(this.getCommandTimeout(command, options));
-        if (this.promises.has(command.id)) {
-            this.complete(command, new TransportTimeoutError(command));
-        }
     }
 
-    private requestReceived<U>(command: ITransportCommand<U>): void {
+    protected requestReceived<U>(command: ITransportCommand<U>): void {
         this.logCommand(command, TransportLogType.REQUEST_RECEIVED);
 
         let listener = this.listeners.get(command.name);
@@ -132,29 +83,15 @@ export class TransportLocal extends Transport {
         listener.next(command);
     }
 
-    private responseSend<U, V>(command: ITransportCommandAsync<U, V>): void {
+    protected responseSend<U, V>(command: ITransportCommandAsync<U, V>): void {
         this.logCommand(command, TransportLogType.RESPONSE_SENDED);
-        // Immediately receive the commad
+
+        // Immediately receive the same commad
         this.responseReceived(command);
     }
 
-    private responseReceived<U, V>(command: ITransportCommandAsync<U, V>): void {
+    protected responseReceived<U, V>(command: ITransportCommandAsync<U, V>): void {
         this.logCommand(command, TransportLogType.RESPONSE_RECEIVED);
-
-        let promise = this.promises.get(command.id);
-        if (_.isNil(promise)) {
-            return;
-        }
-
-        this.options.delete(command.id);
-        this.promises.delete(command.id);
-        if (this.isCommandHasError(command)) {
-            promise.reject(command.error);
-            this.observer.next(new ObservableData(LoadableEvent.ERROR, command, command.error));
-        } else {
-            promise.resolve(command.data);
-            this.observer.next(new ObservableData(LoadableEvent.COMPLETE, command));
-        }
-        this.observer.next(new ObservableData(LoadableEvent.FINISHED, command));
+        this.commandProcessed(command);
     }
 }

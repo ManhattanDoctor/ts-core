@@ -71,7 +71,7 @@ export class NotificationService {
 
     public open<T>(component: ComponentType<INotificationContent<T>>, config: NotificationConfig): INotificationContent<T> {
         let notification = null;
-        if (config.id) {
+        if (!_.isNil(config.id)) {
             notification = this.getById(config.id);
             if (notification) {
                 return notification.content;

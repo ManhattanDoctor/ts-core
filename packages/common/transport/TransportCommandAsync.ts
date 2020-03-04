@@ -2,11 +2,10 @@ import { Exclude, Expose } from 'class-transformer';
 import { ExtendedError } from '../error';
 import { TransformUtil } from '../util';
 import { ITransportCommandAsync } from './ITransport';
-import { ITransportRequest } from './ITransportRequest';
 import { ITransportResponse } from './ITransportResponse';
 import { TransportCommand } from './TransportCommand';
 
-export class TransportCommandAsync<U extends ITransportRequest, V> extends TransportCommand<U> implements ITransportResponse<V>, ITransportCommandAsync<U, V> {
+export class TransportCommandAsync<U, V> extends TransportCommand<U> implements ITransportResponse<V>, ITransportCommandAsync<U, V> {
     // --------------------------------------------------------------------------
     //
     //  Properties
@@ -41,18 +40,15 @@ export class TransportCommandAsync<U extends ITransportRequest, V> extends Trans
     // --------------------------------------------------------------------------
 
     protected validateResponse(value: V | ExtendedError | Error): V {
-        if (ExtendedError.instanceOf(value)) {
-            throw TransformUtil.toClass(ExtendedError, value);
-        }
-
         if (value instanceof ExtendedError) {
             throw value;
         }
-
+        if (ExtendedError.instanceOf(value)) {
+            throw TransformUtil.toClass(ExtendedError, value);
+        }
         if (value instanceof Error) {
             throw ExtendedError.create(value);
         }
-
         return value;
     }
 

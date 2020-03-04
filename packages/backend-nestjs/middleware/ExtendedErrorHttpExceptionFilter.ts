@@ -16,20 +16,16 @@ export class ExtendedErrorHttpExceptionFilter implements ExceptionFilter<Extende
         let response = context.getResponse();
 
         let defaultError = new InternalServerErrorException();
-
-        let code = exception.code;
-        let message = exception.message;
-
-        if (_.isNil(code)) {
-            code = defaultError.getStatus();
+        if (_.isNil(exception.code)) {
+            exception.code = defaultError.getStatus();
         }
-        if (_.isNil(message)) {
-            message = defaultError.message;
+        if (_.isNil(exception.message)) {
+            exception.message = defaultError.message;
         }
 
         let status = defaultError.getStatus();
-        if (code in HttpStatus) {
-            status = code;
+        if (exception.code in HttpStatus) {
+            status = exception.code;
         }
 
         response.status(status).json(TransformUtil.fromClass(exception));

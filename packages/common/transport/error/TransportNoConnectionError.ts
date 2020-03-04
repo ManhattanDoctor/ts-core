@@ -17,6 +17,6 @@ export class TransportNoConnectionError<U> extends ExtendedError<ITransportComma
     // --------------------------------------------------------------------------
 
     constructor(command: ITransportCommand<U>) {
-        super(`${command.name} (${command.id}) no connection `, TransportNoConnectionError.ERROR_CODE, command);
+        super(`${command.name} (${command.id}) no connection `, TransportNoConnectionError.ERROR_CODE);
     }
 }

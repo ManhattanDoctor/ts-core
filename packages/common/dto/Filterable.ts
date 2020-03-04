@@ -78,7 +78,13 @@ export class Filterable<U> implements IFilterable<U> {
     }
 
     private static isConditionValueInvalid(value: any): boolean {
-        return _.isEmpty(value) && !_.isBoolean(value);
+        if (_.isBoolean(value)) {
+            return false;
+        }
+        if (_.isNumber(value)) {
+            return _.isNaN(value);
+        }
+        return _.isEmpty(value) || _.isNil(value);
     }
 
     // --------------------------------------------------------------------------

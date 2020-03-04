@@ -53,6 +53,7 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Destro
             }
         } catch (error) {
             error = ExtendedError.create(error);
+
             this.parseLoginErrorResponse(error);
             this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_ERROR, null, error));
 
@@ -143,13 +144,16 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Destro
     }
 
     public logout(): void {
-        this.observer.next(new ObservableData(LoadableEvent.STARTED));
-        this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGOUT_STARTED));
-        if (this.isLoggedIn) {
-            this.logoutRequest();
+        if (!this.isLoggedIn) {
+            return;
         }
 
+        this.observer.next(new ObservableData(LoadableEvent.STARTED));
+        this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGOUT_STARTED));
+
+        this.logoutRequest();
         this.reset();
+
         this._isLoggedIn = false;
         this.observer.next(new ObservableData(LoadableEvent.FINISHED));
         this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGOUT_FINISHED));

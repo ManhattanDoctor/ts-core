@@ -1,6 +1,6 @@
 import { MatDialogRef } from '@angular/material/dialog';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { filter } from 'rxjs/internal/operators';
+import { filter, takeUntil } from 'rxjs/internal/operators';
 import { ViewUtil } from '../util/ViewUtil';
 import { IWindow, WindowEvent } from './IWindow';
 import { IWindowContent } from './IWindowContent';
@@ -69,18 +69,22 @@ export class WindowImpl extends WindowBase implements IWindow {
         this.setProperties();
         this.setPosition();
 
-        this.addSubscription(
-            this.getReference()
-                .afterOpen()
-                .subscribe(this.setOpened)
-        );
-        this.addSubscription(
-            this.getReference()
-                .afterClosed()
-                .subscribe(this.setClosed)
-        );
+        this.getReference()
+            .afterOpen()
+            .pipe(takeUntil(this.destroyed))
+            .subscribe(this.setOpened);
 
-        this.addSubscription(this.events.pipe(filter(event => event === WindowEvent.CONTENT_READY)).subscribe(this.checkSizeAndUpdatePositionIfNeed));
+        this.getReference()
+            .afterClosed()
+            .pipe(takeUntil(this.destroyed))
+            .subscribe(this.setClosed);
+
+        this.events
+            .pipe(
+                filter(event => event === WindowEvent.CONTENT_READY),
+                takeUntil(this.destroyed)
+            )
+            .subscribe(this.checkSizeAndUpdatePositionIfNeed);
     }
 
     // --------------------------------------------------------------------------

@@ -12,8 +12,6 @@ export abstract class Loadable<U = any, V = any> extends DestroyableContainer {
     protected _status: LoadableStatus;
     protected observer: Subject<ObservableData<U | LoadableEvent, V>>;
 
-    protected isDestroyed: boolean;
-
     // --------------------------------------------------------------------------
     //
     //  Constructor
@@ -43,11 +41,11 @@ export abstract class Loadable<U = any, V = any> extends DestroyableContainer {
     // --------------------------------------------------------------------------
 
     public destroy(): void {
+        super.destroy();
         if (this.observer) {
             this.observer.complete();
             this.observer = null;
         }
-        this.isDestroyed = true;
     }
 
     // --------------------------------------------------------------------------

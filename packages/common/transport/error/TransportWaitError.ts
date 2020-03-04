@@ -1,6 +1,6 @@
 import { ExtendedError } from '../../error';
 
-export class TransportWaitError extends ExtendedError<void> {
+export class TransportWaitError<T = any> extends ExtendedError<T> {
     // --------------------------------------------------------------------------
     //
     //  Constants

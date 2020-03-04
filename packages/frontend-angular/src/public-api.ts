@@ -121,10 +121,12 @@ export * from './question/QuestionManager';
 export * from './service/PipeBaseService';
 /* ======= */
 export * from './service/RouterBaseService';
+/*
 export * from './smart-table/TableDataSource';
 export * from './smart-table/TableMapCollection';
 export * from './smart-table/TablePagedDataSource';
 export * from './smart-table/TablePagedMapCollection';
+*/
 /* ======= */
 export * from './theme/ThemeAssetBackgroundDirective';
 export * from './theme/ThemeAssetDirective';

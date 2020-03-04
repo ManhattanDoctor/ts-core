@@ -1,6 +1,6 @@
 {
     "name": "@ts-core/backend",
-    "version": "1.0.7",
+    "version": "1.0.9",
     "description": "Classes and utils for backend",
     "main": "index.js",
     "scripts": {},
@@ -10,7 +10,8 @@
     },
     "license": "ISC",
     "dependencies": {
-        "@ts-core/common": "^1.0.19",
+        "@ts-core/common": "^1.0.50",
+        "@types/amqplib": "0.5.13",
         "@types/cache-manager": "2.10.0",
         "@types/node": "12.12.18",
         "amqplib": "0.5.5",

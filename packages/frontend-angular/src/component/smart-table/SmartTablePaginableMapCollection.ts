@@ -32,6 +32,20 @@ export abstract class SmartTablePaginableMapCollection<U, V> extends PaginableDa
     //
     // --------------------------------------------------------------------------
 
+    public async reload(): Promise<void> {
+        this.isNeedTableRefresh = true;
+        super.reload();
+    }
+
+    public async load(): Promise<void> {
+        if (this.isNeedTableRefresh) {
+            this.isNeedTableRefresh = false;
+            this.table.refresh();
+        } else {
+            return super.load();
+        }
+    }
+
     public destroy(): void {
         super.destroy();
         if (this._table) {

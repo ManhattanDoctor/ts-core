@@ -5,6 +5,7 @@ import { ObjectUtil } from '@ts-core/common/util';
 import { LanguageService } from '@ts-core/frontend/language';
 import * as _ from 'lodash';
 import { Row } from 'ng2-smart-table/lib/lib/data-set/row';
+import { takeUntil } from 'rxjs/operators';
 
 export abstract class SmartTableBaseComponent<U, V extends DataSourceMapCollection<U>> extends DestroyableContainer {
     // --------------------------------------------------------------------------
@@ -47,13 +48,11 @@ export abstract class SmartTableBaseComponent<U, V extends DataSourceMapCollecti
 
     protected constructor(language: LanguageService) {
         super();
-        this.addSubscription(
-            language.events.subscribe(data => {
-                if (data.type === LoadableEvent.COMPLETE) {
-                    this.commitTableProperties();
-                }
-            })
-        );
+        language.events.pipe(takeUntil(this.destroyed)).subscribe(data => {
+            if (data.type === LoadableEvent.COMPLETE) {
+                this.commitTableProperties();
+            }
+        });
     }
 
     // --------------------------------------------------------------------------

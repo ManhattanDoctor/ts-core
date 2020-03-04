@@ -1,6 +1,6 @@
 {
     "name": "@ts-core/frontend",
-    "version": "1.0.21",
+    "version": "1.0.22",
     "description": "Classes and utils for frontend",
     "main": "index.js",
     "scripts": {},
@@ -10,7 +10,7 @@
     },
     "license": "ISC",
     "dependencies": {
-        "@ts-core/common": "^1.0.19",
+        "@ts-core/common": "^1.0.48",
         "messageformat": "2.2.1"
     }
 }

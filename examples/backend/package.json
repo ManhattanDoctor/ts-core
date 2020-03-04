@@ -4,10 +4,28 @@
     "author": "Renat Gubaev",
     "license": "ISC",
     "scripts": {
-        "start": "ts-node main.ts"
+        "start": "ts-node packages/example/src/main.ts"
     },
     "dependencies": {
-        "@ts-core/blockchain": "file:./blockchain",
-        "@ts-core/backend-nestjs": "file:./backend-nestjs"
+        "@nestjs/common": "6.10.11",
+        "@nestjs/core": "6.10.11",
+        "@nestjs/jwt": "6.1.1",
+        "@nestjs/microservices": "6.10.11",
+        "@nestjs/passport": "6.1.1",
+        "@nestjs/platform-express": "6.10.11",
+        "@nestjs/platform-fastify": "6.10.11",
+        "@nestjs/platform-socket.io": "6.10.11",
+        "@nestjs/platform-ws": "6.10.11",
+        "@nestjs/swagger": "4.0.9",
+        "@nestjs/websockets": "6.10.11",
+        "@ts-core/backend": "^1.0.9",
+        "@ts-core/backend-nestjs": "^6.0.5",
+        "@ts-core/common": "^1.0.49",
+        "@types/amqplib": "0.5.13",
+        "@types/socket.io": "2.1.4",
+        "passport": "0.4.1",
+        "passport-http-bearer": "1.0.1",
+        "passport-jwt": "4.0.0",
+        "swagger-ui-express": "4.1.1"
     }
 }

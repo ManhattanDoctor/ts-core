@@ -42,8 +42,8 @@ export class TransformUtil {
     //
     // --------------------------------------------------------------------------
 
-    public static fromClass<T>(item: T, options?: ClassTransformOptions): any {
-        return !_.isNil(item) ? classToPlain(item, options) : null;
+    public static fromClass<V = any, U = any>(item: U, options?: ClassTransformOptions): V {
+        return !_.isNil(item) ? (classToPlain(item, options) as any) : null;
     }
 
     public static toClass<U, V = any>(type: ClassType<U>, item: V, options?: ClassTransformOptions): U {

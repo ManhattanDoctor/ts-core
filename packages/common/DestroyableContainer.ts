@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { IDestroyable } from './IDestroyable';
 import { ArrayUtil } from './util';
 
@@ -10,10 +10,10 @@ export class DestroyableContainer extends IDestroyable {
     //
     // --------------------------------------------------------------------------
 
-    private _destroyables: Array<IDestroyable>;
-    private _subscriptions: Array<Subscription>;
+    private _destroyed: Subject<void>;
 
-    protected isDestroyed: boolean = false;
+    private destroyables: Array<IDestroyable>;
+    private subscriptions: Array<Subscription>;
 
     // --------------------------------------------------------------------------
     //
@@ -23,6 +23,7 @@ export class DestroyableContainer extends IDestroyable {
 
     constructor() {
         super();
+        this._destroyed = new Subject();
     }
 
     // --------------------------------------------------------------------------
@@ -45,23 +46,23 @@ export class DestroyableContainer extends IDestroyable {
     // --------------------------------------------------------------------------
 
     public addSubscription(value: Subscription): Subscription {
-        if (_.isNil(this._subscriptions)) {
-            this._subscriptions = [];
+        if (_.isNil(this.subscriptions)) {
+            this.subscriptions = [];
         }
-        return this.addItem(value, this._subscriptions);
+        return this.addItem(value, this.subscriptions);
     }
     public removeSubscription(value: Subscription): void {
-        ArrayUtil.remove(this._subscriptions, value);
+        ArrayUtil.remove(this.subscriptions, value);
     }
 
     public addDestroyable<T extends IDestroyable>(value: T): T {
-        if (_.isNil(this._destroyables)) {
-            this._destroyables = [];
+        if (_.isNil(this.destroyables)) {
+            this.destroyables = [];
         }
-        return this.addItem(value as any, this._destroyables);
+        return this.addItem(value as any, this.destroyables);
     }
     public removeDestroyable<T extends IDestroyable>(value: T): void {
-        ArrayUtil.remove(this._destroyables, value);
+        ArrayUtil.remove(this.destroyables, value);
     }
 
     // --------------------------------------------------------------------------
@@ -78,14 +79,34 @@ export class DestroyableContainer extends IDestroyable {
         if (this.isDestroyed) {
             return;
         }
-        this.isDestroyed = true;
-        if (this._subscriptions) {
-            _.forEach(this._subscriptions, item => item.unsubscribe());
-            this._subscriptions = null;
+
+        if (!_.isEmpty(this.subscriptions)) {
+            _.forEach(this.subscriptions, item => item.unsubscribe());
         }
-        if (this._destroyables) {
-            _.forEach(this._destroyables, item => item.destroy());
-            this._destroyables = null;
+
+        if (!_.isEmpty(this.destroyables)) {
+            _.forEach(this.destroyables, item => item.destroy());
         }
+
+        this._destroyed.next();
+        this._destroyed.complete();
+        this._destroyed = null;
+
+        this.destroyables = null;
+        this.subscriptions = null;
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    //  Public Properties
+    //
+    // --------------------------------------------------------------------------
+
+    public get destroyed(): Observable<void> {
+        return !_.isNil(this._destroyed) ? this._destroyed.asObservable() : null;
+    }
+
+    public get isDestroyed(): boolean {
+        return !_.isNil(this._destroyed) ? this._destroyed.closed : true;
     }
 }

@@ -1,23 +1,42 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import * as _ from 'lodash';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { LoadableEvent } from '../../../common';
 import { ExtendedError } from '../../../common/error';
 import { ILogger } from '../../../common/logger';
 import { ObservableData } from '../../../common/observer';
 import { PromiseHandler } from '../../../common/promise';
 import { ITransportCommand, ITransportCommandAsync, ITransportCommandOptions, ITransportEvent, Transport, TransportLogType } from '../../../common/transport';
+import { TransformUtil } from '../../util';
+import { TransportNoConnectionError, TransportTimeoutError } from '../error';
 import { ITransportHttpRequest } from './ITransportHttpRequest';
 import { ITransportHttpSettings } from './ITransportHttpSettings';
 
 export class TransportHttp extends Transport {
     // --------------------------------------------------------------------------
     //
+    // 	Static Methods
+    //
+    // --------------------------------------------------------------------------
+
+    public static isError(data: any): boolean {
+        return data instanceof ExtendedError || ExtendedError.instanceOf(data) || TransportHttp.isAxiosError(data);
+    }
+
+    public static isAxiosError(data: any): boolean {
+        if (!_.isNil(data)) {
+            return _.isBoolean(data.isAxiosError) ? data.isAxiosError : false;
+        }
+        return false;
+    }
+
+    // --------------------------------------------------------------------------
+    //
     //  Properties
     //
     // --------------------------------------------------------------------------
 
-    public defaults: ITransportHttpSettings;
+    public settings: ITransportHttpSettings;
 
     // --------------------------------------------------------------------------
     //
@@ -27,8 +46,7 @@ export class TransportHttp extends Transport {
 
     constructor(logger: ILogger, context?: string) {
         super(logger, context);
-        this.observer = new Subject();
-        this.defaults = { method: 'get', headers: {}, isHandleLoading: true, isHandleError: true };
+        this.settings = { method: 'get', headers: {}, isHandleLoading: true, isHandleError: true };
     }
 
     // --------------------------------------------------------------------------
@@ -37,20 +55,21 @@ export class TransportHttp extends Transport {
     //
     // --------------------------------------------------------------------------
 
-    public send<U>(command: ITransportCommand<U>): void {
-        this.requestSend(command);
+    public send<U>(command: ITransportCommand<U>, options?: ITransportCommandOptions): void {
+        this.requestSend(command, this.getCommandOptions(command, options));
     }
 
     public sendListen<U, V>(command: ITransportCommandAsync<U, V>, options?: ITransportCommandOptions): Promise<V> {
-        let promise = this.promises.get(command.id);
-        if (promise) {
-            return promise.promise;
+        if (this.promises.has(command.id)) {
+            return this.promises.get(command.id).handler.promise;
         }
 
-        promise = PromiseHandler.create();
-        this.promises.set(command.id, promise);
+        options = this.getCommandOptions(command, options);
+
+        let handler = PromiseHandler.create<V, ExtendedError>();
+        this.promises.set(command.id, { command, handler, options });
         this.requestSend(command, options);
-        return promise.promise;
+        return handler.promise;
     }
 
     public complete<U, V>(command: ITransportCommand<U>, result?: V | Error): void {
@@ -80,12 +99,43 @@ export class TransportHttp extends Transport {
         throw new ExtendedError(`Method doesn't implemented`);
     }
 
-    public destroy(): void {
-        super.destroy();
-        if (this.observer) {
-            this.observer.complete();
-            this.observer = null;
+    // --------------------------------------------------------------------------
+    //
+    //  Help Methods
+    //
+    // --------------------------------------------------------------------------
+
+    protected parseError<U>(data: any, command: ITransportCommand<U>): ExtendedError {
+        if (data instanceof ExtendedError) {
+            return data;
         }
+        if (ExtendedError.instanceOf(data)) {
+            return TransformUtil.toClass(ExtendedError, data);
+        }
+        if (TransportHttp.isAxiosError(data)) {
+            return this.parseAxiosError(data, command);
+        }
+        return new ExtendedError(`Unknown error`, ExtendedError.DEFAULT_ERROR_CODE, data);
+    }
+
+    protected parseAxiosError<U, V>(data: AxiosError, command: ITransportCommand<U>): ExtendedError {
+        let message = data.message ? data.message.toLocaleLowerCase() : ``;
+        if (message.includes(`network error`)) {
+            return new TransportNoConnectionError(command);
+        }
+        if (message.includes(`timeout of`)) {
+            return new TransportTimeoutError(command);
+        }
+
+        let response = data.response;
+        if (!_.isNil(response)) {
+            if (ExtendedError.instanceOf(response.data)) {
+                return TransformUtil.toClass(ExtendedError, response.data);
+            } else {
+                return new ExtendedError(response.statusText, response.status, response.data);
+            }
+        }
+        return new ExtendedError(`Unknown axios error`, ExtendedError.DEFAULT_ERROR_CODE, data);
     }
 
     // --------------------------------------------------------------------------
@@ -94,73 +144,56 @@ export class TransportHttp extends Transport {
     //
     // --------------------------------------------------------------------------
 
-    protected async requestSend<U, V>(command: ITransportCommand<U>, options?: ITransportCommandOptions): Promise<void> {
+    protected async requestSend<U>(command: ITransportCommand<U>, options: ITransportCommandOptions): Promise<void> {
         this.prepareCommand(command, options);
 
-        let request = command.request;
+        this.logCommand(command, this.isCommandAsync(command) ? TransportLogType.REQUEST_SENDED : TransportLogType.REQUEST_NO_REPLY);
+        this.observer.next(new ObservableData(LoadableEvent.STARTED, command));
+        let result = null;
 
-        this.logCommand(command, TransportLogType.REQUEST_SENDED);
-        this.observer.next(new ObservableData(LoadableEvent.STARTED, request));
-
-        let result: V | Error = null;
         try {
-            result = (await axios.create(this.defaults).request<V>(request)).data;
+            result = (await axios.create(this.settings).request(command.request)).data;
         } catch (error) {
             result = error;
         }
-        this.complete(command, result);
+        this.complete(command, TransportHttp.isError(result) ? this.parseError(result, command) : result);
     }
 
-    private responseSend<U, V>(command: ITransportCommandAsync<U, V>): void {
+    protected responseSend<U, V>(command: ITransportCommandAsync<U, V>): void {
         // Immediately receive the commad
         this.responseReceived(command);
     }
 
-    private responseReceived<U, V>(command: ITransportCommandAsync<U, V>): void {
+    protected responseReceived<U, V>(command: ITransportCommandAsync<U, V>): void {
         this.logCommand(command, TransportLogType.RESPONSE_RECEIVED);
-
-        let promise = this.promises.get(command.id);
-        if (_.isNil(promise)) {
-            return;
-        }
-
-        this.options.delete(command.id);
-        this.promises.delete(command.id);
-        if (this.isCommandHasError(command)) {
-            promise.reject(command.error);
-            this.observer.next(new ObservableData(LoadableEvent.ERROR, command, command.error));
-        } else {
-            promise.resolve(command.data);
-            this.observer.next(new ObservableData(LoadableEvent.COMPLETE, command));
-        }
-        this.observer.next(new ObservableData(LoadableEvent.FINISHED, command));
+        this.commandProcessed(command);
     }
 
-    protected prepareCommand<U>(command: ITransportCommand<U>, options?: ITransportCommandOptions): void {
-        if (_.isNil(this.defaults)) {
-            throw new ExtendedError(`Defaults is undefined`);
+    protected prepareCommand<U>(command: ITransportCommand<U>, options: ITransportCommandOptions): void {
+        if (_.isNil(this.settings)) {
+            throw new ExtendedError(`Settings is undefined`);
         }
-        if (_.isNil(this.defaults.method)) {
+        if (_.isNil(this.settings.method)) {
             throw new ExtendedError(`Defaults method is undefined`);
         }
-        if (_.isNil(this.defaults.baseURL)) {
+        if (_.isNil(this.settings.baseURL)) {
             throw new ExtendedError(`Defaults baseUrl is undefined`);
         }
 
         let request = command.request as ITransportHttpRequest;
-        request.timeout = this.getCommandTimeout(command, options);
+        request.timeout = options.waitTimeout;
 
         if (_.isNil(request.url)) {
             request.url = command.name;
         }
         if (_.isNil(request.method)) {
-            request.method = this.defaults.method;
+            request.method = this.settings.method;
         }
-        if (_.isNil(request.isHandleError)) {
-            request.isHandleError = this.defaults.isHandleError;
+        if (_.isNil(request.isHandleError && this.settings.isHandleError)) {
+            request.isHandleError = this.settings.isHandleError;
         }
-        if (_.isNil(request.isHandleLoading)) {
-            request.isHandleLoading = this.defaults.isHandleLoading;
+        if (_.isNil(request.isHandleLoading) && this.settings.isHandleLoading) {
+            request.isHandleLoading = this.settings.isHandleLoading;
         }
 
         if (request.method.toLowerCase() === 'get') {

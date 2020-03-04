@@ -50,7 +50,6 @@ export class TransportAmqp extends Transport {
     private consumes: Map<string, string>;
     private replyQueue: Map<string, string>;
     private delayAsserts: Set<string>;
-    private promises: Map<string, PromiseHandler<any, ExtendedError>>;
 
     private eventQueueName: string;
     private subscribedEvent: Map<string, Subject<any>>;
@@ -78,7 +77,6 @@ export class TransportAmqp extends Transport {
         this.messages = new Map();
         this.listening = new Set();
         this.consumes = new Map();
-        this.promises = new Map();
         this.replyQueue = new Map();
         this.subscribedEvent = new Map();
     }
@@ -170,10 +168,10 @@ export class TransportAmqp extends Transport {
     public async sendListen<U, V>(command: ITransportCommandAsync<U, V>, options?: ITransportCommandOptions): Promise<V> {
         let item = this.promises.get(command.id);
         if (item) {
-            return item.promise;
+            return item.handler.promise;
         }
 
-        item = PromiseHandler.create<any, ExtendedError>();
+        let handler = PromiseHandler.create<any, ExtendedError>();
 
         try {
             if (!this.replyQueue.has(command.name)) {
@@ -183,14 +181,14 @@ export class TransportAmqp extends Transport {
             }
 
             let commandOptions = this.createCommandOptions(command, true, options);
-            this.promises.set(commandOptions.correlationId, item);
+            this.promises.set(commandOptions.correlationId, { handler, command, options });
 
-            this.logCommand(command, TransportLogType.REQUEST_SEND);
+            this.logCommand(command, TransportLogType.REQUEST_SENDED);
             await this.sendToQueue(command, commandOptions);
 
             if (_.isNumber(commandOptions.expiration)) {
                 PromiseHandler.delay(commandOptions.expiration).then(() => {
-                    item.reject(new TransportTimeoutError(command));
+                    handler.reject(new TransportTimeoutError(command));
                     this.promises.delete(commandOptions.correlationId);
                 });
             }
@@ -202,10 +200,10 @@ export class TransportAmqp extends Transport {
                     error = ExtendedError.create(error);
                 }
             }
-            item.reject(error);
+            handler.reject(error);
         }
 
-        return item.promise;
+        return handler.promise;
     }
 
     public complete<U, V>(command: ITransportCommand<U>, result?: V | ExtendedError): Promise<void> {
@@ -232,7 +230,7 @@ export class TransportAmqp extends Transport {
             asyncCommand.response(error);
         }
 
-        this.logCommand(asyncCommand, TransportLogType.RESPONSE_SEND);
+        this.logCommand(asyncCommand, TransportLogType.RESPONSE_SENDED);
 
         this.sendReplyToQueue(asyncCommand, msg.properties.replyTo, options);
         this.ack(msg);
@@ -267,7 +265,6 @@ export class TransportAmqp extends Transport {
     }
 
     public dispatch<T>(event: ITransportEvent<T>): void {
-        this.logDispatch(event);
         this.assertEventExchange();
         if (event instanceof TransportEvent) {
             event = event.toObject();
@@ -367,8 +364,8 @@ export class TransportAmqp extends Transport {
             return;
         }
 
-        let promise = this.promises.get(msg.properties.correlationId);
-        if (!promise) {
+        let item = this.promises.get(msg.properties.correlationId);
+        if (!item) {
             this.error('!!!!!! No PROMISE FOUND');
             // this.reject(msg, true);
             return;
@@ -379,10 +376,10 @@ export class TransportAmqp extends Transport {
 
         let newCommand = new TransportCommandAsync<any, any>(command.name, command.request, command.id);
         newCommand.response(response);
-        this.logCommand(newCommand, TransportLogType.RESPONSE_RECEIVE);
+        this.logCommand(newCommand, TransportLogType.RESPONSE_RECEIVED);
 
-        this.rejectError(msg, response, promise);
-        promise.resolve(response);
+        this.rejectError(msg, response, item.handler);
+        item.handler.resolve(response);
 
         this.promises.delete(msg.properties.correlationId);
     }
@@ -445,7 +442,7 @@ export class TransportAmqp extends Transport {
             ? new TransportCommandAsync(commandName, requestJson, messageId)
             : new TransportCommand(commandName, requestJson, messageId);
 
-        this.logCommand(command, TransportLogType.REQUEST_RECEIVE);
+        this.logCommand(command, TransportLogType.REQUEST_RECEIVED);
         observer.next(command);
     }
 
@@ -460,7 +457,6 @@ export class TransportAmqp extends Transport {
     private async sendToDelay(queue, msg: Message): Promise<boolean> {
         const delayQueue = queue + '_delay';
         await this.assertDelay(queue, delayQueue);
-
         return this.channel.publish(delayQueue, '', msg.content, msg.properties);
     }
 
@@ -558,6 +554,7 @@ export class TransportAmqp extends Transport {
 
     private async consumeEvent(): Promise<void> {
         await this.assertEventQueue();
+        console.log(this.eventQueueName);
         this.channel
             .consume(
                 this.eventQueueName,

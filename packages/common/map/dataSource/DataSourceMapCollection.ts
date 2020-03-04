@@ -57,21 +57,21 @@ export abstract class DataSourceMapCollection<U, V = any> extends DestroyableMap
 
     protected parseResponse(response: V): void {
         let items = this.getResponseItems(response);
-        if (!_.isEmpty(items)) {
-            this.parseItems(items);
-        }
+        this.parseItems(items);
         this._isAllLoaded = true;
     }
 
     protected parseItems(items: Array<any>): void {
         let parsedItems: Array<U> = new Array();
-        for (let item of items) {
-            let value: U = this.parseItem(item);
-            if (_.isNil(value)) {
-                continue;
+        if (!_.isEmpty(items)) {
+            for (let item of items) {
+                let value: U = this.parseItem(item);
+                if (_.isNil(value)) {
+                    continue;
+                }
+                this.add(value);
+                parsedItems.push(value);
             }
-            this.add(value);
-            parsedItems.push(value);
         }
         this.observer.next(new ObservableData(DataSourceMapCollectionEvent.DATA_LOADED_AND_PARSED, parsedItems));
     }

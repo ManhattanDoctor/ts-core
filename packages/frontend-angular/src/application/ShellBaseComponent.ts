@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { DestroyableContainer } from '@ts-core/common';
 import * as _ from 'lodash';
-import { filter } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { MenuItems } from '../menu/MenuItems';
 import { NavigationMenuItem } from '../menu/NavigationMenuItem';
 import { NotificationConfig } from '../notification/NotificationConfig';
@@ -43,17 +43,26 @@ export abstract class ShellBaseComponent extends DestroyableContainer {
     protected initialize(): void {
         // Notifications
         this.isHasNotificationsCheck();
-        this.addSubscription(
-            this.notifications.events
-                .pipe(filter(data => data.type === NotificationServiceEvent.CLOSED || data.type === NotificationServiceEvent.REMOVED))
-                .subscribe(this.isHasNotificationsCheck)
-        );
+
+        this.notifications.events
+            .pipe(
+                filter(data => data.type === NotificationServiceEvent.CLOSED || data.type === NotificationServiceEvent.REMOVED),
+                takeUntil(this.destroyed)
+            )
+            .subscribe(this.isHasNotificationsCheck);
+
         // Routing
-        this.addSubscription(this.router.events.pipe(filter(data => data.type === RouterBaseServiceEvent.LOADING_CHANGED)).subscribe(this.activeItemCheck));
+        this.router.events
+            .pipe()
+            .pipe(filter(data => data.type === RouterBaseServiceEvent.LOADING_CHANGED))
+            .subscribe(this.activeItemCheck);
 
         // Menu Size
         this.isNeedSideCheck();
-        this.addSubscription(this.breakpointObserver.observe(this.sideMediaQueryToCheck).subscribe(this.isNeedSideCheck));
+        this.breakpointObserver
+            .observe(this.sideMediaQueryToCheck)
+            .pipe(takeUntil(this.destroyed))
+            .subscribe(this.isNeedSideCheck);
 
         this.initializeMenu();
         this.activeItemCheck();

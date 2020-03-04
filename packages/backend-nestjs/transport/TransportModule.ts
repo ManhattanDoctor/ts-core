@@ -1,6 +1,6 @@
 import { DynamicModule, Global, Provider } from '@nestjs/common';
-import { IAmqpSettings } from '@ts-core/backend/settings';
 import { TransportAmqp } from '@ts-core/backend/transport';
+import { ITransportAmqpSettings, TransportAmqp2 } from '@ts-core/backend/transport/amqp';
 import { ExtendedError } from '@ts-core/common/error';
 import { Logger } from '@ts-core/common/logger';
 import { Transport } from '@ts-core/common/transport';
@@ -38,6 +38,17 @@ export class TransportModule {
                     }
                 });
                 break;
+            case TransportType.AMQP2:
+                providers.push({
+                    provide: Transport,
+                    inject: [Logger],
+                    useFactory: async (logger: Logger) => {
+                        let item = new TransportAmqp2(logger);
+                        await item.connect(settings.options);
+                        return item;
+                    }
+                });
+                break;
             default:
                 throw new ExtendedError(`Can't to create transport for ${type} type`);
         }
@@ -53,10 +64,11 @@ export class TransportModule {
 
 export interface ITransportModuleSettings {
     type: TransportType;
-    options?: IAmqpSettings;
+    options?: ITransportAmqpSettings;
 }
 
 export enum TransportType {
     LOCAL = 'LOCAL',
-    AMQP = 'AMQP'
+    AMQP = 'AMQP',
+    AMQP2 = 'AMQP2'
 }

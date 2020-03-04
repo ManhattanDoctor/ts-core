@@ -6,6 +6,7 @@ import { SettingsBaseService } from '@ts-core/frontend/service';
 import { ThemeService } from '@ts-core/frontend/theme';
 import * as moment from 'moment';
 import * as numeral from 'numeral';
+import { takeUntil } from 'rxjs/operators';
 import { ViewUtil } from '../util/ViewUtil';
 import { ApplicationBaseComponent } from './ApplicationBaseComponent';
 
@@ -39,18 +40,16 @@ export abstract class ApplicationComponent<T extends SettingsBaseService> extend
 
         // Language
         this.language.initialize(Assets.languagesUrl, this.settings.languages);
-        this.addSubscription(
-            this.language.events.subscribe(data => {
-                switch (data.type) {
-                    case LoadableEvent.COMPLETE:
-                        this.languageLoadingComplete(data.data);
-                        break;
-                    case LoadableEvent.ERROR:
-                        this.languageLoadingError(data.data, data.error);
-                        break;
-                }
-            })
-        );
+        this.language.events.pipe(takeUntil(this.destroyed)).subscribe(data => {
+            switch (data.type) {
+                case LoadableEvent.COMPLETE:
+                    this.languageLoadingComplete(data.data);
+                    break;
+                case LoadableEvent.ERROR:
+                    this.languageLoadingError(data.data, data.error);
+                    break;
+            }
+        });
     }
 
     protected isReady(): boolean {

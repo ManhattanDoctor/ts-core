@@ -2,6 +2,7 @@ import { ActivatedRoute } from '@angular/router';
 import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
 import { LanguageService } from '@ts-core/frontend/language';
 import * as _ from 'lodash';
+import { takeUntil } from 'rxjs/operators';
 
 export abstract class MessageBaseComponent extends DestroyableContainer {
     // --------------------------------------------------------------------------
@@ -35,13 +36,11 @@ export abstract class MessageBaseComponent extends DestroyableContainer {
         if (this.language.isLoaded) {
             this.commitLanguageProperties();
         }
-        this.addSubscription(
-            language.events.subscribe(data => {
-                if (data.type === LoadableEvent.COMPLETE) {
-                    this.commitLanguageProperties();
-                }
-            })
-        );
+        language.events.pipe(takeUntil(this.destroyed)).subscribe(data => {
+            if (data.type === LoadableEvent.COMPLETE) {
+                this.commitLanguageProperties();
+            }
+        });
     }
 
     // --------------------------------------------------------------------------

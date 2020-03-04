@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { ExtendedError } from '../error';
 
 export interface ITransport {
-    send<U>(command: ITransportCommand<U>): void;
+    send<U>(command: ITransportCommand<U>, options?: ITransportCommandOptions): void;
     sendListen<U, V>(command: ITransportCommandAsync<U, V>, options?: ITransportCommandOptions): Promise<V>;
 
     wait<U>(command: ITransportCommand<U>): void;
@@ -26,8 +26,19 @@ export interface ITransportCommandAsync<U, V> extends ITransportCommand<U> {
 }
 
 export interface ITransportCommandOptions {
+    waitDelay?: TransportCommandWaitDelay;
     waitTimeout?: number;
-    repeatCount?: number;
+    waitMaxCount?: number;
+}
+
+export enum TransportCommandWaitDelay {
+    EXTRA_SLOW = 30000,
+    SUPER_SLOW = 10000,
+    SLOW = 5000,
+    NORMAL = 3000,
+    FAST = 1000,
+    SUPER_FAST = 500,
+    EXTRA_FAST = 100
 }
 
 export interface ITransportEvent<T> {

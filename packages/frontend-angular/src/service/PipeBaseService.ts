@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
 import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
 import { LanguageService } from '@ts-core/frontend/language';
+import { takeUntil } from 'rxjs/operators';
 import { CamelCasePipe } from '../pipe/CamelCasePipe';
 import { FinancePipe } from '../pipe/FinancePipe';
 import { MomentDateAdaptivePipe } from '../pipe/MomentDateAdaptivePipe';
@@ -50,13 +51,11 @@ export class PipeBaseService extends DestroyableContainer {
         if (this.language.isLoaded) {
             this.commitLanguageProperties();
         }
-        this.addSubscription(
-            this.language.events.subscribe(data => {
-                if (data.type === LoadableEvent.COMPLETE) {
-                    this.commitLanguageProperties();
-                }
-            })
-        );
+        this.language.events.pipe(takeUntil(this.destroyed)).subscribe(data => {
+            if (data.type === LoadableEvent.COMPLETE) {
+                this.commitLanguageProperties();
+            }
+        });
     }
 
     // --------------------------------------------------------------------------

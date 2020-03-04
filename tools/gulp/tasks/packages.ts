@@ -187,5 +187,6 @@ const packagePublish = async (packageName: string, type: 'patch' | 'minor' | 'ma
     task(`registry:public`, () => registryPublicSet());
     task(`registry:private`, () => registryPrivateSet());
 
+    task(`backend`, () => run(`npm --prefix examples/backend run start`)());
     task(`frontend`, () => run(`npm --prefix examples/frontend run start`)());
 })();

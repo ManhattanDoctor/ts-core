@@ -1,6 +1,6 @@
 import { MatDialogRef } from '@angular/material/dialog';
 import { Observable, Subject } from 'rxjs';
-import { filter } from 'rxjs/internal/operators';
+import { filter, takeUntil } from 'rxjs/internal/operators';
 import { ViewUtil } from '../util/ViewUtil';
 import { WindowEvent } from '../window/IWindow';
 import { WindowBase } from '../window/WindowBase';
@@ -42,17 +42,22 @@ export class Notification extends WindowBase implements INotification {
         this.setProperties();
         this.setPosition();
 
-        this.addSubscription(
-            this.getReference()
-                .afterOpen()
-                .subscribe(this.setOpened)
-        );
-        this.addSubscription(
-            this.getReference()
-                .afterClosed()
-                .subscribe(this.setClosed)
-        );
-        this.addSubscription(this.observer.pipe(filter(event => event === WindowEvent.CONTENT_READY)).subscribe(this.checkSizeAndUpdatePositionIfNeed));
+        this.getReference()
+            .afterOpen()
+            .pipe(takeUntil(this.destroyed))
+            .subscribe(this.setOpened);
+
+        this.getReference()
+            .afterClosed()
+            .pipe(takeUntil(this.destroyed))
+            .subscribe(this.setClosed);
+
+        this.observer
+            .pipe(
+                filter(event => event === WindowEvent.CONTENT_READY),
+                takeUntil(this.destroyed)
+            )
+            .subscribe(this.checkSizeAndUpdatePositionIfNeed);
     }
 
     // --------------------------------------------------------------------------

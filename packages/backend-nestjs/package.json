@@ -1,6 +1,6 @@
 {
     "name": "@ts-core/backend-nestjs",
-    "version": "6.0.2",
+    "version": "6.0.5",
     "description": "Classes and utils for backend based on nestjs",
     "main": "index.js",
     "scripts": {},
@@ -9,7 +9,7 @@
         "email": "renat.gubaev@gmail.com"
     },
     "license": "ISC",
-    "peerDependencies": {
+    "dependencies": {
         "@nestjs/common": "6.10.11",
         "@nestjs/core": "6.10.11",
         "@nestjs/jwt": "6.1.1",
@@ -21,8 +21,8 @@
         "@nestjs/platform-ws": "6.10.11",
         "@nestjs/swagger": "4.0.9",
         "@nestjs/websockets": "6.10.11",
-        "@ts-core/common": "^1.0.26",
-        "@ts-core/backend": "^1.0.7",
+        "@ts-core/backend": "^1.0.9",
+        "@ts-core/common": "^1.0.48",
         "@types/socket.io": "2.1.4",
         "passport": "0.4.1",
         "passport-http-bearer": "1.0.1",

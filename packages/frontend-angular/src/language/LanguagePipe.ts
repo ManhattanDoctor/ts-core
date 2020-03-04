@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
 import { LanguageService } from '@ts-core/frontend/language';
+import { takeUntil } from 'rxjs/operators';
 
 @Pipe({
     name: 'viTranslate',
@@ -25,13 +26,11 @@ export class LanguagePipe extends DestroyableContainer implements PipeTransform 
 
     constructor(private language: LanguageService) {
         super();
-        this.addSubscription(
-            language.events.subscribe(data => {
-                if (data.type === LoadableEvent.COMPLETE) {
-                    this.updateValue();
-                }
-            })
-        );
+        language.events.pipe(takeUntil(this.destroyed)).subscribe(data => {
+            if (data.type === LoadableEvent.COMPLETE) {
+                this.updateValue();
+            }
+        });
     }
 
     // --------------------------------------------------------------------------

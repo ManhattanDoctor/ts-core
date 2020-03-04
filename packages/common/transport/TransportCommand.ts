@@ -1,9 +1,8 @@
 import { Exclude, Expose } from 'class-transformer';
 import * as uuid from 'uuid';
 import { ITransportCommand } from './ITransport';
-import { ITransportRequest } from './ITransportRequest';
 
-export class TransportCommand<T extends ITransportRequest> implements ITransportCommand<T> {
+export class TransportCommand<T> implements ITransportCommand<T> {
     // --------------------------------------------------------------------------
     //
     //  Properties
@@ -24,8 +23,8 @@ export class TransportCommand<T extends ITransportRequest> implements ITransport
     // --------------------------------------------------------------------------
 
     constructor(name: string, request?: T, id?: string) {
-        this._name = name;
         this._id = id || uuid();
+        this._name = name;
         this._request = this.validateRequest(request || ({} as any));
     }
 
@@ -58,15 +57,5 @@ export class TransportCommand<T extends ITransportRequest> implements ITransport
     @Expose()
     public get request(): T {
         return this._request;
-    }
-
-    @Expose()
-    public get isHandleError(): boolean {
-        return this.request ? this.request.isHandleError : false;
-    }
-
-    @Expose()
-    public get isHandleLoading(): boolean {
-        return this.request ? this.request.isHandleLoading : false;
     }
 }
