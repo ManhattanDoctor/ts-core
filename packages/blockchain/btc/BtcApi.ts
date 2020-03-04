@@ -1,9 +1,9 @@
-import * as RpcClient from 'bitcoind-rpc';
-import * as _ from 'lodash';
 import { ExtendedError } from '@ts-core/common/error';
 import { ILogger, LoggerWrapper } from '@ts-core/common/logger';
 import { PromiseHandler } from '@ts-core/common/promise';
 import { DateUtil, ObjectUtil } from '@ts-core/common/util';
+import * as RpcClient from 'bitcoind-rpc';
+import * as _ from 'lodash';
 import { BtcApiInputsTransactionLoader } from './BtcApiInputsTransactionLoader';
 import { IBtcBlock } from './IBtcBlock';
 import { IBtcInput } from './IBtcInput';
@@ -125,7 +125,7 @@ export class BtcApi extends LoggerWrapper {
         return promise.promise;
     }
 
-    private isBlock(item: any): boolean {
+    private isBlock(item: any): item is IBtcBlock {
         return ObjectUtil.instanceOf(item, ['tx', 'height']);
     }
 
@@ -145,7 +145,7 @@ export class BtcApi extends LoggerWrapper {
         item.destroy();
 
         if (this.isBlock(source)) {
-            BtcApi.parseBlock(source as IBtcBlock);
+            BtcApi.parseBlock(source);
         } else {
             BtcApi.parseTransaction(source as IBtcTransaction);
         }
@@ -155,7 +155,6 @@ export class BtcApi extends LoggerWrapper {
         let items = [];
 
         if (this.isBlock(item)) {
-            item = item as IBtcBlock;
             for (let transaction of item.transactions) {
                 items.push(...this.getInputs(transaction));
             }

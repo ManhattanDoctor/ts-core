@@ -35,8 +35,12 @@ export class TransportAmqp2 extends Transport {
     //
     // --------------------------------------------------------------------------
 
-    private static POSTFIX_WAIT = '.WAIT';
-    private static POSTFIX_REPLY = '.REPLY';
+    private static QUEUE_WAIT = 'QUEUE_WAIT';
+    private static QUEUE_REPLY = 'QUEUE_REPLY';
+
+    private static EXCHANGE_DEAD = 'EXCHANGE_DEAD';
+    private static EXCHANGE_WAIT = 'EXCHANGE_WAIT';
+    private static EXCHANGE_EVENT = 'EXCHANGE_EVENT';
 
     // --------------------------------------------------------------------------
     //
@@ -44,8 +48,8 @@ export class TransportAmqp2 extends Transport {
     //
     // --------------------------------------------------------------------------
 
-    private queues: Map<string, PromiseHandler<string, ExtendedError<void>>>;
     private requests: Map<string, IRequestStorage>;
+    private queueOrExchanger: Map<string, PromiseHandler<string, ExtendedError<void>>>;
 
     private uid: string;
     private settings: ITransportAmqpSettings;
@@ -66,8 +70,8 @@ export class TransportAmqp2 extends Transport {
     constructor(logger: ILogger, context?: string) {
         super(logger, context);
         this.uid = uuid();
-        this.queues = new Map();
         this.requests = new Map();
+        this.queueOrExchanger = new Map();
     }
 
     // --------------------------------------------------------------------------
@@ -106,8 +110,8 @@ export class TransportAmqp2 extends Transport {
     }
 
     public disconnect(error?: ExtendedError): void {
-        this.queues.forEach(item => item.reject(error));
-        this.queues.clear();
+        this.queueOrExchanger.forEach(item => item.reject(error));
+        this.queueOrExchanger.clear();
 
         this.requests.forEach(item => this.channel.nack(item.message, false, true));
         this.requests.clear();
@@ -137,7 +141,7 @@ export class TransportAmqp2 extends Transport {
         this.requestSend(command, this.getCommandOptions(command, options), false);
     }
 
-    public sendListen<U, V>(command: ITransportCommandAsync<U, V>, options?: ITransportCommandOptions): Promise<V> {
+    public async sendListen<U, V>(command: ITransportCommandAsync<U, V>, options?: ITransportCommandOptions): Promise<V> {
         if (this.promises.has(command.id)) {
             return this.promises.get(command.id).handler.promise;
         }
@@ -146,7 +150,9 @@ export class TransportAmqp2 extends Transport {
 
         let handler = PromiseHandler.create<V, ExtendedError>();
         this.promises.set(command.id, { command, handler, options });
-        this.requestSend(command, options, true);
+        await this.requestSend(command, options, true);
+        this.commandTimeout(command, options);
+
         return handler.promise;
     }
 
@@ -165,15 +171,14 @@ export class TransportAmqp2 extends Transport {
         }
 
         if (this.isPayloadExpired(request.payload)) {
-            this.logCommand(command, TransportLogType.RESPONSE_TIMEOUT);
-            this.warn(`Unable to complete "${command.name}" command: timeout is expired`);
+            this.logCommand(command, TransportLogType.RESPONSE_EXPIRED);
+            this.warn(`Unable to complete "${command.name}" command: timeout is expired (but now response sent anyway for test purposes)`);
             // this.channel.nack(request.message);
             // return;
         }
 
-        let async = command as ITransportCommandAsync<U, any>;
-        async.response(result);
-        this.responseSend(async, request.message);
+        command.response(result);
+        this.responseSend(command, request.message);
     }
 
     public listen<U>(name: string): Observable<U> {
@@ -182,7 +187,7 @@ export class TransportAmqp2 extends Transport {
         }
 
         let item = super.listen<U>(name);
-        this.createQueueIfNeed(this.listenQueueForRequest, this.createQueueName(name));
+        this.createIfNeed(this.listenQueueForRequest, this.createQueueName(name));
         return item;
     }
 
@@ -205,12 +210,16 @@ export class TransportAmqp2 extends Transport {
         this.eventSend(event);
     }
 
+    public getDispatcher<T>(name: string): Observable<T> {
+        return super.getDispatcher(name);
+    }
+
     public destroy(): void {
         super.destroy();
         this.disconnect();
 
-        this.queues = null;
         this.requests = null;
+        this.queueOrExchanger = null;
 
         if (this.observer) {
             this.observer.complete();
@@ -224,22 +233,24 @@ export class TransportAmqp2 extends Transport {
     //
     // --------------------------------------------------------------------------
 
+    /*
     protected getCommandTimeoutDelay<U>(command: ITransportCommand<U>, options: ITransportCommandOptions): number {
         return 2 * super.getCommandTimeoutDelay(command as any, options);
     }
+    */
 
     protected isWaitExpired(request: IRequestStorage): boolean {
         if (!_.isNil(request.payload.waitMaxCount) && request.waitCount > request.payload.waitMaxCount) {
             return true;
         }
-        if (request.waitCount * request.payload.waitDelay >= request.payload.waitTimeout) {
+        if (request.waitCount * request.payload.waitDelay >= request.payload.timeout) {
             return true;
         }
         return false;
     }
 
     protected isPayloadExpired(payload: TransportAmqpRequestPayload): boolean {
-        return Date.now() > payload.expiredDate.getTime();
+        return !_.isNil(payload.expiredDate) ? Date.now() > payload.expiredDate.getTime() : false;
     }
 
     // --------------------------------------------------------------------------
@@ -253,22 +264,19 @@ export class TransportAmqp2 extends Transport {
             throw new ExtendedError(`Unable to send "${command.name}" command request: transport is not connected`);
         }
 
-        this.logCommand(command, this.isCommandAsync(command) ? TransportLogType.REQUEST_SENDED : TransportLogType.REQUEST_NO_REPLY);
+        this.logCommand(command, isNeedReply ? TransportLogType.REQUEST_SENDED : TransportLogType.REQUEST_NO_REPLY);
         this.observer.next(new ObservableData(LoadableEvent.STARTED, command));
 
         let request = this.createRequestOptions(command, options, isNeedReply);
         if (isNeedReply) {
-            request.replyTo = await this.createQueueIfNeed(this.listenQueueForReply, this.createQueueReplyName(request.queue));
+            request.replyTo = await this.createIfNeed(this.listenQueueForReply, this.createQueueReplyName());
         }
 
-        await this.createQueueIfNeed(this.createQueueForCommand, request.queue);
-        let content = Buffer.from(TransformUtil.fromJSON(request.payload));
+        let queue = await this.createIfNeed(this.createQueueForCommand, this.createQueueName(command.name));
+        let content = Buffer.from(TransformUtil.fromJSON(request.payload), 'utf-8');
 
         try {
-            await this.channel.sendToQueue(request.queue, content, request);
-            if (this.isCommandAsync(command)) {
-                this.commandTimeout(command as ITransportCommandAsync<U, any>, options);
-            }
+            await this.channel.sendToQueue(queue, content, request);
         } catch (error) {
             this.error(new ExtendedError(`Unable to send "${command.name}" command request: ${error.message}`));
         }
@@ -277,10 +285,11 @@ export class TransportAmqp2 extends Transport {
     protected async responseSend<U, V>(command: ITransportCommandAsync<U, V>, message: Message): Promise<void> {
         this.logCommand(command, TransportLogType.RESPONSE_SENDED);
 
+        let queue = message.properties.replyTo;
         let response = this.createResponseOptions(command, message);
         let content = Buffer.from(TransformUtil.fromJSON(response.payload));
         try {
-            await this.channel.sendToQueue(response.queue, content, response);
+            await this.channel.sendToQueue(queue, content, response);
             this.channel.ack(message);
         } catch (error) {
             this.error(new ExtendedError(`Unable to send "${command.name}" command response: ${error.message}`));
@@ -295,9 +304,9 @@ export class TransportAmqp2 extends Transport {
         this.logEvent(event, TransportLogType.EVENT_SENDED);
         let request = this.createEventOptions(event);
         let content = Buffer.from(TransformUtil.fromJSON(request.payload));
-
+        let exchange = await this.createIfNeed(this.createExchangeForEvent, this.eventExchangeName);
         try {
-            await this.channel.publish(request.queue, '', content);
+            await this.channel.publish(exchange, '', content);
         } catch (error) {
             throw new ExtendedError(`Unable to send "${event.name}" event: ${error.message}`);
         }
@@ -311,9 +320,11 @@ export class TransportAmqp2 extends Transport {
         this.logCommand(command, TransportLogType.RESPONSE_WAIT);
 
         let queue = this.createQueueName(command.name);
-        let waitQueue = await this.createQueueIfNeed(this.createQueueForWait, this.createWaitQueueName(queue, waitDelay), waitDelay, queue);
+        let waitExchange = this.createWaitExchangeName(waitDelay);
+        await this.createIfNeed(this.createExchangeForWait, waitExchange, waitDelay);
+
         try {
-            await this.channel.publish(waitQueue, '', message.content, message.properties);
+            await this.channel.publish(waitExchange, queue, message.content, message.properties);
         } catch (error) {
             this.complete(command, new ExtendedError(`Unable to send wait "${command.name}" command: ${error.message}`));
         }
@@ -374,7 +385,7 @@ export class TransportAmqp2 extends Transport {
 
         if (this.isPayloadExpired(payload)) {
             this.logCommand(command, TransportLogType.REQUEST_EXPIRED);
-            this.warn(`Unable to receive "${command.name}" command: timeout expired`);
+            this.warn(`Unable to receive "${command.name}" command: timeout expired (but now response sent anyway for test purposes)`);
             // this.channel.nack(message, false, false);
             // return;
         }
@@ -436,9 +447,9 @@ export class TransportAmqp2 extends Transport {
     //
     // --------------------------------------------------------------------------
 
-    protected async createQueueIfNeed(queueBuilder: (name: string, ...params) => Promise<string>, name: string, ...params): Promise<string> {
-        if (!_.isNil(name) && this.queues.has(name)) {
-            return this.queues.get(name).promise;
+    protected async createIfNeed(builder: (name: string, ...params) => Promise<string>, name: string, ...params): Promise<string> {
+        if (!_.isNil(name) && this.queueOrExchanger.has(name)) {
+            return this.queueOrExchanger.get(name).promise;
         }
 
         if (_.isEmpty(params)) {
@@ -447,12 +458,12 @@ export class TransportAmqp2 extends Transport {
         params.unshift(name);
         let promise = PromiseHandler.create<string, ExtendedError<void>>();
         try {
-            name = await queueBuilder.apply(this, params);
+            name = await builder.apply(this, params);
             promise.resolve(name);
         } catch (error) {
             promise.reject(ExtendedError.create(error));
         }
-        this.queues.set(name, promise);
+        this.queueOrExchanger.set(name, promise);
         return promise.promise;
     }
 
@@ -468,60 +479,68 @@ export class TransportAmqp2 extends Transport {
         return queue;
     };
 
-    protected listenQueueEvents = async (name: string): Promise<string> => {
-        let { exchange } = await this.channel.assertExchange(name, 'fanout', { durable: false });
+    protected listenQueueForEvents = async (exchange: string): Promise<string> => {
+        await this.createExchangeForEvent(exchange);
         let { queue } = await this.channel.assertQueue('', { exclusive: true });
         await this.channel.bindQueue(queue, exchange, '');
         await this.channel.consume(queue, this.eventMessageReceived, { noAck: true });
-        return name;
+        return exchange;
     };
 
     protected createQueueForCommand = async (name: string): Promise<string> => {
         await this.channel.assertExchange(name, 'direct');
         await this.channel.assertQueue(name, { durable: true });
         await this.channel.bindQueue(name, name, name);
+        await this.channel.bindQueue(name, this.deadExchangeName, name);
         return name;
     };
 
-    private createQueueForWait = async (waitQueue: string, waitDelay: TransportCommandWaitDelay, queue: string): Promise<string> => {
-        await this.channel.assertExchange(waitQueue, 'direct');
-        await this.channel.assertQueue(waitQueue, {
-            durable: true,
-            deadLetterRoutingKey: queue,
-            deadLetterExchange: queue,
-            messageTtl: waitDelay
-        });
-        await this.channel.bindQueue(waitQueue, waitQueue, '');
-        return waitQueue;
+    private createExchangeForWait = async (exchange: string, delay: TransportCommandWaitDelay): Promise<string> => {
+        await this.channel.assertExchange(exchange, 'fanout');
+
+        let queue = this.createWaitQueueName(delay);
+        await this.channel.assertQueue(queue, { durable: true, deadLetterExchange: this.deadExchangeName, messageTtl: delay });
+        await this.channel.bindQueue(queue, exchange, '');
+        return exchange;
+    };
+
+    private createExchangeForDead = async (exchange: string): Promise<string> => {
+        await this.channel.assertExchange(exchange, 'direct');
+        return exchange;
+    };
+
+    protected createExchangeForEvent = async (exchange: string): Promise<string> => {
+        await this.channel.assertExchange(exchange, 'fanout', { durable: false });
+        return exchange;
     };
 
     protected createEventOptions<U>(event: ITransportEvent<U>): ITransportAmqpEventOptions<U> {
         let payload = new TransportAmqpEventPayload<U>(event);
-        let request = { payload, queue: this.getEventQueueName() } as ITransportAmqpEventOptions;
-        return request;
+        return { payload };
     }
 
     protected createRequestOptions<U>(command: ITransportCommand<U>, options: ITransportCommandOptions, isNeedReply: boolean): ITransportAmqpRequestOptions<U> {
         let payload = new TransportAmqpRequestPayload<U>();
+        payload.isNeedReply = isNeedReply;
         ObjectUtil.copyProperties(command, payload, ['id', 'name', 'request']);
         ObjectUtil.copyProperties(options, payload);
 
-        payload.isNeedReply = isNeedReply;
-        if (this.isCommandAsync(command)) {
-            payload.expiredDate = DateUtil.getDate(Date.now() + this.getCommandTimeoutDelay(command, options));
-        }
+        let request: ITransportAmqpRequestOptions = { payload };
+        request.contentType = 'application/json';
+        request.contentEncoding = 'utf-8';
+        request.timestamp = Date.now();
 
-        let request = { payload, expiration: payload.waitTimeout, queue: this.createQueueName(command.name) } as ITransportAmqpRequestOptions;
-        if (payload.isNeedReply) {
+        if (isNeedReply) {
             request.messageId = request.correlationId = command.id;
+            request.expiration = options.timeout;
+            payload.expiredDate = DateUtil.getDate(Date.now() + this.getCommandTimeoutDelay(command, options));
         }
         return request;
     }
 
     protected createResponseOptions<U, V>(command: ITransportCommandAsync<U, V>, message: Message): ITransportAmqpResponseOptions<U> {
         let payload = new TransportAmqpResponsePayload<U, V>(command);
-        let response = { payload: TransformUtil.fromClass(payload) } as any;
-        response.queue = response.replyTo = message.properties.replyTo;
+        let response: ITransportAmqpResponseOptions<U> = { payload: TransformUtil.fromClass(payload) };
         return response;
     }
 
@@ -529,12 +548,16 @@ export class TransportAmqp2 extends Transport {
         return this.prefixAdd(name);
     }
 
-    protected createQueueReplyName(name: string): string {
-        return `${name}${TransportAmqp2.POSTFIX_REPLY}.${this.uid}`;
+    protected createQueueReplyName(): string {
+        return this.prefixAdd(`${TransportAmqp2.QUEUE_REPLY}.${this.uid}`);
     }
 
-    protected createWaitQueueName(name: string, waitDelay: TransportCommandWaitDelay): string {
-        return `${name}${TransportAmqp2.POSTFIX_WAIT}.${waitDelay}`;
+    protected createWaitQueueName(waitDelay: TransportCommandWaitDelay): string {
+        return this.prefixAdd(`${TransportAmqp2.QUEUE_WAIT}.${waitDelay}`);
+    }
+
+    protected createWaitExchangeName(waitDelay: TransportCommandWaitDelay): string {
+        return this.prefixAdd(`${TransportAmqp2.EXCHANGE_WAIT}.${waitDelay}`);
     }
 
     protected createConnectionUrl(settings: ITransportAmqpSettings): string {
@@ -543,10 +566,6 @@ export class TransportAmqp2 extends Transport {
             value += '/' + settings.amqpVhost;
         }
         return value;
-    }
-
-    protected getEventQueueName(): string {
-        return this.prefixAdd(`${!_.isNil(this.settings.queueEvent) ? this.settings.queueEvent : 'EVENT_EXCHANGER'}`);
     }
 
     protected prefixAdd(value: string): string {
@@ -630,7 +649,7 @@ export class TransportAmqp2 extends Transport {
         try {
             this.connection = await amqp.connect(url);
             this.channel = await this.connection.createChannel();
-            await this.createQueueIfNeed(this.listenQueueEvents, this.getEventQueueName());
+            await this.createIfNeed(this.createExchangeForDead, this.deadExchangeName);
             this.connectionConnectCompleteHandler();
         } catch (error) {
             if (this.connectionAttempts > this.settings.reconnectMaxAttempts) {
@@ -645,7 +664,21 @@ export class TransportAmqp2 extends Transport {
 
     // --------------------------------------------------------------------------
     //
-    //  Public Methods
+    //  Public Properties
+    //
+    // --------------------------------------------------------------------------
+
+    protected get deadExchangeName(): string {
+        return this.prefixAdd(TransportAmqp2.EXCHANGE_DEAD);
+    }
+
+    protected get eventExchangeName(): string {
+        return this.prefixAdd(TransportAmqp2.EXCHANGE_EVENT);
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    //  Public Properties
     //
     // --------------------------------------------------------------------------
 

@@ -20,7 +20,7 @@
         "@nestjs/websockets": "6.10.11",
         "@ts-core/backend": "^1.0.9",
         "@ts-core/backend-nestjs": "^6.0.5",
-        "@ts-core/common": "^1.0.49",
+        "@ts-core/common": "^1.0.50",
         "@types/amqplib": "0.5.13",
         "@types/socket.io": "2.1.4",
         "passport": "0.4.1",

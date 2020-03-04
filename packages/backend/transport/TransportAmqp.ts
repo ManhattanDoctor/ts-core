@@ -140,7 +140,7 @@ export class TransportAmqp extends Transport {
             options = {};
         }
 
-        let expiration = _.isNumber(options.waitTimeout) ? options.waitTimeout : Transport.WAIT_TIMEOUT;
+        let expiration = _.isNumber(options.timeout) ? options.timeout : Transport.DEFAULT_TIMEOUT;
         if (!this.isCommandAsync(command)) {
             return { headers: { IS_ASYNC_COMMAND: false, IS_NEED_REPLY: false } };
         }
@@ -240,7 +240,7 @@ export class TransportAmqp extends Transport {
         let msg = this.getMessage(command);
         let waitCount = this.getRetry(msg);
         let headers = msg.properties.headers as ICommandHeaders;
-        let timeout = _.isNil(headers.GATEWAY_TRANSPORT_TIMEOUT) ? TransportAmqp.WAIT_TIMEOUT : headers.GATEWAY_TRANSPORT_TIMEOUT;
+        let timeout = _.isNil(headers.GATEWAY_TRANSPORT_TIMEOUT) ? Transport.DEFAULT_TIMEOUT : headers.GATEWAY_TRANSPORT_TIMEOUT;
 
         this.reject(msg);
         if (this.isCommandAsync(command) && waitCount * TransportAmqp.DELAY_TTL > timeout) {
@@ -502,7 +502,7 @@ export class TransportAmqp extends Transport {
         try {
             let options: Options.AssertQueue = { durable: true };
             if (queue.search(TransportAmqp.REPLY_POSTFIX) > 0) {
-                options.messageTtl = TransportAmqp.WAIT_TIMEOUT;
+                options.messageTtl = Transport.DEFAULT_TIMEOUT;
             }
             await this.channel.assertExchange(queue, 'direct');
             await this.channel.assertQueue(queue, options);
@@ -603,36 +603,6 @@ export class TransportAmqp extends Transport {
         return !msg.properties.headers || !msg.properties.headers['x-death'] ? 0 : parseInt(msg.properties.headers['x-death'][0].count.toString(), 10);
     }
 
-    /*
-    private debugSendCommand<U>(command: ITransportCommand<U>) {
-        const anyRequest = (command.request as any) as ITraceable;
-        const logMessage = {
-            message: `Send Listen ${command.name}`,
-            commandId: command.id,
-            traceId: anyRequest.traceId || null
-        };
-        this.debug(logMessage);
-    }
-
-    private debugListenCommand<U>(command: ITransportCommand<U>) {
-        const commandAnyResponse = (command.request as any) as ITraceable;
-        const logMessage = {
-            message: `Get response ${command.name}`,
-            commandId: command.id,
-            traceId: commandAnyResponse.traceId || null
-        };
-        this.debug(logMessage);
-    }
-
-    private debugReply(messageId: string, jsonResponse: any) {
-        const logMessage = {
-            message: `Get reply response ${messageId}`,
-            commandId: messageId,
-            traceId: jsonResponse.traceId || null
-        };
-        this.debug(logMessage);
-    }
-    */
     // --------------------------------------------------------------------------
     //
     //  Event Handlers

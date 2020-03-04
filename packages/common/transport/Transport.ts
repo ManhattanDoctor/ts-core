@@ -18,7 +18,7 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
     //
     // --------------------------------------------------------------------------
 
-    public static WAIT_TIMEOUT = 30 * DateUtil.MILISECONDS_SECOND;
+    public static DEFAULT_TIMEOUT = 30 * DateUtil.MILISECONDS_SECOND;
 
     // --------------------------------------------------------------------------
     //
@@ -26,12 +26,12 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
     //
     // --------------------------------------------------------------------------
 
-    public static isCommandAsync<U>(command: ITransportCommand<U>): boolean {
+    public static isCommandAsync<U, V = any>(command: ITransportCommand<U>): command is ITransportCommandAsync<U, V> {
         return ObjectUtil.instanceOf(command, ['id', 'name', 'response']);
     }
 
     public static isCommandHasError<U>(command: ITransportCommand<U>): boolean {
-        return Transport.isCommandAsync(command) && !_.isNil((command as any).error);
+        return Transport.isCommandAsync(command) && !_.isNil(command.error);
     }
 
     // --------------------------------------------------------------------------
@@ -137,14 +137,18 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
     }
 
     private commandToString<U>(command: ITransportCommand<U>, type: TransportLogType): string {
-        return `${this.getLogMark(type)} ${command.name} ${!this.isCommandHasError(command) ? '✔' : '✘'} (${command.id})`;
+        let prefix = this.getLogMark(type);
+        let suffix = '•';
+        if (this.isCommandAsync(command) && (!_.isNil(command.error) || !_.isNil(command.data))) {
+            suffix = !this.isCommandHasError(command) ? '✔' : '✘';
+        }
+        return `${prefix} ${command.name} ${suffix} (${command.id})`;
     }
 
     private verboseData<U>(data: U, type: TransportLogType): void {
         if (_.isNil(data)) {
             return;
         }
-
         this.verbose(`${this.getLogMark(type)} ${util.inspect(data, { colors: true, showHidden: false, depth: null, compact: false })}`);
     }
 
@@ -153,12 +157,11 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
             this.verboseData(command.request, type);
         }
     }
-    private logResponse<U, V>(command: ITransportCommand<U>, type: TransportLogType): void {
-        if (_.isNil(command)) {
+    private logResponse<U>(command: ITransportCommand<U>, type: TransportLogType): void {
+        if (_.isNil(command) || !this.isCommandAsync(command)) {
             return;
         }
-        let async = command as ITransportCommandAsync<U, any>;
-        this.verboseData(this.isCommandHasError(command) ? async.error : async.data, type);
+        this.verboseData(this.isCommandHasError(command) ? command.error : command.data, type);
     }
 
     private getLogMark(type: TransportLogType): string {
@@ -168,7 +171,7 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
             case TransportLogType.REQUEST_RECEIVED:
                 return '⇠';
             case TransportLogType.REQUEST_NO_REPLY:
-                return '⇤';
+                return '⇥';
             case TransportLogType.REQUEST_EXPIRED:
                 return '↚';
 
@@ -177,11 +180,11 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
             case TransportLogType.RESPONSE_SENDED:
                 return '⇢';
             case TransportLogType.RESPONSE_NO_REPLY:
-                return '⇥';
+                return '⬎';
             case TransportLogType.RESPONSE_EXPIRED:
                 return '↛';
             case TransportLogType.RESPONSE_WAIT:
-                return '⧗';
+                return '↺';
             case TransportLogType.RESPONSE_TIMEOUT:
                 return '⧖';
 
@@ -231,7 +234,7 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
     //
     // --------------------------------------------------------------------------
 
-    protected isCommandAsync<U>(command: ITransportCommand<U>): boolean {
+    protected isCommandAsync<U, V = any>(command: ITransportCommand<U>): command is ITransportCommandAsync<U, V> {
         return Transport.isCommandAsync(command);
     }
 
@@ -244,8 +247,8 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
             options = {};
         }
 
-        if (_.isNil(options.waitTimeout)) {
-            options.waitTimeout = Transport.WAIT_TIMEOUT;
+        if (_.isNil(options.timeout)) {
+            options.timeout = Transport.DEFAULT_TIMEOUT;
         }
         if (_.isNil(options.waitDelay) || !(options.waitDelay in TransportCommandWaitDelay)) {
             options.waitDelay = TransportCommandWaitDelay.NORMAL;
@@ -254,7 +257,7 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
     }
 
     protected getCommandTimeoutDelay<U>(command: ITransportCommand<U>, options: ITransportCommandOptions): number {
-        return options.waitTimeout;
+        return options.timeout;
     }
 
     // --------------------------------------------------------------------------
@@ -313,7 +316,7 @@ export enum TransportLogType {
     REQUEST_EXPIRED = 'REQUEST_EXPIRED',
 
     RESPONSE_RECEIVED = 'RESPONSE_RECEIVE',
-    RESPONSE_SENDED = 'RESPONSE_SEND',
+    RESPONSE_SENDED = 'RESPONSE_SENDED',
     RESPONSE_NO_REPLY = 'RESPONSE_NO_REPLY',
     RESPONSE_EXPIRED = 'RESPONSE_EXPIRED',
 

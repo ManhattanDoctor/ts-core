@@ -3,11 +3,11 @@ import { LoggerModule } from '@ts-core/backend-nestjs/logger';
 import { TransportAmqp } from '@ts-core/backend/transport';
 import { TransportAmqp2 } from '@ts-core/backend/transport/amqp';
 import { Logger } from '@ts-core/common/logger';
+import { PromiseHandler } from '@ts-core/common/promise';
 import { ITransport, TransportCommandAsync, TransportCommandWaitDelay } from '@ts-core/common/transport';
 import { TransportHttp } from '@ts-core/common/transport/http';
 import { TransportLocal } from '@ts-core/common/transport/local';
 import { AppSettings } from './AppSettings';
-import { PromiseHandler } from '@ts-core/common/promise';
 
 export class AppModule implements OnApplicationBootstrap {
     // --------------------------------------------------------------------------
@@ -69,19 +69,13 @@ export class AppModule implements OnApplicationBootstrap {
 
         let transport: ITransport = amqp2;
         transport.listen<any>('test').subscribe(async command => {
-            await PromiseHandler.delay(10000);
-            // transport.wait(command);
+            await PromiseHandler.delay(5000);
             transport.complete(command, { message: 'response' });
+            // transport.wait(command);
         });
 
-        try {
-            await transport.sendListen(new TransportCommandAsync(`test`, { message: 'request' }), {
-                waitDelay: TransportCommandWaitDelay.NORMAL,
-                // waitMaxCount: 2,
-                waitTimeout: 2000
-            });
-        } catch (error) {
-            // console.log(error);
+        for (let i = 0; i < 2; i++) {
+            transport.sendListen(new TransportCommandAsync(`test`, { message: 'request' }), { timeout: 3000, waitDelay: TransportCommandWaitDelay.SLOW }).catch(() => {});
         }
 
         /*

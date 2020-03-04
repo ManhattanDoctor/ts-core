@@ -7,11 +7,11 @@ export abstract class IDestroyable {
     //
     // --------------------------------------------------------------------------
 
-    public static instanceOf(data: any): boolean {
+    public static instanceOf(data: any): data is IDestroyable {
         return !_.isNil(data) ? _.isFunction(data['destroy']) : false;
     }
 
-    public static destroy(value: any): boolean {
+    public static destroy<T = any>(value: T): boolean {
         if (!IDestroyable.instanceOf(value)) {
             return false;
         }

@@ -34,8 +34,8 @@ export class ExtendedError<T = any> extends Error implements Error {
         return new ExtendedError(message, _.isNil(code) ? ExtendedError.DEFAULT_ERROR_CODE : code, error.stack);
     }
 
-    public static instanceOf(data: any): boolean {
-        return ObjectUtil.instanceOf(data, ['code', 'message', 'details', 'isFatal']);
+    public static instanceOf(data: any): data is ExtendedError {
+        return ObjectUtil.instanceOf<ExtendedError>(data, ['code', 'message', 'details', 'isFatal']);
     }
 
     // --------------------------------------------------------------------------

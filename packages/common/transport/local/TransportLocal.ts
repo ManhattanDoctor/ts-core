@@ -36,9 +36,8 @@ export class TransportLocal extends Transport {
             return;
         }
 
-        let async = command as ITransportCommandAsync<U, any>;
-        async.response(result);
-        this.responseSend(async);
+        command.response(result);
+        this.responseSend(command);
     }
 
     public wait<U>(command: ITransportCommand<U>): void {
@@ -66,7 +65,7 @@ export class TransportLocal extends Transport {
         this.observer.next(new ObservableData(LoadableEvent.STARTED, command));
 
         if (this.isCommandAsync(command)) {
-            this.commandTimeout(command as ITransportCommandAsync<U, any>, options);
+            this.commandTimeout(command, options);
         }
         // Immediately receive the same command
         this.requestReceived(command);

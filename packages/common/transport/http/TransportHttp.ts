@@ -78,9 +78,8 @@ export class TransportHttp extends Transport {
             return;
         }
 
-        let async = command as ITransportCommandAsync<U, any>;
-        async.response(result);
-        this.responseSend(async);
+        command.response(result);
+        this.responseSend(command);
     }
 
     public wait<U>(command: ITransportCommand<U>): void {
@@ -181,7 +180,7 @@ export class TransportHttp extends Transport {
         }
 
         let request = command.request as ITransportHttpRequest;
-        request.timeout = options.waitTimeout;
+        request.timeout = options.timeout;
 
         if (_.isNil(request.url)) {
             request.url = command.name;

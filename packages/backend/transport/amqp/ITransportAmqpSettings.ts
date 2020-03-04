@@ -5,6 +5,5 @@ export interface ITransportAmqpSettings extends IAmqpSettings {
     reconnectMaxAttempts?: number;
     isExitApplicationOnDisconnect?: boolean;
 
-    queueEvent?: string;
     queuePrefix?: string;
 }

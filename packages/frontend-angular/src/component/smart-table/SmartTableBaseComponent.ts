@@ -1,6 +1,6 @@
 import { EventEmitter, Input, Output } from '@angular/core';
 import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
-import { DataSourceMapCollection } from '@ts-core/common/map/dataSource';
+import { DataSourceMapCollection, FilterableDataSourceMapCollection } from '@ts-core/common/map/dataSource';
 import { ObjectUtil } from '@ts-core/common/util';
 import { LanguageService } from '@ts-core/frontend/language';
 import * as _ from 'lodash';

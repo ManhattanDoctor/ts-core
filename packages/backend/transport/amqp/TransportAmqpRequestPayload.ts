@@ -18,7 +18,7 @@ export class TransportAmqpRequestPayload<U = any> implements ITransportCommandOp
         let data = null;
         let content: string = null;
         try {
-            content = message.content.toString();
+            content = message.content.toString('utf-8');
             data = TransformUtil.toJSON(content);
         } catch (error) {
             throw new TransportInvalidDataError(`Invalid payload: ${error.message}`, content);
@@ -61,11 +61,11 @@ export class TransportAmqpRequestPayload<U = any> implements ITransportCommandOp
     @IsOptional()
     public request: U;
 
+    @IsNumber()
+    public timeout: number;
+
     @IsEnum(TransportCommandWaitDelay)
     public waitDelay: TransportCommandWaitDelay;
-
-    @IsNumber()
-    public waitTimeout: number;
 
     @IsOptional()
     @IsNumber()

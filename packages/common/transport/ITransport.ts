@@ -26,8 +26,8 @@ export interface ITransportCommandAsync<U, V> extends ITransportCommand<U> {
 }
 
 export interface ITransportCommandOptions {
+    timeout?: number;
     waitDelay?: TransportCommandWaitDelay;
-    waitTimeout?: number;
     waitMaxCount?: number;
 }
 

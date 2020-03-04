@@ -15,7 +15,7 @@ export class TransportAmqpEventPayload<U = any> {
         let data = null;
         let content: string = null;
         try {
-            content = message.content.toString();
+            content = message.content.toString('utf-8');
             data = TransformUtil.toJSON(content);
         } catch (error) {
             throw new TransportInvalidDataError(`Invalid payload: ${error.message}`, content);

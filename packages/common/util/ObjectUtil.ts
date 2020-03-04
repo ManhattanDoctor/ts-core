@@ -44,7 +44,7 @@ export class ObjectUtil {
         return item;
     }
 
-    public static instanceOf(data: any, properties: Array<string>): boolean {
+    public static instanceOf<T = any>(data: any, properties: Array<string>): data is T {
         if (_.isNil(data) || _.isBoolean(data) || data !== Object(data)) {
             return false;
         }
