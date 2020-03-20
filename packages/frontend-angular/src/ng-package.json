@@ -18,6 +18,7 @@
             "@ts-core/common/logger": "@ts-core/common/logger",
             "@ts-core/common/promise": "@ts-core/common/promise",
             "@ts-core/common/observer": "@ts-core/common/observer",
+            "@ts-core/common/transport": "@ts-core/common/transport",
             "@ts-core/common/map/dataSource": "@ts-core/common/map/dataSource",
             "@ts-core/common/api/http": "@ts-core/common/api/http",
             "@ts-core/common/api/http/map": "@ts-core/common/api/http/map",

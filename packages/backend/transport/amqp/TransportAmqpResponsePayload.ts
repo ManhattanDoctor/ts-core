@@ -1,8 +1,9 @@
 import { ExtendedError } from '@ts-core/common/error';
 import { ITransportCommandAsync } from '@ts-core/common/transport';
 import { TransportInvalidDataError } from '@ts-core/common/transport/error/TransportInvalidDataError';
-import { TransformUtil } from '@ts-core/common/util';
+import { TransformUtil, ValidateUtil } from '@ts-core/common/util';
 import { Message } from 'amqplib';
+import { IsDefined, IsString } from 'class-validator';
 import * as _ from 'lodash';
 
 export class TransportAmqpResponsePayload<U = any, V = any> {
@@ -21,7 +22,10 @@ export class TransportAmqpResponsePayload<U = any, V = any> {
         } catch (error) {
             throw new TransportInvalidDataError(`Invalid payload: ${error.message}`, content);
         }
-        return TransformUtil.toClass(TransportAmqpResponsePayload, data) as any;
+
+        let payload = TransformUtil.toClass<TransportAmqpResponsePayload<U, V>>(TransportAmqpResponsePayload, data);
+        ValidateUtil.validate(payload);
+        return payload;
     }
 
     // --------------------------------------------------------------------------
@@ -30,7 +34,10 @@ export class TransportAmqpResponsePayload<U = any, V = any> {
     //
     // --------------------------------------------------------------------------
 
+    @IsString()
     public id: string;
+
+    @IsDefined()
     public response: ExtendedError | V;
 
     // --------------------------------------------------------------------------

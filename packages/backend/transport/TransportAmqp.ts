@@ -19,10 +19,10 @@ import { Channel, Message, Options, Replies } from 'amqplib';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 import * as uuid from 'uuid';
-import { IAmqpSettings } from '../settings/IAmqpSettings';
+import { ITransportAmqpSettings } from './ITransportAmqpSettings';
 import { TransportInvalidHeadersError } from './TransportInvalidHeadersError';
 
-export class TransportAmqp extends Transport {
+export class TransportAmqp extends Transport<ITransportAmqpSettings> {
     // --------------------------------------------------------------------------
     //
     //  Constants
@@ -69,8 +69,8 @@ export class TransportAmqp extends Transport {
     //
     // --------------------------------------------------------------------------
 
-    constructor(logger: ILogger, private settings: IAmqpSettings) {
-        super(logger);
+    constructor(logger: ILogger, settings?: ITransportAmqpSettings, context?: string) {
+        super(logger, settings, context);
 
         this.asserts = new Set();
         this.delayAsserts = new Set();
@@ -554,7 +554,6 @@ export class TransportAmqp extends Transport {
 
     private async consumeEvent(): Promise<void> {
         await this.assertEventQueue();
-        console.log(this.eventQueueName);
         this.channel
             .consume(
                 this.eventQueueName,

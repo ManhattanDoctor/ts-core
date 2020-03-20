@@ -37,7 +37,8 @@ export class LoggerWrapper implements ILogger, IDestroyable {
             return;
         }
 
-        let value = this.level.toString().toUpperCase();
+        let level = this.level as string;
+        let value = level.toUpperCase();
         if (value in LoggerLevel) {
             this._level = LoggerLevel[value];
         }

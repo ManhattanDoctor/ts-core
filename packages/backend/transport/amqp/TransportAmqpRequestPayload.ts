@@ -1,13 +1,12 @@
-import { ITransportCommand, ITransportCommandOptions, TransportCommand, TransportCommandAsync, TransportCommandWaitDelay } from '@ts-core/common/transport';
+import { ITransportCommand, ITransportCommandOptions, TransportCommand, TransportCommandAsync } from '@ts-core/common/transport';
 import { TransportInvalidDataError } from '@ts-core/common/transport/error';
-import { TransformUtil } from '@ts-core/common/util';
+import { TransformUtil, ValidateUtil } from '@ts-core/common/util';
 import { Message } from 'amqplib';
-import { Type } from 'class-transformer';
 import { ClassType } from 'class-transformer/ClassTransformer';
-import { IsBoolean, IsDate, IsEnum, IsNumber, IsOptional, IsString, validateSync } from 'class-validator';
+import { IsBoolean, IsDefined, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 
-export class TransportAmqpRequestPayload<U = any> implements ITransportCommandOptions {
+export class TransportAmqpRequestPayload<U = any> {
     // --------------------------------------------------------------------------
     //
     //  Static Methods
@@ -25,10 +24,7 @@ export class TransportAmqpRequestPayload<U = any> implements ITransportCommandOp
         }
 
         let payload = TransformUtil.toClass<TransportAmqpRequestPayload<U>>(TransportAmqpRequestPayload, data);
-        let errors = validateSync(payload);
-        if (!_.isEmpty(errors)) {
-            throw new TransportInvalidDataError(`Invalid payload: validation failed`, errors);
-        }
+        ValidateUtil.validate(payload);
 
         if (payload.isNeedReply) {
             let properties = message.properties;
@@ -61,20 +57,8 @@ export class TransportAmqpRequestPayload<U = any> implements ITransportCommandOp
     @IsOptional()
     public request: U;
 
-    @IsNumber()
-    public timeout: number;
-
-    @IsEnum(TransportCommandWaitDelay)
-    public waitDelay: TransportCommandWaitDelay;
-
-    @IsOptional()
-    @IsNumber()
-    public waitMaxCount: number;
-
-    @Type(() => Date)
-    @IsOptional()
-    @IsDate()
-    public expiredDate: Date;
+    @IsDefined()
+    public options: ITransportCommandOptions;
 
     @IsBoolean()
     public isNeedReply: boolean;

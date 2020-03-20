@@ -114,13 +114,15 @@ export class BtcApi extends LoggerWrapper {
 
         let promise = PromiseHandler.create<any, ExtendedError>();
         let method = this.client[methodName];
-        params.push((error, data): void => {
-            if (error) {
-                promise.reject(new ExtendedError(error.message, error.code));
-            } else {
-                promise.resolve(data.result);
+        params.push(
+            (error, data): void => {
+                if (error) {
+                    promise.reject(new ExtendedError(error.message, error.code));
+                } else {
+                    promise.resolve(data.result);
+                }
             }
-        });
+        );
         method.apply(this.client, params);
         return promise.promise;
     }

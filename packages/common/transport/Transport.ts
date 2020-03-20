@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import * as util from 'util';
-import { ExtendedError } from '../error';
+import { ExtendedError, UnreachableStatementError } from '../error';
 import { LoadableEvent } from '../Loadable';
 import { ILogger, LoggerWrapper } from '../logger';
 import { ObservableData } from '../observer';
@@ -10,15 +10,18 @@ import { PromiseHandler } from '../promise';
 import { DateUtil, ObjectUtil } from '../util';
 import { TransportTimeoutError } from './error';
 import { ITransport, ITransportCommand, ITransportCommandAsync, ITransportCommandOptions, ITransportEvent, TransportCommandWaitDelay } from './ITransport';
+import { ITransportSettings } from './ITransportSettings';
 
-export abstract class Transport extends LoggerWrapper implements ITransport {
+export abstract class Transport<T extends ITransportSettings = any> extends LoggerWrapper implements ITransport {
     // --------------------------------------------------------------------------
     //
     //  Constants
     //
     // --------------------------------------------------------------------------
 
-    public static DEFAULT_TIMEOUT = 30 * DateUtil.MILISECONDS_SECOND;
+    protected static DEFAULT_TIMEOUT = 30 * DateUtil.MILISECONDS_SECOND;
+    protected static DEFAULT_WAIT_DELAY = TransportCommandWaitDelay.NORMAL;
+    protected static DEFAULT_WAIT_MAX_COUNT = null;
 
     // --------------------------------------------------------------------------
     //
@@ -40,10 +43,12 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
     //
     // --------------------------------------------------------------------------
 
+    protected requests: Map<string, ITransportRequestStorage>;
     protected promises: Map<string, ITransportPromise>;
     protected listeners: Map<string, Subject<any>>;
     protected dispatchers: Map<string, Subject<any>>;
 
+    protected settings: T;
     protected observer: Subject<ObservableData<LoadableEvent, ITransportCommand<any>>>;
 
     // --------------------------------------------------------------------------
@@ -52,11 +57,13 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
     //
     // --------------------------------------------------------------------------
 
-    constructor(logger: ILogger, context?: string) {
+    constructor(logger: ILogger, settings?: T, context?: string) {
         super(logger, context);
 
+        this.settings = settings;
         this.observer = new Subject();
 
+        this.requests = new Map();
         this.promises = new Map();
         this.listeners = new Map();
         this.dispatchers = new Map();
@@ -104,6 +111,11 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
 
     public destroy(): void {
         super.destroy();
+
+        if (this.listeners) {
+            this.requests.clear();
+            this.requests = null;
+        }
 
         if (this.listeners) {
             this.listeners.forEach(item => item.complete());
@@ -180,7 +192,7 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
             case TransportLogType.RESPONSE_SENDED:
                 return '⇢';
             case TransportLogType.RESPONSE_NO_REPLY:
-                return '⬎';
+                return '✔';
             case TransportLogType.RESPONSE_EXPIRED:
                 return '↛';
             case TransportLogType.RESPONSE_WAIT:
@@ -192,6 +204,9 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
                 return '↦';
             case TransportLogType.EVENT_RECEIVED:
                 return '↤';
+
+            default:
+                throw new UnreachableStatementError(type);
         }
     }
 
@@ -206,7 +221,6 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
         if (_.isNil(promise)) {
             return;
         }
-
         this.promises.delete(command.id);
         if (this.isCommandHasError(command)) {
             promise.handler.reject(command.error);
@@ -228,12 +242,6 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
         this.commandProcessed(command);
     }
 
-    // --------------------------------------------------------------------------
-    //
-    //  Protected Methods
-    //
-    // --------------------------------------------------------------------------
-
     protected isCommandAsync<U, V = any>(command: ITransportCommand<U>): command is ITransportCommandAsync<U, V> {
         return Transport.isCommandAsync(command);
     }
@@ -248,16 +256,33 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
         }
 
         if (_.isNil(options.timeout)) {
-            options.timeout = Transport.DEFAULT_TIMEOUT;
+            options.timeout = this.getSettingsValue('defaultTimeout', Transport.DEFAULT_TIMEOUT);
         }
         if (_.isNil(options.waitDelay) || !(options.waitDelay in TransportCommandWaitDelay)) {
-            options.waitDelay = TransportCommandWaitDelay.NORMAL;
+            options.waitDelay = this.getSettingsValue('defaultWaitDelay', Transport.DEFAULT_WAIT_DELAY);
+        }
+        if (_.isNil(options.waitMaxCount)) {
+            options.waitMaxCount = this.getSettingsValue('defaultWaitMaxCount', Transport.DEFAULT_WAIT_DELAY);
         }
         return options;
     }
 
     protected getCommandTimeoutDelay<U>(command: ITransportCommand<U>, options: ITransportCommandOptions): number {
         return options.timeout;
+    }
+
+    protected isRequestWaitExpired(request: ITransportRequestStorage): boolean {
+        if (!_.isNil(request.waitMaxCount) && request.waitCount >= request.waitMaxCount) {
+            return true;
+        }
+        if (request.waitCount * request.waitDelay >= request.timeout) {
+            return true;
+        }
+        return false;
+    }
+
+    protected isRequestExpired(request: ITransportRequestStorage): boolean {
+        return !_.isNil(request.expiredDate) ? Date.now() > request.expiredDate.getTime() : false;
     }
 
     // --------------------------------------------------------------------------
@@ -294,6 +319,20 @@ export abstract class Transport extends LoggerWrapper implements ITransport {
 
     // --------------------------------------------------------------------------
     //
+    //  Protected Propeties
+    //
+    // --------------------------------------------------------------------------
+
+    protected getSettingsValue<P extends keyof T>(name: P, defaultValue?: T[P]): T[P] {
+        let value = !_.isNil(this.settings) ? this.settings[name] : null;
+        if (_.isNil(value)) {
+            value = defaultValue;
+        }
+        return value;
+    }
+
+    // --------------------------------------------------------------------------
+    //
     //  Public Propeties
     //
     // --------------------------------------------------------------------------
@@ -307,6 +346,11 @@ export interface ITransportPromise<U = any, V = any> {
     handler: PromiseHandler<V, ExtendedError>;
     command: ITransportCommandAsync<U, V>;
     options: ITransportCommandOptions;
+}
+export interface ITransportRequestStorage extends ITransportCommandOptions {
+    waitCount: number;
+    expiredDate: Date;
+    isNeedReply: boolean;
 }
 
 export enum TransportLogType {

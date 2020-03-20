@@ -7,6 +7,14 @@ import { ObjectUtil } from './ObjectUtil';
 export class TransformUtil {
     // --------------------------------------------------------------------------
     //
+    // 	Constants
+    //
+    // --------------------------------------------------------------------------
+
+    public static ENCODING: BufferEncoding = 'utf-8';
+
+    // --------------------------------------------------------------------------
+    //
     // 	JSON
     //
     // --------------------------------------------------------------------------
@@ -19,7 +27,7 @@ export class TransformUtil {
     }
 
     public static toJSON(item: string): any {
-        return ObjectUtil.isJSON(item) ? JSON.parse(item) : item;
+        return ObjectUtil.isJSON(item) ? JSON.parse(item) : null;
     }
 
     // --------------------------------------------------------------------------
@@ -46,7 +54,17 @@ export class TransformUtil {
         return !_.isNil(item) ? (classToPlain(item, options) as any) : null;
     }
 
+    public static fromClassBuffer<U = any>(item: U, options?: ClassTransformOptions): Buffer {
+        let value = TransformUtil.fromJSON(TransformUtil.fromClass(item, options));
+        return !_.isNil(value) ? Buffer.from(value, TransformUtil.ENCODING) : null;
+    }
+
     public static toClass<U, V = any>(type: ClassType<U>, item: V, options?: ClassTransformOptions): U {
         return !_.isNil(item) ? plainToClass<U, any>(type, item, options) : null;
+    }
+
+    public static toClassBuffer<U>(type: ClassType<U>, item: Buffer, options?: ClassTransformOptions): U {
+        let value = TransformUtil.toJSON(item.toString(TransformUtil.ENCODING));
+        return !_.isNil(value) ? TransformUtil.toClass(type, value, options) : null;
     }
 }

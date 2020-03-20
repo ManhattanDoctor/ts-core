@@ -6,3 +6,4 @@ export * from './ObjectUtil';
 export * from './RandomUtil';
 export * from './TransformUtil';
 export * from './UrlUtil';
+export * from './ValidateUtil';

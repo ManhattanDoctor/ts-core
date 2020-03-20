@@ -8,12 +8,12 @@
         "noLib": false,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "target": "ES2017",
+        "target": "es2015",
         "sourceMap": true,
         "allowJs": true,
         "outDir": "dist",
         "lib": ["es7"]
     },
-    "include": ["packages/**/*", "examples/backend/amqp/ITransportAmqpSettings.ts"],
+    "include": ["packages/**/*"],
     "exclude": ["node_modules", "**/*.spec.ts"]
 }

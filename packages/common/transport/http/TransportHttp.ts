@@ -12,7 +12,7 @@ import { TransportNoConnectionError, TransportTimeoutError } from '../error';
 import { ITransportHttpRequest } from './ITransportHttpRequest';
 import { ITransportHttpSettings } from './ITransportHttpSettings';
 
-export class TransportHttp extends Transport {
+export class TransportHttp extends Transport<ITransportHttpSettings> {
     // --------------------------------------------------------------------------
     //
     // 	Static Methods
@@ -44,9 +44,13 @@ export class TransportHttp extends Transport {
     //
     // --------------------------------------------------------------------------
 
-    constructor(logger: ILogger, context?: string) {
-        super(logger, context);
-        this.settings = { method: 'get', headers: {}, isHandleLoading: true, isHandleError: true };
+    constructor(logger: ILogger, settings: ITransportHttpSettings, context?: string) {
+        super(logger, settings, context);
+        /*
+        if (_.isNil(settings)) {
+            this.settings = { method: 'get', headers: {}, isHandleLoading: true, isHandleError: true };
+        }
+        */
     }
 
     // --------------------------------------------------------------------------

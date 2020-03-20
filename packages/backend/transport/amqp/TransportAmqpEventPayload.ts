@@ -1,7 +1,8 @@
 import { ITransportEvent, TransportEvent } from '@ts-core/common/transport';
 import { TransportInvalidDataError } from '@ts-core/common/transport/error';
-import { TransformUtil } from '@ts-core/common/util';
+import { TransformUtil, ValidateUtil } from '@ts-core/common/util';
 import { Message } from 'amqplib';
+import { IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 
 export class TransportAmqpEventPayload<U = any> {
@@ -22,10 +23,7 @@ export class TransportAmqpEventPayload<U = any> {
         }
 
         let payload = TransformUtil.toClass(TransportAmqpEventPayload, data);
-        if (_.isNil(payload.name)) {
-            throw new TransportInvalidDataError(`Invalid payload: name is nil`, content);
-        }
-
+        ValidateUtil.validate(payload);
         return new TransportEvent(payload.name, payload.data) as any;
     }
 
@@ -35,7 +33,10 @@ export class TransportAmqpEventPayload<U = any> {
     //
     // --------------------------------------------------------------------------
 
+    @IsString()
     public name: string;
+
+    @IsOptional()
     public data: U;
 
     // --------------------------------------------------------------------------

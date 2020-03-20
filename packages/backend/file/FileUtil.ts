@@ -29,6 +29,18 @@ export class FileUtil {
         return promise.promise;
     }
 
+    public static async directoryCreate(path: string): Promise<void> {
+        let promise = PromiseHandler.create();
+        fs.mkdir(path, error => {
+            if (error) {
+                promise.reject(error.message);
+            } else {
+                promise.resolve();
+            }
+        });
+        return promise.promise;
+    }
+
     public static async jsonRead<D>(path: string): Promise<D> {
         let promise = PromiseHandler.create();
         fs.readFile(path, 'utf8', (error, data) => {

@@ -118,6 +118,11 @@ export class BtcApiInsignt extends LoggerWrapper {
         let item = await this.client.get<IBtcApiBalanceInsight>(`address/${address}/balance`);
         return item.data;
     }
+
+    public async getAddressTransactions(address: string, isNeedOnlyUnspent?: boolean): Promise<Array<IBtcOutputInsight>> {
+        let item = await this.client.get<Array<IBtcOutputInsight>>(`address/${address}/?unspent=${isNeedOnlyUnspent}`);
+        return item.data;
+    }
 }
 
 export interface IBtcApiBalanceInsight {
