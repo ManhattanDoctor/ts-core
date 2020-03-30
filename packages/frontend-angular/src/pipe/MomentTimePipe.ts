@@ -1,5 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { DateUtil } from '@ts-core/common/util';
+import moment from 'moment';
+import numeral from 'numeral';
 
 @Pipe({
     name: 'viMomentTime'
@@ -26,6 +28,3 @@ export class MomentTimePipe implements PipeTransform {
         return numeral(seconds).format('00:00:00');
     }
 }
-
-declare let moment: any;
-declare let numeral: any;

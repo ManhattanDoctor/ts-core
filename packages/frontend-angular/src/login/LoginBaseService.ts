@@ -1,10 +1,9 @@
-import { Destroyable, LoadableEvent } from '@ts-core/common';
+import { LoadableEvent, Loadable, LoadableStatus } from '@ts-core/common';
 import { ExtendedError } from '@ts-core/common/error';
 import { ObservableData } from '@ts-core/common/observer';
 import { TransportNoConnectionError, TransportTimeoutError } from '@ts-core/common/transport';
-import { Observable, Subject } from 'rxjs';
 
-export abstract class LoginBaseService<E = any, U = any, V = any> extends Destroyable {
+export abstract class LoginBaseService<E = any, U = any, V = any> extends Loadable<E | LoginBaseServiceEvent, U | V | ExtendedError> {
     // --------------------------------------------------------------------------
     //
     // 	Properties
@@ -15,10 +14,7 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Destro
     protected _resource: string;
 
     protected _loginData: V;
-    protected _isLoading: boolean = false;
     protected _isLoggedIn: boolean = false;
-
-    protected observer: Subject<ObservableData<E | LoadableEvent | LoginBaseServiceEvent, U | V>>;
 
     // --------------------------------------------------------------------------
     //
@@ -28,7 +24,6 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Destro
 
     constructor() {
         super();
-        this.observer = new Subject();
     }
 
     // --------------------------------------------------------------------------
@@ -42,21 +37,25 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Destro
             return;
         }
 
-        this._isLoading = true;
+        this.status = LoadableStatus.LOADING;
         this.observer.next(new ObservableData(LoadableEvent.STARTED));
         this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_STARTED));
 
         try {
             this.parseLoginResponse(await this.loginRequest(param));
-            if (this.isCanLoginWithSid()) {
+            this.status = !this.isCanLoginWithSid() ? LoadableStatus.LOADED : LoadableStatus.LOADING;
+            if (this.isLoading) {
                 this.loginBySid();
             }
         } catch (error) {
             error = ExtendedError.create(error);
 
+            this.status = LoadableStatus.ERROR;
             this.parseLoginErrorResponse(error);
             this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_ERROR, null, error));
+        }
 
+        if (!this.isLoading) {
             this.observer.next(new ObservableData(LoadableEvent.FINISHED));
             this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_FINISHED));
         }
@@ -67,23 +66,22 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Destro
             this._sid = this.getSavedSid();
         }
 
-        this._isLoading = true;
-
         try {
             let response = await this.loginSidRequest();
             this.parseLoginSidResponse(response);
 
             this._isLoggedIn = true;
+            this.status = LoadableStatus.LOADED;
             this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_COMPLETE, response));
         } catch (error) {
             error = ExtendedError.create(error);
             this.parseLoginSidErrorResponse(error);
 
             this._isLoggedIn = false;
+            this.status = LoadableStatus.ERROR;
             this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_ERROR, null, error));
         }
 
-        this._isLoading = false;
         this.observer.next(new ObservableData(LoadableEvent.FINISHED));
         this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_FINISHED));
     }
@@ -91,6 +89,7 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Destro
     protected reset(): void {
         this._sid = null;
         this._resource = null;
+        this._loginData = null;
     }
 
     protected abstract loginRequest(param: any): Promise<U>;
@@ -155,6 +154,7 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Destro
         this.reset();
 
         this._isLoggedIn = false;
+        this.status = LoadableStatus.NOT_LOADED;
         this.observer.next(new ObservableData(LoadableEvent.FINISHED));
         this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGOUT_FINISHED));
     }
@@ -164,11 +164,8 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Destro
     }
 
     public destroy(): void {
-        if (this.observer) {
-            this.observer.complete();
-            this.observer = null;
-        }
-        this._loginData = null;
+        super.destroy();
+        this.reset();
     }
 
     // --------------------------------------------------------------------------
@@ -176,10 +173,6 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Destro
     // 	Public Properties
     //
     // --------------------------------------------------------------------------
-
-    public get events(): Observable<ObservableData<E | LoadableEvent | LoginBaseServiceEvent, any>> {
-        return this.observer.asObservable();
-    }
 
     public get sid(): string {
         return this._sid;
@@ -191,10 +184,6 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Destro
 
     public get loginData(): V {
         return this._loginData;
-    }
-
-    public get isLoading(): boolean {
-        return this._isLoading;
     }
 
     public get isLoggedIn(): boolean {

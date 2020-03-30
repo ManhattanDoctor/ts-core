@@ -38,6 +38,7 @@ export abstract class IWindow<T = any> extends Destroyable {
     // --------------------------------------------------------------------------
 
     public isOnTop: boolean = false;
+    public isDisabled: boolean = false;
     public isMinimized: boolean = false;
 
     readonly events: Observable<string>;
@@ -56,6 +57,7 @@ export enum WindowEvent {
 
     MOVED = 'EVENT_MOVED',
     RESIZED = 'RESIZED',
+    DISABLED_CHANGED = 'DISABLED_CHANGED',
     MINIMIZED_CHANGED = 'MINIMIZED_CHANGED',
 
     SET_ON_TOP = 'SET_ON_TOP'

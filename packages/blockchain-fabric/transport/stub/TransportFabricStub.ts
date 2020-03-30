@@ -48,12 +48,12 @@ export class TransportFabricStub implements ITransportFabricStub {
             return null;
         }
         let value = TransformUtil.toJSON(buffer.toString(TransformUtil.ENCODING));
-        if (_.isNil(type)) {
+        if (_.isNil(type) || _.isNil(value)) {
             return value;
         }
         let item: U = TransformUtil.toClass<U>(type, value);
         if (isNeedValidate) {
-            ValidateUtil.validate(value);
+            ValidateUtil.validate(item);
         }
         return item;
     }

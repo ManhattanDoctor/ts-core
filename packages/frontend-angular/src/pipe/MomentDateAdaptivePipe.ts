@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import * as _ from 'lodash';
 import { Moment } from 'moment';
-import * as moment from 'moment';
+import moment from 'moment';
 import { MomentDatePipe } from './MomentDatePipe';
 
 @Pipe({

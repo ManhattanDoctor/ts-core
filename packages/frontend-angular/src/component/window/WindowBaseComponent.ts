@@ -67,18 +67,23 @@ export class WindowBaseComponent extends WindowDragable {
     }
 
     protected commitIsBlinkProperties(): void {
-        ViewUtil.toggleClass(this.container, 'blink', this.isBlink);
+        ViewUtil.toggleClass(this.container, this.blinkClass, this.isBlink);
+    }
+
+    protected commitIsDisabledProperties(): void {
+        ViewUtil.toggleClass(this.container, this.disabledClass, this.isDisabled);
+        ViewUtil.toggleClass(this.content.element, this.disabledClass, this.isDisabled);
+        ViewUtil.toggleClass(this.content.element.nativeElement.parentElement, this.disabledClass, this.isDisabled);
     }
 
     protected commitIsShakingProperties(): void {
-        ViewUtil.toggleClass(this.container, 'shake-constant', this.isShaking);
-        ViewUtil.toggleClass(this.container, 'shake-horizontal', this.isShaking);
+        ViewUtil.toggleClass(this.container, this.shakingClass, this.isShaking);
     }
 
     protected commitIsMinimizedProperties(): void {
-        ViewUtil.toggleClass(this.container, 'minimized', this.isMinimized);
-        ViewUtil.toggleClass(this.content.element, 'minimized', this.isMinimized);
-        ViewUtil.toggleClass(this.content.element.nativeElement.parentElement, 'minimized', this.isMinimized);
+        ViewUtil.toggleClass(this.container, this.minimizedClass, this.isMinimized);
+        ViewUtil.toggleClass(this.content.element, this.minimizedClass, this.isMinimized);
+        ViewUtil.toggleClass(this.content.element.nativeElement.parentElement, this.minimizedClass, this.isMinimized);
     }
 
     protected isNeedClickStopPropagation(event: MouseEvent): boolean {
@@ -99,6 +104,22 @@ export class WindowBaseComponent extends WindowDragable {
 
     protected get resolver(): ComponentFactoryResolver {
         return APPLICATION_INJECTOR().get(ComponentFactoryResolver);
+    }
+
+    protected get blinkClass(): string {
+        return 'blink';
+    }
+
+    protected get disabledClass(): string {
+        return 'disabled';
+    }
+
+    protected get minimizedClass(): string {
+        return 'minimized';
+    }
+
+    protected get shakingClass(): string {
+        return 'shake-constant shake-horizontal';
     }
 
     // --------------------------------------------------------------------------

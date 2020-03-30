@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { TransportFabric } from '@ts-core/blockchain-fabric/transport';
-import { TransportCommandFabricAsyncHandler } from '@ts-core/blockchain-fabric/transport/command';
+import { TransportCommandFabricHandler } from '@ts-core/blockchain-fabric/transport/command';
 import { ITransportFabricStub } from '@ts-core/blockchain-fabric/transport/stub';
 import { Logger } from '@ts-core/common/logger';
 
-import { User } from '../lib/user/User';
-import { UserGetCommand } from './UserGetCommand';
+import { UserAccount, UserAccountType } from '../lib/user/UserAccount';
+import { TestCommand } from './TestCommand';
 
 @Injectable()
-export class UserGetHandler extends TransportCommandFabricAsyncHandler<string, User, UserGetCommand> {
+export class TestHandler extends TransportCommandFabricHandler<string, TestCommand> {
     // --------------------------------------------------------------------------
     //
     //  Constructor
@@ -16,7 +16,7 @@ export class UserGetHandler extends TransportCommandFabricAsyncHandler<string, U
     // --------------------------------------------------------------------------
 
     constructor(logger: Logger, transport: TransportFabric) {
-        super(logger, transport, UserGetCommand.NAME);
+        super(logger, transport, TestCommand.NAME);
     }
 
     // --------------------------------------------------------------------------
@@ -25,7 +25,14 @@ export class UserGetHandler extends TransportCommandFabricAsyncHandler<string, U
     //
     // --------------------------------------------------------------------------
 
-    protected async execute(params: string, stub: ITransportFabricStub): Promise<User> {
-        return stub.getState<User>(User.getUid(params), User);
+    protected async execute(params: string, stub: ITransportFabricStub): Promise<void> {
+        let value = await stub.getState('test', UserAccount);
+        console.log(1, params, value);
+
+        value = new UserAccount();
+        value.type = UserAccountType.ADMINISTRATOR;
+        await stub.putState('test', value);
+
+        console.log(2, params, value);
     }
 }

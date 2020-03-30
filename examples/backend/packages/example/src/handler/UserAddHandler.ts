@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { TransportFabric } from '@ts-core/blockchain-fabric/transport';
+import { TransportCommandFabricAsyncHandler } from '@ts-core/blockchain-fabric/transport/command';
+import { ITransportFabricStub } from '@ts-core/blockchain-fabric/transport/stub';
 import { ExtendedError } from '@ts-core/common/error';
 import { Logger } from '@ts-core/common/logger';
 import { ObjectUtil, TransformUtil } from '@ts-core/common/util';
-import { TransportFabric } from '../fabric/transport';
-import { TransportCommandFabricAsyncHandler } from '../fabric/transport/command';
-import { ITransportFabricStub } from '../fabric/transport/stub';
+
 import { User } from '../lib/user/User';
 import { UserAccount, UserAccountType } from '../lib/user/UserAccount';
 import { IUserAddDto, UserAddCommand } from './UserAddCommand';

@@ -4,7 +4,7 @@
     "author": "Renat Gubaev",
     "license": "ISC",
     "scripts": {
-        "start": "npm run example:serve",
+        "start": "npm run serve",
         "postinstall": "gulp frontend-angular:build",
         "serve": "ng serve example",
         "build": "ng build example --prod"

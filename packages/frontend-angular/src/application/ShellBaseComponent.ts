@@ -55,6 +55,7 @@ export abstract class ShellBaseComponent extends DestroyableContainer {
         this.router.events
             .pipe()
             .pipe(filter(data => data.type === RouterBaseServiceEvent.LOADING_CHANGED))
+            .pipe(takeUntil(this.destroyed))
             .subscribe(this.activeItemCheck);
 
         // Menu Size

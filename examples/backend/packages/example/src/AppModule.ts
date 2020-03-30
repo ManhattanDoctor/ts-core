@@ -2,18 +2,23 @@ import { DynamicModule, Inject, OnApplicationBootstrap } from '@nestjs/common';
 import { LoggerModule } from '@ts-core/backend-nestjs/logger';
 import { TransportAmqp2 } from '@ts-core/backend/transport/amqp';
 import { Logger } from '@ts-core/common/logger';
+import { FileUtil } from '@ts-core/backend/file';
 import { PromiseHandler } from '@ts-core/common/promise';
 import { ITransport, Transport, TransportCommandAsync, TransportCommandWaitDelay } from '@ts-core/common/transport';
 import { TransportLocal } from '@ts-core/common/transport/local';
-import * as _ from 'lodash';
 import { AppSettings } from './AppSettings';
-import { TransportFabric } from './fabric/transport/TransportFabric';
-import { UserAddCommand } from './handler/UserAddCommand';
+import { TransportFabric } from '@ts-core/blockchain-fabric/transport';
+import { TestCommand } from './handler/TestCommand';
+import { TestHandler } from './handler/TestHandler';
 import { UserAddHandler } from './handler/UserAddHandler';
 import { UserGetCommand } from './handler/UserGetCommand';
 import { UserGetHandler } from './handler/UserGetHandler';
 import { UserRemoveHandler } from './handler/UserRemoveHandler';
+import * as _ from 'lodash';
 import { Chaincode } from './service/Chaincode';
+import { FabricApi } from '@ts-core/blockchain-fabric/api';
+import { TransportFabricBlockParser } from '@ts-core/blockchain-fabric/transport/block';
+import { UserAddCommand } from './handler/UserAddCommand';
 
 export class AppModule implements OnApplicationBootstrap {
     // --------------------------------------------------------------------------
@@ -36,6 +41,7 @@ export class AppModule implements OnApplicationBootstrap {
                     inject: [Logger],
                     useFactory: async (logger: Logger) => {
                         let item = new TransportFabric(logger, settings);
+                        item.readonlyCommands = [UserGetCommand.NAME];
                         await item.connect();
                         return item;
                     }
@@ -44,9 +50,17 @@ export class AppModule implements OnApplicationBootstrap {
                     provide: Transport,
                     useExisting: TransportFabric
                 },
+                {
+                    provide: FabricApi,
+                    useFactory: async (logger: Logger) => {
+                        let item = new FabricApi(logger, settings);
+                        await item.connect();
+                        return item;
+                    }
+                },
                 Chaincode
             ],
-            controllers: [UserGetHandler, UserAddHandler, UserRemoveHandler]
+            controllers: [UserGetHandler, UserAddHandler, UserRemoveHandler, TestHandler]
         };
     }
 
@@ -56,7 +70,7 @@ export class AppModule implements OnApplicationBootstrap {
     //
     // --------------------------------------------------------------------------
 
-    constructor(@Inject(Logger) private logger: Logger, private settings: AppSettings, private fabric: TransportFabric) {}
+    constructor(@Inject(Logger) private logger: Logger, private settings: AppSettings, private fabric: TransportFabric, private api: FabricApi) {}
 
     // --------------------------------------------------------------------------
     //
@@ -66,28 +80,37 @@ export class AppModule implements OnApplicationBootstrap {
 
     public async onApplicationBootstrap(): Promise<void> {
         // this.transportTest();
-        this.fabricClientTest(this.fabric);
+        this.fabricClientTest();
     }
 
-    private async fabricClientTest(transport: TransportFabric): Promise<void> {
+    private async fabricClientTest(): Promise<void> {
         await PromiseHandler.delay(1000);
 
-        // transport.readonlyCommands = ['test'];
+        
+        let blockLast = await this.api.getBlockNumber();
+        /*
+        blockLast = 1;
 
-        let userId = 'Renat';
-        let publicKey = 'e365007e85508c6b44d5101a1d59d0061a48fd1bcd393186ccb5e7ae938a59a8';
-        let privateKey = 'e87501bc00a3db3ba436f7109198e0cb65c5f929eabcedbbb5a9874abc2c73a3e365007e85508c6b44d5101a1d59d0061a48fd1bcd393186ccb5e7ae938a59a8';
+        let parser = new TransportFabricBlockParser();
+        for (let i = blockLast - 1; i < blockLast; i++) {
+            this.logger.log(`Getting block ${i}...`);
+            let block = await this.api.getBlock(i);
+            await FileUtil.jsonSave(`block${i}.json`, block);
+            await FileUtil.jsonSave(`block${i}_parsed.json`, parser.parse(block));
+        }
+        */
 
-        let options = {
-            fabricUserId: userId,
-            fabricUserPublicKey: publicKey,
-            fabricUserPrivateKey: privateKey
-        };
+        this.logger.log(`Last block is ${blockLast}`);
+
         try {
+            let userId = 'Renat';
             let item = null;
-            item = await transport.sendListen(new UserGetCommand(userId), options);
+            item = await this.fabric.sendListen(new UserGetCommand(userId), this.settings.fabricUserOptions);
             if (_.isNil(item)) {
-                item = await transport.sendListen(new UserAddCommand({ id: userId, publicKey }), options);
+                item = await this.fabric.sendListen(
+                    new UserAddCommand({ id: userId, publicKey: this.settings.fabricUserOptions.fabricUserPublicKey }),
+                    this.settings.fabricUserOptions
+                );
             }
             console.log(item);
         } catch (error) {

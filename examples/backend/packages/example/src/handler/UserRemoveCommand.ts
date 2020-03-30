@@ -1,5 +1,6 @@
+import { TransportCommandFabricAsync } from '@ts-core/blockchain-fabric/transport/command';
 import { TransformUtil } from '@ts-core/common/util';
-import { TransportCommandFabricAsync } from '../fabric/transport/command';
+
 import { User } from '../lib/user/User';
 
 export class UserRemoveCommand extends TransportCommandFabricAsync<string, User> {

@@ -1,7 +1,8 @@
 import { EnvSettingsStorage, ILoggerSettings } from '@ts-core/backend/settings';
 import { ITransportAmqpSettings } from '@ts-core/backend/transport/amqp';
 import { ILogger, LoggerLevel } from '@ts-core/common/logger';
-import { ITransportFabricSettings } from './fabric/transport/ITransportFabricSettings';
+import { ITransportFabricSettings } from '@ts-core/blockchain-fabric/transport';
+import { ITransportFabricCommandOptions } from '@ts-core/blockchain-fabric/transport';
 
 export class AppSettings extends EnvSettingsStorage implements ILoggerSettings, ITransportFabricSettings, ITransportAmqpSettings {
     // --------------------------------------------------------------------------
@@ -18,6 +19,15 @@ export class AppSettings extends EnvSettingsStorage implements ILoggerSettings, 
     //
     // --------------------------------------------------------------------------
 
+    public get fabricUserOptions(): ITransportFabricCommandOptions {
+        return {
+            fabricUserId: 'Renat',
+            fabricUserPublicKey: 'e365007e85508c6b44d5101a1d59d0061a48fd1bcd393186ccb5e7ae938a59a8',
+            fabricUserPrivateKey:
+                'e87501bc00a3db3ba436f7109198e0cb65c5f929eabcedbbb5a9874abc2c73a3e365007e85508c6b44d5101a1d59d0061a48fd1bcd393186ccb5e7ae938a59a8'
+        };
+    }
+
     public get fabricIdentity(): string {
         return this.getValue('FABRIC_IDENTITY', 'user1');
     }
@@ -27,13 +37,16 @@ export class AppSettings extends EnvSettingsStorage implements ILoggerSettings, 
     }
 
     public get fabricIdentityPrivateKey(): string {
-        return this.getValue('FABRIC_IDENTITY_PRIVATE_KEY', '-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgJXSS8DqIg9htIQJa\nFC2deN9kmnOKOdIQvk3z10ceuAmhRANCAATok3hIK5WZcVUBMR+qeyLbUBeR9ufm\nPtSsWloH/0YfC1txZ6QCPL7IUzwlMrwwQa82OV8954begPVh2O46Fvn1\n-----END PRIVATE KEY-----\n');
+        return this.getValue(
+            'FABRIC_IDENTITY_PRIVATE_KEY',
+            '-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgFV2tecLU03cs8uQG\nOTqAvoGZT/WNvY2sFsvGLAlLX9ahRANCAATRwhiQNQGvRszE5vjN1ZUU0Qor5aVV\nmpff+rFd8szAH9VIw+VXDExI1D2u1OPR3Jci2VfE8jq/IPg65QuKh/wE\n-----END PRIVATE KEY-----'
+        );
     }
 
     public get fabricIdentityCertificate(): string {
         return this.getValue(
             'FABRIC_IDENTITY_CERTIFICATE',
-            '-----BEGIN CERTIFICATE-----\nMIICjjCCAjWgAwIBAgIUCQLXpk7IK6Mw2lw6pgKn507YfpEwCgYIKoZIzj0EAwIw\nczELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNh\nbiBGcmFuY2lzY28xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMT\nE2NhLm9yZzEuZXhhbXBsZS5jb20wHhcNMjAwMzE5MTUzOTAwWhcNMjEwMzE5MTU0\nNDAwWjBCMTAwDQYDVQQLEwZjbGllbnQwCwYDVQQLEwRvcmcxMBIGA1UECxMLZGVw\nYXJ0bWVudDExDjAMBgNVBAMTBXVzZXIxMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD\nQgAE6JN4SCuVmXFVATEfqnsi21AXkfbn5j7UrFpaB/9GHwtbcWekAjy+yFM8JTK8\nMEGvNjlfPeeG3oD1YdjuOhb59aOB1zCB1DAOBgNVHQ8BAf8EBAMCB4AwDAYDVR0T\nAQH/BAIwADAdBgNVHQ4EFgQUAQU6Wm+pWzxy5jYP0Lj5gu1ivUUwKwYDVR0jBCQw\nIoAg8GuSK+7N1xyVYfLDRSicU5tv3CpnZpYZ0cxkEr7ACPswaAYIKgMEBQYHCAEE\nXHsiYXR0cnMiOnsiaGYuQWZmaWxpYXRpb24iOiJvcmcxLmRlcGFydG1lbnQxIiwi\naGYuRW5yb2xsbWVudElEIjoidXNlcjEiLCJoZi5UeXBlIjoiY2xpZW50In19MAoG\nCCqGSM49BAMCA0cAMEQCIHgFe6HYdlTowM/+zm86JnWn+Qpgx0lYVugzP95Ll4oU\nAiARGkhAwhjC68W3UNTizR9ahB1v6lzLYG1jBBoeI7C9LA==\n-----END CERTIFICATE-----\n'
+            '-----BEGIN CERTIFICATE-----\nMIICjjCCAjWgAwIBAgIUOiQB5yeOWfYmGPVO8VZUA0ouxLMwCgYIKoZIzj0EAwIw\nczELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNh\nbiBGcmFuY2lzY28xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMT\nE2NhLm9yZzEuZXhhbXBsZS5jb20wHhcNMjAwMzI0MTYwNzAwWhcNMjEwMzI0MTYx\nMjAwWjBCMTAwDQYDVQQLEwZjbGllbnQwCwYDVQQLEwRvcmcxMBIGA1UECxMLZGVw\nYXJ0bWVudDExDjAMBgNVBAMTBXVzZXIxMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD\nQgAE0cIYkDUBr0bMxOb4zdWVFNEKK+WlVZqX3/qxXfLMwB/VSMPlVwxMSNQ9rtTj\n0dyXItlXxPI6vyD4OuULiof8BKOB1zCB1DAOBgNVHQ8BAf8EBAMCB4AwDAYDVR0T\nAQH/BAIwADAdBgNVHQ4EFgQUC+JeBv82tQd2FXIdZvx9mg57wCgwKwYDVR0jBCQw\nIoAgUn+0FOv3dX+1WR7Fa8jfriCeHzZbH7Jat8R1I2RDTQ8waAYIKgMEBQYHCAEE\nXHsiYXR0cnMiOnsiaGYuQWZmaWxpYXRpb24iOiJvcmcxLmRlcGFydG1lbnQxIiwi\naGYuRW5yb2xsbWVudElEIjoidXNlcjEiLCJoZi5UeXBlIjoiY2xpZW50In19MAoG\nCCqGSM49BAMCA0cAMEQCIGZJMg1Z7/MdTjqACo8JDaIJ8XBpujZ6K+BTiMDXV6Sp\nAiAAmPhEIica+eb8v+fvDvX6s70o29qOYrXa9ftiI+J5NQ==\n-----END CERTIFICATE-----\n'
         );
     }
 

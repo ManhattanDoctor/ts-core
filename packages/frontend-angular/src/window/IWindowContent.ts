@@ -32,6 +32,7 @@ export abstract class IWindowContent<T = any> extends DestroyableContainer imple
     protected commitWindowProperties(): void {
         this.commitConfigProperties();
     }
+
     protected commitConfigProperties(): void {}
 
     // --------------------------------------------------------------------------
@@ -96,6 +97,16 @@ export abstract class IWindowContent<T = any> extends DestroyableContainer imple
         return this.window ? this.window.events : null;
     }
 
+    public get isDisabled(): boolean {
+        return this.window ? this.window.isDisabled : false;
+    }
+
+    public set isDisabled(value: boolean) {
+        if (this.window) {
+            this.window.isDisabled = value;
+        }
+    }
+
     // --------------------------------------------------------------------------
     //
     //  Public Properties
@@ -107,7 +118,7 @@ export abstract class IWindowContent<T = any> extends DestroyableContainer imple
     }
 
     public get config(): WindowConfig<T> {
-        return this._window ? this._window.config : null;
+        return this.window ? this._window.config : null;
     }
 
     public get window(): IWindow {

@@ -2,7 +2,7 @@ import { ComponentType } from '@angular/cdk/portal';
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ObservableData } from '@ts-core/common/observer';
-import { ArrayUtil } from '@ts-core/common/util';
+import { ArrayUtil, ObjectUtil } from '@ts-core/common/util';
 import { LanguageService } from '@ts-core/frontend/language';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
@@ -114,14 +114,14 @@ export class NotificationService {
     // --------------------------------------------------------------------------
 
     private getById(id: string): INotification {
-        let result = null;
+        let value = null;
         this._notifications.forEach(item => {
             if (item.config.id === id) {
-                result = item;
+                value = item;
                 return true;
             }
         });
-        return result;
+        return value;
     }
 
     private setDefaultProperties(config: NotificationConfig): void {
@@ -197,7 +197,36 @@ export class NotificationService {
     //
     // --------------------------------------------------------------------------
 
-    public remove(config: NotificationConfig): void {
+    public get(value: NotificationId): NotificationConfig {
+        if (_.isNil(value)) {
+            return null;
+        }
+        if (value instanceof NotificationConfig) {
+            return value;
+        }
+
+        let id = value.toString();
+        if (ObjectUtil.instanceOf<NotificationConfigOptions>(value, ['id'])) {
+            id = value.id;
+        }
+        for (let item of this.configs) {
+            if (item.id === id) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public has(value: NotificationId): boolean {
+        return !_.isNil(this.get(value));
+    }
+
+    public remove(value: NotificationId): void {
+        let config = this.get(value);
+        if (_.isNil(config)) {
+            return;
+        }
+
         this.close(config);
         ArrayUtil.remove(this._configs, config);
         ArrayUtil.remove(this._closedConfigs, config);
@@ -209,7 +238,12 @@ export class NotificationService {
         this.configs.forEach(item => this.remove(item));
     }
 
-    public close(config: NotificationConfig): INotification {
+    public close(value: NotificationId): INotification {
+        let config = this.get(value);
+        if (_.isNil(config)) {
+            return;
+        }
+
         let notification = this._notifications.get(config);
         if (!notification) {
             return null;
@@ -258,6 +292,8 @@ export class NotificationService {
         return this._notifications;
     }
 }
+
+export type NotificationId = string | NotificationConfig | NotificationConfigOptions;
 
 export enum NotificationServiceEvent {
     OPENED = 'OPENED',

@@ -1,5 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import * as _ from 'lodash';
+import numeral from 'numeral';
 
 @Pipe({
     name: 'viFinance'
@@ -40,5 +41,3 @@ export class FinancePipe implements PipeTransform {
         }
     }
 }
-
-declare let numeral: any;

@@ -65,8 +65,7 @@ export class RootComponent extends ApplicationComponent<SettingsService> {
     }
 
     private async test() {
-        let http = new TransportHttp(this.logger);
-        http.defaults.baseURL = `http://localhost:3000/api`;
+        let http = new TransportHttp(this.logger, { baseURL: `http://localhost:3000/api`, method: 'get' });
 
         console.log(
             await http.sendListen(
@@ -90,14 +89,11 @@ export class RootComponent extends ApplicationComponent<SettingsService> {
         let value = await transport.sendListen(new TransportCommandAsync(`Hello`, { name: 123 }));
         console.log(value);
 
-        
         this.table = new CoinBlockMapCollection(http);
         this.table.events.subscribe(data => {
             console.log(data);
         });
-        
 
- 
         /*
         try {
             console.log(

@@ -21,17 +21,13 @@
         "@ts-core/backend": "^1.0.17",
         "@ts-core/backend-nestjs": "^6.0.6",
         "@ts-core/blockchain": "^1.1.7",
+        "@ts-core/blockchain-fabric": "^1.0.3",
         "@ts-core/common": "^1.0.60",
         "@types/amqplib": "0.5.13",
         "@types/socket.io": "2.1.4",
-        "fabric-ca-client": "1.4.7",
-        "fabric-network": "1.4.7",
-        "fabric-client": "1.4.7",
         "passport": "0.4.1",
         "passport-http-bearer": "1.0.1",
         "passport-jwt": "4.0.0",
-        "swagger-ui-express": "4.1.1",
-        "fabric-shim": "1.4.5",
-        "fabric-contract-api": "1.4.5"
+        "swagger-ui-express": "4.1.1"
     }
 }

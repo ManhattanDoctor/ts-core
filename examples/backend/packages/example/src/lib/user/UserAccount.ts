@@ -1,8 +1,8 @@
-import { IsEnum } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
 
 export enum UserAccountType {
     ROOT = 'ROOT',
-    ADMINISTRATOR = 'ADMINISTRATOR',
+    ADMINISTRATOR = 'ADMINISTRATOR'
 }
 
 export class UserAccount {

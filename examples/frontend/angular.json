@@ -35,10 +35,10 @@
                         "scripts": [
                             "node_modules/css-element-queries/src/ResizeSensor.js",
                             "node_modules/interactjs/dist/interact.min.js",
+                            "node_modules/moment/moment.js",
+                            "node_modules/moment/locale/ru.js",
                             "node_modules/numeral/numeral.js",
                             "node_modules/numeral/locales/ru.js",
-                            "node_modules/moment/min/moment.min.js",
-                            "node_modules/moment/locale/ru.js",
                             "node_modules/messageformat/messageformat.js"
                         ]
                     },

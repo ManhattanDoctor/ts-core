@@ -8,7 +8,28 @@ import { ITransportFabricCommandOptions } from './ITransportFabricCommandOptions
 import { ITransportFabricStub, TransportFabricStub } from './stub';
 import { ITransportCommandFabric, ITransportCommandFabricAsync, TransportFabric } from './TransportFabric';
 
-export class TransportFabricRequestPayload<U = any> {
+// --------------------------------------------------------------------------
+//
+//  Interface
+//
+// --------------------------------------------------------------------------
+
+export interface ITransportFabricRequestPayload<U = any> {
+    id: string;
+    name: string;
+    request: U;
+    options: ITransportFabricCommandOptions;
+    isNeedReply: boolean;
+    signature: string;
+}
+
+// --------------------------------------------------------------------------
+//
+//  Class
+//
+// --------------------------------------------------------------------------
+
+export class TransportFabricRequestPayload<U = any> implements ITransportFabricRequestPayload<U> {
     // --------------------------------------------------------------------------
     //
     //  Static Methods

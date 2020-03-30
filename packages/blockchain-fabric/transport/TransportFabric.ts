@@ -3,7 +3,16 @@ import { LoadableEvent } from '@ts-core/common/Loadable';
 import { ILogger } from '@ts-core/common/logger';
 import { ObservableData } from '@ts-core/common/observer';
 import { PromiseHandler } from '@ts-core/common/promise';
-import { ITransportCommand, ITransportCommandAsync, ITransportEvent, ITransportRequestStorage, Transport, TransportCommandWaitDelay, TransportLogType, TransportTimeoutError } from '@ts-core/common/transport';
+import {
+    ITransportCommand,
+    ITransportCommandAsync,
+    ITransportEvent,
+    ITransportRequestStorage,
+    Transport,
+    TransportCommandWaitDelay,
+    TransportLogType,
+    TransportTimeoutError
+} from '@ts-core/common/transport';
 import { TransportWaitExceedError } from '@ts-core/common/transport/error';
 import { DateUtil, ObjectUtil, TransformUtil } from '@ts-core/common/util';
 import { Channel } from 'fabric-client';
@@ -56,12 +65,12 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     private connectionPromise: PromiseHandler<void, ExtendedError>;
     private connectionAttempts: number;
 
-    private network: Network;
-    private channel: Channel;
-    private contract: Contract;
-    private _gateway: Gateway;
+    private _network: Network;
+    private _channel: Channel;
+    private _contract: Contract;
 
     private _wallet: Wallet;
+    private _gateway: Gateway;
     private _isConnected: boolean;
 
     public readonlyCommands: Array<string>;
@@ -158,16 +167,17 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
             return;
         }
 
-        if (!this.isCommandAsync(command) || !request.isNeedReply) {
-            this.logCommand(command, TransportLogType.RESPONSE_NO_REPLY);
-            return;
-        }
-
         if (this.isRequestExpired(request)) {
             this.logCommand(command, TransportLogType.RESPONSE_EXPIRED);
             let error = new ExtendedError(`Unable to completed "${command.name}" command: timeout is expired`);
             this.warn(error.message);
             request.handler.resolve(TransportFabricResponsePayload.fromError(command.id, error));
+            return;
+        }
+
+        if (!this.isCommandAsync(command) || !request.isNeedReply) {
+            this.logCommand(command, TransportLogType.RESPONSE_NO_REPLY);
+            request.handler.resolve();
             return;
         }
 
@@ -207,13 +217,7 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     public destroy(): void {
         super.destroy();
         this.disconnect();
-
         this.requests = null;
-
-        if (this.observer) {
-            this.observer.complete();
-            this.observer = null;
-        }
     }
 
     // --------------------------------------------------------------------------
@@ -234,9 +238,17 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
 
         try {
             let content = TransformUtil.fromJSON(TransformUtil.fromClass(request.payload));
-            let transaction = await this.contract.createTransaction(request.method);
-            let buffer = await transaction.submit(content);
-            this.responseMessageReceived(buffer);
+            let response = null;
+            if (this.isNeedSign(command.name)) {
+                let transaction = await this.contract.createTransaction(request.method);
+                response = await transaction.submit(content);
+            } else {
+                response = await this.contract.evaluateTransaction(request.method, content);
+            }
+
+            if (this.isCommandAsync(command) && isNeedReply) {
+                this.responseMessageReceived(response);
+            }
         } catch (error) {
             error = new ExtendedError(`Unable to send "${command.name}" command request: ${error.message}`);
             this.error(error);
@@ -267,6 +279,7 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     // --------------------------------------------------------------------------
     //
     //  Recevie Message Methods
+    //
     //
     // --------------------------------------------------------------------------
 
@@ -302,7 +315,7 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     }
 
     protected responseMessageReceived(data: Buffer): void {
-        if (_.isNil(data)) {
+        if (_.isNil(data) || data.length === 0) {
             this.warn(`Received nil response message`);
             return;
         }
@@ -444,9 +457,9 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     }
     protected set gateway(value: Gateway) {
         if (this._gateway) {
-            this.network = null;
-            this.channel = null;
-            this.contract = null;
+            this._network = null;
+            this._channel = null;
+            this._contract = null;
             this._gateway.disconnect();
         }
         this._gateway = value;
@@ -470,9 +483,9 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
                 discovery: { enabled: true, asLocalhost: true }
             });
 
-            this.network = await this.gateway.getNetwork(this.settings.fabricNetworkName);
-            this.channel = this.network.getChannel();
-            this.contract = this.network.getContract(this.settings.fabricChaincodeName);
+            this._network = await this.gateway.getNetwork(this.settings.fabricNetworkName);
+            this._channel = this.network.getChannel();
+            this._contract = this.network.getContract(this.settings.fabricChaincodeName);
             this.connectionConnectCompleteHandler();
         } catch (error) {
             error = ExtendedError.create(error, TransportTimeoutError.ERROR_CODE);
@@ -509,6 +522,18 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
 
     public get isConnected(): boolean {
         return this._isConnected;
+    }
+
+    public get network(): Network {
+        return this._network;
+    }
+
+    public get channel(): Channel {
+        return this._channel;
+    }
+
+    public get contract(): Contract {
+        return this._contract;
     }
 
     public get cryptoManager(): ITransportFabricCryptoManager {

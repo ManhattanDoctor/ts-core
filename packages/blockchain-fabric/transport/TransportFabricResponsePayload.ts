@@ -5,7 +5,24 @@ import { TransformUtil, ValidateUtil } from '@ts-core/common/util';
 import { IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 
-export class TransportFabricResponsePayload<U = any, V = any> {
+// --------------------------------------------------------------------------
+//
+//  Interface
+//
+// --------------------------------------------------------------------------
+
+export interface ITransportFabricResponsePayload<V> {
+    id: string;
+    response?: ExtendedError | V;
+}
+
+// --------------------------------------------------------------------------
+//
+//  Class
+//
+// --------------------------------------------------------------------------
+
+export class TransportFabricResponsePayload<U = any, V = any> implements ITransportFabricResponsePayload<V> {
     // --------------------------------------------------------------------------
     //
     //  Static Methods
@@ -19,7 +36,6 @@ export class TransportFabricResponsePayload<U = any, V = any> {
         } catch (error) {
             throw new TransportInvalidDataError(`Invalid payload: ${error.message}`, buffer.toString(TransformUtil.ENCODING));
         }
-
         ValidateUtil.validate(payload);
         return payload;
     }

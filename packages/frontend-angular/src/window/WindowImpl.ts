@@ -34,6 +34,7 @@ export class WindowImpl extends WindowBase implements IWindow {
     private resizeTimer: any;
 
     private _isOnTop: boolean = false;
+    private _isDisabled: boolean = false;
     private _isMinimized: boolean = false;
 
     private isOpened: boolean = false;
@@ -127,6 +128,7 @@ export class WindowImpl extends WindowBase implements IWindow {
 
     protected commitIsBlinkProperties(): void {}
     protected commitIsShakingProperties(): void {}
+    protected commitIsDisabledProperties(): void {}
     protected commitIsMinimizedProperties(): void {}
 
     protected getConfig(): WindowConfig {
@@ -338,16 +340,6 @@ export class WindowImpl extends WindowBase implements IWindow {
 
     // --------------------------------------------------------------------------
     //
-    //  Protected Properties
-    //
-    // --------------------------------------------------------------------------
-
-    protected get shakeClassName(): string {
-        return null;
-    }
-
-    // --------------------------------------------------------------------------
-    //
     //  Public Properties
     //
     // --------------------------------------------------------------------------
@@ -399,5 +391,17 @@ export class WindowImpl extends WindowBase implements IWindow {
         this.commitIsMinimizedProperties();
         this.emit(WindowEvent.MINIMIZED_CHANGED);
         this.stopBlinkIfNeed();
+    }
+
+    public get isDisabled(): boolean {
+        return this._isDisabled;
+    }
+    public set isDisabled(value: boolean) {
+        if (value === this._isDisabled) {
+            return;
+        }
+        this._isDisabled = value;
+        this.commitIsDisabledProperties();
+        this.emit(WindowEvent.DISABLED_CHANGED);
     }
 }

@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { TransportFabric } from '@ts-core/blockchain-fabric/transport';
 import { Logger } from '@ts-core/common/logger';
-import { TransportFabric } from '../fabric/transport/TransportFabric';
-import { ChaincodeBaseService } from './ChaincodeBaseService';
+
+import { ChaincodeTransportBased } from '@ts-core/blockchain-fabric/chaincode';
 
 @Injectable()
-export class Chaincode extends ChaincodeBaseService<void> {
+export class Chaincode extends ChaincodeTransportBased<void> {
     // --------------------------------------------------------------------------
     //
     // 	Constructor

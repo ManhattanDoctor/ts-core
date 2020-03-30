@@ -165,5 +165,3 @@ export class LocaleContainer extends IDestroyable {
         }
     }
 }
-
-// declare let MessageFormat: any;

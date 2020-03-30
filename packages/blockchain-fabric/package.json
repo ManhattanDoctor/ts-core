@@ -1,0 +1,21 @@
+{
+    "name": "@ts-core/blockchain-fabric",
+    "version": "1.0.3",
+    "description": "Classes and utils for HLF",
+    "main": "index.js",
+    "scripts": {},
+    "author": {
+        "name": "Renat Gubaev",
+        "email": "renat.gubaev@gmail.com"
+    },
+    "license": "ISC",
+    "dependencies": {
+        "@ts-core/common": "^1.0.64",
+        "@ts-core/backend": "^1.0.17",
+        "fabric-ca-client": "1.4.7",
+        "fabric-network": "1.4.7",
+        "fabric-client": "1.4.7",
+        "fabric-shim": "1.4.5",
+        "fabric-contract-api": "1.4.5"
+    }
+}

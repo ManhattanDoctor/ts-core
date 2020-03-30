@@ -1,7 +1,6 @@
 import { Component, ElementRef } from '@angular/core';
-import { ViewUtil } from '@ts-core/frontend-angular';
+import { ViewUtil, SmartTableBaseComponent } from '@ts-core/frontend-angular';
 import { LanguageService } from '@ts-core/frontend/language';
-import { SmartTableBaseComponent } from '../../../../../../packages/frontend-angular/src/component/smart-table/SmartTableBaseComponent';
 import { Coin, CoinMapCollection } from '../service/CoinMapCollection';
 
 @Component({
