@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { TransportFabric } from '@ts-core/blockchain-fabric/transport';
-import { TransportCommandFabricHandler } from '@ts-core/blockchain-fabric/transport/command';
+import { TransportCommandFabricAsyncHandler } from '@ts-core/blockchain-fabric/transport/command';
 import { ITransportFabricStub } from '@ts-core/blockchain-fabric/transport/stub';
 import { Logger } from '@ts-core/common/logger';
 
 import { UserAccount, UserAccountType } from '../lib/user/UserAccount';
 import { TestCommand } from './TestCommand';
+import { ExtendedError } from '@ts-core/common/error';
 
 @Injectable()
-export class TestHandler extends TransportCommandFabricHandler<string, TestCommand> {
+export class TestHandler extends TransportCommandFabricAsyncHandler<string, string, TestCommand> {
     // --------------------------------------------------------------------------
     //
     //  Constructor
@@ -25,14 +26,17 @@ export class TestHandler extends TransportCommandFabricHandler<string, TestComma
     //
     // --------------------------------------------------------------------------
 
-    protected async execute(params: string, stub: ITransportFabricStub): Promise<void> {
-        let value = await stub.getState('test', UserAccount);
-        console.log(1, params, value);
+    protected async execute(params: string, stub: ITransportFabricStub): Promise<string> {
+        if (params === 'Seven') {
+            throw new ExtendedError('Hello');
+        }
 
+        let value = await stub.getState('test', UserAccount);
         value = new UserAccount();
+        value['name'] = params;
         value.type = UserAccountType.ADMINISTRATOR;
         await stub.putState('test', value);
-
-        console.log(2, params, value);
+        console.log('OK');
+        return params;
     }
 }

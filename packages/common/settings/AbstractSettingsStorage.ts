@@ -12,6 +12,10 @@ export abstract class AbstractSettingsStorage {
         return value === true || value === 'true' || value === 'TRUE' || value === 1 || value === '1';
     }
 
+    public static parsePEM(value: string): string {
+        return _.isString(value) ? value.replace(/\\n/gm, '\n') : value;
+    }
+
     private static parseValue<T>(value: any, defaultValue: T): T {
         if (!_.isNil(value) && _.isNumber(defaultValue)) {
             return parseFloat(value.toString()) as any;

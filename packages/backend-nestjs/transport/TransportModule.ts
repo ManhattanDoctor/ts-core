@@ -43,8 +43,8 @@ export class TransportModule {
                     provide: Transport,
                     inject: [Logger],
                     useFactory: async (logger: Logger) => {
-                        let item = new TransportAmqp2(logger);
-                        await item.connect(settings.options);
+                        let item = new TransportAmqp2(logger, settings.options);
+                        await item.connect();
                         return item;
                     }
                 });

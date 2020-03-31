@@ -3,6 +3,8 @@ import { LoadableEvent } from '@ts-core/common/Loadable';
 import { ILogger } from '@ts-core/common/logger';
 import { ObservableData } from '@ts-core/common/observer';
 import { PromiseHandler } from '@ts-core/common/promise';
+
+import { FileUtil } from '@ts-core/backend/file';
 import {
     ITransportCommand,
     ITransportCommandAsync,
@@ -37,6 +39,22 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     // --------------------------------------------------------------------------
 
     private static CRYPTO_MANAGER: ITransportFabricCryptoManager;
+
+    private static parseEndorsementError<U>(command: ITransportCommand<U>, error: any): ExtendedError {
+        let defaultError = new ExtendedError(`Unable to send "${command.name}" command request: ${error.message}`);
+        if (_.isEmpty(error.endorsements)) {
+            return defaultError;
+        }
+        error = error.endorsements[0];
+        let message = error.message.replace('transaction returned with failure:', '').trim();
+        if (!ObjectUtil.isJSON(message)) {
+            return defaultError;
+        }
+        let response = TransformUtil.toClass(TransportFabricResponsePayload, TransformUtil.toJSON(message));
+        let item = ExtendedError.instanceOf(response.response) ? TransformUtil.toClass(ExtendedError, response.response) : defaultError;
+        item.stack = null;
+        return item;
+    }
 
     // --------------------------------------------------------------------------
     //
@@ -175,15 +193,11 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
             return;
         }
 
-        if (!this.isCommandAsync(command) || !request.isNeedReply) {
-            this.logCommand(command, TransportLogType.RESPONSE_NO_REPLY);
-            request.handler.resolve();
-            return;
+        if (this.isCommandAsync(command)) {
+            command.response(result);
         }
 
-        command.response(result);
-
-        this.logCommand(command, TransportLogType.RESPONSE_SENDED);
+        this.logCommand(command, request.isNeedReply ? TransportLogType.RESPONSE_SENDED : TransportLogType.RESPONSE_NO_REPLY);
         request.handler.resolve(new TransportFabricResponsePayload<U, V>(command));
     }
 
@@ -250,7 +264,8 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
                 this.responseMessageReceived(response);
             }
         } catch (error) {
-            error = new ExtendedError(`Unable to send "${command.name}" command request: ${error.message}`);
+            error = TransportFabric.parseEndorsementError(command, error);
+
             this.error(error);
             if (!this.isCommandAsync(command)) {
                 return;

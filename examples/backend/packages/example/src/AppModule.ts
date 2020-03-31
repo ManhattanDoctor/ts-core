@@ -19,6 +19,7 @@ import { Chaincode } from './service/Chaincode';
 import { FabricApi } from '@ts-core/blockchain-fabric/api';
 import { TransportFabricBlockParser } from '@ts-core/blockchain-fabric/transport/block';
 import { UserAddCommand } from './handler/UserAddCommand';
+import { ObjectUtil } from '@ts-core/common/util';
 
 export class AppModule implements OnApplicationBootstrap {
     // --------------------------------------------------------------------------
@@ -86,26 +87,29 @@ export class AppModule implements OnApplicationBootstrap {
     private async fabricClientTest(): Promise<void> {
         await PromiseHandler.delay(1000);
 
-        
-        let blockLast = await this.api.getBlockNumber();
-        /*
-        blockLast = 1;
-
         let parser = new TransportFabricBlockParser();
-        for (let i = blockLast - 1; i < blockLast; i++) {
+        let blockLast = await this.api.getBlockNumber();
+        this.logger.log(`Last block is ${blockLast}`);
+
+        for (let i = blockLast; i < blockLast; i++) {
             this.logger.log(`Getting block ${i}...`);
             let block = await this.api.getBlock(i);
             await FileUtil.jsonSave(`block${i}.json`, block);
             await FileUtil.jsonSave(`block${i}_parsed.json`, parser.parse(block));
         }
-        */
 
-        this.logger.log(`Last block is ${blockLast}`);
+        let transaction = await this.api.getTransaction('18a062a9a37d0320ced382283b9910cb65a84840933265551c25edf786545b4f');
 
+        await FileUtil.jsonSave('transaction.json', parser.parseTransaction(transaction.transactionEnvelope));
+        // this.fabric.send(new TestCommand(`Five`), this.settings.fabricUserOptions);
+        // this.fabric.send(new TestCommand(`Six`), this.settings.fabricUserOptions);
+
+        /*
         try {
             let userId = 'Renat';
             let item = null;
             item = await this.fabric.sendListen(new UserGetCommand(userId), this.settings.fabricUserOptions);
+            
             if (_.isNil(item)) {
                 item = await this.fabric.sendListen(
                     new UserAddCommand({ id: userId, publicKey: this.settings.fabricUserOptions.fabricUserPublicKey }),
@@ -116,32 +120,6 @@ export class AppModule implements OnApplicationBootstrap {
         } catch (error) {
             console.log(error.message);
         }
-    }
-
-    private async transportTest(): Promise<void> {
-        let amqp2 = new TransportAmqp2(this.logger, this.settings);
-        await amqp2.connect();
-
-        let local = new TransportLocal(this.logger);
-        let transport: ITransport = amqp2;
-
-        transport.listen<any>('test').subscribe(async command => {
-            // await PromiseHandler.delay(3000);
-            // transport.complete(command, new ExtendedError('Error!23'));
-            // transport.complete(command, { message: 'response' });
-        });
-
-        for (let i = 0; i < 1; i++) {
-            await transport.sendListen(new TransportCommandAsync(`test`, { message: 'request' }), {
-                timeout: 5000,
-                waitMaxCount: 1,
-                waitDelay: TransportCommandWaitDelay.SLOW
-            });
-        }
-
-        /*
-        transport.getDispatcher('hello').subscribe(event => {console.log(123, event)});
-        setTimeout(() => transport.dispatch(new TransportEvent(`hello`, { hello: 123 })), 1000);
         */
     }
 }

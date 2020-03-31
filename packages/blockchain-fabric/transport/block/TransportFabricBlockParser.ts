@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import { ITransportFabricTransaction } from './ITransportFabricTransaction';
 import { TransportFabric } from '../TransportFabric';
 import { TransformUtil } from '@ts-core/common/util';
+import { IFabricBlock } from '../../api';
 
 export class TransportFabricBlockParser {
     // --------------------------------------------------------------------------
@@ -12,25 +13,25 @@ export class TransportFabricBlockParser {
     //
     // --------------------------------------------------------------------------
 
-    public parse(block: Block): ITransportFabricBlock {
+    public parse(block: IFabricBlock): ITransportFabricBlock {
         let item: ITransportFabricBlock = {} as any;
-        item.number = Number(block.header.number);
+        item.hash = block.hash;
+        item.number = block.number;
+        item.createdDate = block.createdDate;
         if (_.isNil(block.data) || _.isEmpty(block.data.data)) {
             return;
         }
 
         let transactions: Array<ITransportFabricTransaction> = [];
         for (let data of block.data.data) {
-            transactions.push(this.parseBlockData(data));
+            transactions.push(this.parseTransaction(data));
         }
         item.transactions = _.compact(transactions);
-        if (!_.isEmpty(transactions)) {
-            item.createdDate = new Date(transactions[0].timestamp);
-        }
-        // transactions = transactions.filter(item => item)
-
-        item.transactions = transactions;
         return item;
+    }
+
+    public parseTransaction(data: BlockData): ITransportFabricTransaction {
+        return this.parseBlockData(data);
     }
 
     // --------------------------------------------------------------------------

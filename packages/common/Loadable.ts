@@ -84,6 +84,9 @@ export abstract class Loadable<U = any, V = any> extends DestroyableContainer {
     public get isLoading(): boolean {
         return this.status === LoadableStatus.LOADING;
     }
+    public get isNotLoaded(): boolean {
+        return this.status === LoadableStatus.NOT_LOADED;
+    }
 }
 
 export interface ILoadable {}

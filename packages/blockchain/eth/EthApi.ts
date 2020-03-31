@@ -4,6 +4,7 @@ import Web3, * as GLOBAL_WEB3 from 'web3';
 import { IEthBlock } from './IEthBlock';
 import { IEthTransaction } from './IEthTransaction';
 import { IEthTransactionReceipt } from './IEthTransactionReceipt';
+import * as _ from 'lodash';
 
 export class EthApi {
     // --------------------------------------------------------------------------
@@ -21,6 +22,9 @@ export class EthApi {
     // --------------------------------------------------------------------------
 
     public static parseBlock(item: IEthBlock): void {
+        if (_.isNil(item)) {
+            return;
+        }
         item.createdDate = DateUtil.parseDate(Number(item.timestamp) * DateUtil.MILISECONDS_SECOND);
     }
 

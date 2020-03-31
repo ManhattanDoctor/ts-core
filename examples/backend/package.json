@@ -4,7 +4,7 @@
     "author": "Renat Gubaev",
     "license": "ISC",
     "scripts": {
-        "start": "CORE_CHAINCODE_LOGGING_LEVEL='CRITICAL' CORE_CHAINCODE_ID_NAME='test:1.18' ts-node packages/example/src/main.ts --peer.address 0.0.0.0:7052"
+        "start": "CORE_CHAINCODE_LOGGING_LEVEL='LOG' CORE_CHAINCODE_ID_NAME='test:1.18' ts-node packages/example/src/main.ts --peer.address 0.0.0.0:7052"
     },
     "dependencies": {
         "@nestjs/common": "6.10.11",

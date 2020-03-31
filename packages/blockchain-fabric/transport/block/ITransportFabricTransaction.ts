@@ -5,6 +5,7 @@ export interface ITransportFabricTransaction<U = any, V = any> {
     id: string;
     timestamp: string;
     channelId: string;
+    validationCode: number;
     chaincode: { name: string; version: string; path: string };
 
     request: ITransportFabricRequestPayload<U>;

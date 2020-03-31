@@ -1,27 +1,7 @@
-import { TransportFabricRequestPayload, ITransportFabricRequestPayload } from '../transport/TransportFabricRequestPayload';
-import { ITransportFabricResponsePayload } from '../transport/TransportFabricResponsePayload';
+import { Block } from 'fabric-client';
 
-export interface IFabricBlock {
+export interface IFabricBlock extends Block {
+    hash: string;
     number: number;
     createdDate: Date;
-    events: Array<IFabricEvent>;
-    transactions: Array<IFabricTransaction>;
-
-    // data: { data: BlockData[] };
-    // metadata: { metadata: any };
-}
-
-export interface IFabricEvent<U = any> {}
-
-export interface IFabricTransaction<U = any, V = any> {
-    chaincode: IFabricTransactionChaincode;
-
-    request: ITransportFabricRequestPayload<U>;
-    response: ITransportFabricResponsePayload<V>;
-}
-
-export interface IFabricTransactionChaincode {
-    path: string;
-    name: string;
-    version: string;
 }

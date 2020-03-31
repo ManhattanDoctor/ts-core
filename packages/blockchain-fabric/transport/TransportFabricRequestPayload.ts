@@ -61,7 +61,8 @@ export class TransportFabricRequestPayload<U = any> implements ITransportFabricR
         stub: ChaincodeStub,
         isUserSignatureVerified: boolean
     ): ITransportCommandFabric<U> {
-        let type: ClassType<ITransportCommandFabric<U>> = payload.isNeedReply ? TransportCommandFabricAsyncImpl : TransportCommandFabricImpl;
+        // let type: ClassType<ITransportCommandFabric<U>> = payload.isNeedReply ? TransportCommandFabricAsyncImpl : TransportCommandFabricImpl;
+        let type: ClassType<ITransportCommandFabric<U>> = TransportCommandFabricAsyncImpl;
         let command = new type(payload, stub, isUserSignatureVerified);
         return command;
     }
@@ -98,27 +99,6 @@ export class TransportFabricRequestPayload<U = any> implements ITransportFabricR
 // --------------------------------------------------------------------------
 
 class TransportCommandFabricAsyncImpl<U, V> extends TransportCommandAsync<U, V> implements ITransportCommandFabricAsync<U, V> {
-    // --------------------------------------------------------------------------
-    //
-    //  Properties
-    //
-    // --------------------------------------------------------------------------
-
-    public stub: ITransportFabricStub;
-
-    // --------------------------------------------------------------------------
-    //
-    //  Constructor
-    //
-    // --------------------------------------------------------------------------
-
-    constructor(payload: TransportFabricRequestPayload, stub: ChaincodeStub, isUserSignatureVerified: boolean) {
-        super(payload.name, payload.request, payload.id);
-        this.stub = new TransportFabricStub(payload, stub, isUserSignatureVerified);
-    }
-}
-
-class TransportCommandFabricImpl<T> extends TransportCommand<T> implements ITransportCommandFabric<T> {
     // --------------------------------------------------------------------------
     //
     //  Properties

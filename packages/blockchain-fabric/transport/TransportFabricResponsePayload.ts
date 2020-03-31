@@ -1,5 +1,5 @@
 import { ExtendedError } from '@ts-core/common/error';
-import { ITransportCommandAsync } from '@ts-core/common/transport';
+import { ITransportCommandAsync, ITransportCommand, Transport } from '@ts-core/common/transport';
 import { TransportInvalidDataError } from '@ts-core/common/transport/error/TransportInvalidDataError';
 import { TransformUtil, ValidateUtil } from '@ts-core/common/util';
 import { IsOptional, IsString } from 'class-validator';
@@ -65,11 +65,13 @@ export class TransportFabricResponsePayload<U = any, V = any> implements ITransp
     //
     // --------------------------------------------------------------------------
 
-    constructor(command?: ITransportCommandAsync<U, V>) {
+    constructor(command?: ITransportCommand<U>) {
         if (_.isNil(command)) {
             return;
         }
         this.id = command.id;
-        this.response = _.isNil(command.error) ? command.data : command.error;
+        if (Transport.isCommandAsync(command)) {
+            this.response = _.isNil(command.error) ? command.data : command.error;
+        }
     }
 }

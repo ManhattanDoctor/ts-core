@@ -49,14 +49,15 @@ export abstract class ChaincodeTransportBased<T> extends LoggerWrapper implement
 
         // No need to response
         let content = _.isNil(response) ? Buffer.from('') : TransformUtil.fromClassBuffer(response);
-        if (!_.isNil(response) && ExtendedError.instanceOf(response.response)) {
+        let isError = !_.isNil(response) && ExtendedError.instanceOf(response.response);
+        if (isError) {
             this.observer.next(new ObservableData(ChaincodeTransportBasedEvent.INVOKE_ERROR, response));
         } else {
             this.observer.next(new ObservableData(ChaincodeTransportBasedEvent.INVOKE_COMPLETE, response));
         }
 
         this.observer.next(new ObservableData(ChaincodeTransportBasedEvent.INVOKE_FINISHED, stub));
-        return shim.success(content);
+        return isError ? shim.error(content) : shim.success(content);
     }
 
     // --------------------------------------------------------------------------

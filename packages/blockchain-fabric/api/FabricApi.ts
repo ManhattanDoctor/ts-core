@@ -8,8 +8,35 @@ import { Subject } from 'rxjs';
 import { LoadableEvent } from '@ts-core/common/Loadable';
 import { IFabricChannelInfo } from './IFabricChannelInfo';
 import { LoggerWrapper, ILogger } from '@ts-core/common/logger';
+import { IFabricBlock } from './IFabricBlock';
 
 export class FabricApi extends LoggerWrapper {
+    // --------------------------------------------------------------------------
+    //
+    // 	Static Methods
+    //
+    // --------------------------------------------------------------------------
+
+    public static parseBlock(block: Block): void {
+        let item: IFabricBlock = block as any;
+        item.hash = block.header.data_hash.toString('hex');
+        item.number = Number(block.header.number);
+        item.createdDate = FabricApi.getBlockCreatedDate(block);
+    }
+
+    public static getBlockCreatedDate(block: Block): Date {
+        if (_.isNil(block.data) || _.isEmpty(block.data.data)) {
+            return null;
+        }
+        for (let data of block.data.data) {
+            if (_.isNil(data) || _.isNil(data.payload) || _.isNil(data.payload.header) || _.isNil(data.payload.header.channel_header)) {
+                continue;
+            }
+            return new Date(data.payload.header.channel_header.timestamp);
+        }
+        return null;
+    }
+
     // --------------------------------------------------------------------------
     //
     //  Properties
@@ -147,7 +174,7 @@ export class FabricApi extends LoggerWrapper {
         return info.height;
     }
 
-    public async getBlock(block: number | string): Promise<Block> {
+    public async getBlock(block: number | string): Promise<IFabricBlock> {
         let item: Block = null;
         if (_.isString(block)) {
             item = await this.channel.queryBlockByHash(Buffer.from(block, 'hex'));
@@ -156,11 +183,14 @@ export class FabricApi extends LoggerWrapper {
         } else {
             throw new ExtendedError(`Invalid block: value must be string or number`);
         }
-        return item;
+        FabricApi.parseBlock(item);
+        return item as IFabricBlock;
     }
 
-    public async getBlockByTxID(id: string): Promise<Block> {
-        return this.channel.queryBlockByTxID(id);
+    public async getBlockByTxID(id: string): Promise<IFabricBlock> {
+        let item = await this.channel.queryBlockByTxID(id);
+        FabricApi.parseBlock(item);
+        return item as IFabricBlock;
     }
 
     public async getTransaction(id: string): Promise<any> {
