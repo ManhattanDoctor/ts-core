@@ -11,7 +11,7 @@ import * as _ from 'lodash';
 //
 // --------------------------------------------------------------------------
 
-export interface ITransportFabricResponsePayload<V> {
+export interface ITransportFabricResponsePayload<V = any> {
     id: string;
     response?: ExtendedError | V;
 }

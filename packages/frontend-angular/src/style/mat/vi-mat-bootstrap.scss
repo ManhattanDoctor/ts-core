@@ -11,7 +11,6 @@
     body {
         @include mat-typography-level-to-styles($typography, body-1);
     }
-
 }
 
 @mixin vi-mat-theme-bootstrap($theme, $text-primary-default, $text-accent-default) {
@@ -22,44 +21,63 @@
     $background: map-get($theme, background);
     $foreground: map-get($theme, foreground);
 
-    $text-accent: mat-color($accent, $text-accent-default);
-    $text-primary: mat-color($primary, $text-primary-default);
+    $text-color: map-get($foreground, text);
+    $text-accent-color: mat-color($accent, $text-accent-default);
+    $text-primary-color: mat-color($primary, $text-primary-default);
+
+    $divider-color: map-get($foreground, divider);
+
     @if $is-dark {
-        $text-accent: mat-color($accent);
-        $text-primary: mat-color($primary);
+        $text-accent-color: mat-color($accent);
+        $text-primary-color: mat-color($primary);
     }
 
     // _reset.scss
-    color: map-get($foreground, text);
+    color: $text-color;
     background-color: map-get($background, body) !important;
 
     .bg-primary {
-        background-color: $text-primary !important;
+        background-color: $text-primary-color !important;
     }
     .border-primary {
-        border-color: $text-primary !important;
+        border-color: $text-primary-color !important;
     }
 
     .form-control {
         background: transparent;
-        color: map-get($foreground, text);
-        border-color: map-get($foreground, divider);
+        color: $text-color;
+        border-color: $divider-color;
     }
 
     .border {
-        border-color: map-get($foreground, divider) !important;
+        border-color: $divider-color !important;
+        &.dashed {
+            border: 1px dashed $divider-color !important;
+        }
     }
     .border-top {
-        border-color: map-get($foreground, divider) !important;
+        border-color: $divider-color !important;
+        &.dashed {
+            border-top: 1px dashed $divider-color !important;
+        }
     }
     .border-left {
-        border-color: map-get($foreground, divider) !important;
+        border-color: $divider-color !important;
+        &.dashed {
+            border-left: 1px dashed $divider-color !important;
+        }
     }
     .border-right {
-        border-color: map-get($foreground, divider) !important;
+        border-color: $divider-color !important;
+        &.dashed {
+            border-right: 1px dashed $divider-color !important;
+        }
     }
     .border-bottom {
-        border-color: map-get($foreground, divider) !important;
+        border-color: $divider-color !important;
+        &.dashed {
+            border-bottom: 1px dashed $divider-color !important;
+        }
     }
 
     .background {
@@ -70,13 +88,13 @@
     }
 
     .text-base {
-        color: map-get($foreground, text) !important;
+        color: $text-color !important;
     }
     .text-accent {
-        color: $text-accent !important;
+        color: $text-accent-color !important;
     }
     .text-primary {
-        color: $text-primary !important;
+        color: $text-primary-color !important;
     }
     .text-danger {
         color: mat-color($warn) !important;

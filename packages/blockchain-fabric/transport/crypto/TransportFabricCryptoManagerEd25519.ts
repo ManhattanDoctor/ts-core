@@ -1,6 +1,6 @@
 import { TweetNaCl } from '@ts-core/common/crypto';
 import { TransformUtil } from '@ts-core/common/util';
-import { ITransportFabricCryptoManager } from './ITransportFabricCryptoManager';
+import { ITransportFabricCryptoManager, TransportFabricCryptoAlgorithm } from './ITransportFabricCryptoManager';
 
 export class TransportFabricCryptoManagerEd25519 implements ITransportFabricCryptoManager {
     // --------------------------------------------------------------------------
@@ -25,5 +25,9 @@ export class TransportFabricCryptoManagerEd25519 implements ITransportFabricCryp
 
     protected toString<U>(request: U): string {
         return TransformUtil.fromJSON(TransformUtil.fromClass(request));
+    }
+
+    public get algorithm(): TransportFabricCryptoAlgorithm {
+        return TransportFabricCryptoAlgorithm.ED25519;
     }
 }

@@ -32,4 +32,18 @@ export class ValidateUtil {
     public static async isValidAsync<T = any>(item: T, isNeedThrowError: boolean = true, options?: ValidatorOptions): Promise<boolean> {
         return _.isEmpty(await this.validateAsync(item, isNeedThrowError, options));
     }
+
+    public static toString(items: Array<ValidationError>): string {
+        if (!_.isArray(items) || _.isEmpty(items)) {
+            return `Validation failed`;
+        }
+
+        let value = ``;
+        for (let item of items) {
+            if (item instanceof ValidationError) {
+                value += `${item.toString()}\n`;
+            }
+        }
+        return value.trim();
+    }
 }

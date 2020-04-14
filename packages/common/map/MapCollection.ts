@@ -14,6 +14,7 @@ export class MapCollection<U> extends Destroyable {
     protected uidPropertyName: keyof U;
 
     protected _length: number;
+    protected _maxLength: number;
     protected _collection: Array<U>;
 
     // --------------------------------------------------------------------------
@@ -22,7 +23,7 @@ export class MapCollection<U> extends Destroyable {
     //
     // --------------------------------------------------------------------------
 
-    constructor(uidPropertyName: keyof U) {
+    constructor(uidPropertyName: keyof U, maxLength: number = NaN) {
         super();
 
         if (_.isNil(uidPropertyName)) {
@@ -34,6 +35,7 @@ export class MapCollection<U> extends Destroyable {
 
         this._length = 0;
         this._collection = [];
+        this._maxLength = maxLength;
     }
 
     // --------------------------------------------------------------------------
@@ -68,11 +70,27 @@ export class MapCollection<U> extends Destroyable {
 
         this.map.set(uid, item);
         this.setLength(this._collection.length);
+        this.checkMaxLength();
         return item;
+    }
+
+    public addItems(items: Array<U>): Array<U> {
+        if (_.isNil(items) || _.isEmpty(items)) {
+            return [];
+        }
+        return _.compact(items.map(item => this.add(item)));
     }
 
     public get(uid: string): U {
         return !_.isNil(uid) ? this.map.get(uid) : null;
+    }
+
+    public getFirst(): U {
+        return !_.isEmpty(this._collection) ? this._collection[0] : null;
+    }
+
+    public getLast(): U {
+        return !_.isEmpty(this._collection) ? this._collection[this._collection.length - 1] : null;
     }
 
     public has(uid: string): boolean {
@@ -101,6 +119,10 @@ export class MapCollection<U> extends Destroyable {
         }
         this.map.delete(uid);
         return item;
+    }
+
+    public removeItems(uids: Array<string>): Array<U> {
+        return _.compact(uids.map(item => this.remove(item)));
     }
 
     public move(oldIndex: number, newIndex: number): void {
@@ -144,6 +166,14 @@ export class MapCollection<U> extends Destroyable {
         this._length = value;
     }
 
+    protected checkMaxLength(): void {
+        if (!_.isNumber(this._maxLength) || _.isNaN(this._maxLength) || this._maxLength <= 0 || this._length <= this._maxLength) {
+            return;
+        }
+        let item = this._collection[0];
+        this.remove(this.getUidValue(item));
+    }
+
     // --------------------------------------------------------------------------
     //
     //  Public Properties
@@ -152,6 +182,18 @@ export class MapCollection<U> extends Destroyable {
 
     public get length(): number {
         return this._length;
+    }
+
+    public get maxLength(): number {
+        return this._maxLength;
+    }
+
+    public set maxLength(value: number) {
+        if (value === this._maxLength) {
+            return;
+        }
+        this._maxLength = value;
+        this.checkMaxLength();
     }
 
     public get collection(): Array<U> {

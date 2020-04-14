@@ -24,8 +24,12 @@ export abstract class PaginableDataSourceMapCollection<U, V> extends FilterableD
 
     protected _items: Array<U>;
 
+    protected _total: number;
+    protected _pages: number;
     protected _pageSize: number = 10;
     protected _pageIndex: number = 0;
+
+    public isClearAfterLoad: boolean = false;
 
     // --------------------------------------------------------------------------
     //
@@ -62,10 +66,16 @@ export abstract class PaginableDataSourceMapCollection<U, V> extends FilterableD
     protected parseResponse(response: IPagination<V>): void {
         super.parseResponse(response);
         let items = this.getResponseItems(response);
+        this._total = response.total;
+        this._pages = response.pages;
         this._isAllLoaded = _.isEmpty(items);
 
         if (this._isAllLoaded) {
             return;
+        }
+
+        if (this.isClearAfterLoad) {
+            this.clear();
         }
 
         this.parseItems(items);
@@ -73,7 +83,7 @@ export abstract class PaginableDataSourceMapCollection<U, V> extends FilterableD
     }
 
     protected checkIsAllLoaded(response: IPagination<V>, items: Array<any>): void {
-        this._isAllLoaded = response.pageIndex >= response.pages - 1 || response.pageSize > items.length;
+        this._isAllLoaded = !this.isClearAfterLoad && (response.pageIndex >= response.pages - 1 || response.pageSize > items.length);
     }
 
     protected getResponseItems(response: IPagination<V>): Array<any> {
@@ -116,5 +126,13 @@ export abstract class PaginableDataSourceMapCollection<U, V> extends FilterableD
 
     public get items(): Array<U> {
         return this._items;
+    }
+
+    public get pages(): number {
+        return this._pages;
+    }
+
+    public get total(): number {
+        return this._total;
     }
 }

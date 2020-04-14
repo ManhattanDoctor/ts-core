@@ -9,6 +9,7 @@ import { LoadableEvent } from '@ts-core/common/Loadable';
 import { IFabricChannelInfo } from './IFabricChannelInfo';
 import { LoggerWrapper, ILogger } from '@ts-core/common/logger';
 import { IFabricBlock } from './IFabricBlock';
+import { IFabricTransaction } from './IFabricTransaction';
 
 export class FabricApi extends LoggerWrapper {
     // --------------------------------------------------------------------------
@@ -193,7 +194,7 @@ export class FabricApi extends LoggerWrapper {
         return item as IFabricBlock;
     }
 
-    public async getTransaction(id: string): Promise<any> {
+    public async getTransaction(id: string): Promise<IFabricTransaction> {
         return this.channel.queryTransaction(id);
     }
 

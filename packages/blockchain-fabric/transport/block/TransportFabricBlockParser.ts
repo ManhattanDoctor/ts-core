@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { ITransportFabricTransaction } from './ITransportFabricTransaction';
 import { TransportFabric } from '../TransportFabric';
 import { TransformUtil } from '@ts-core/common/util';
-import { IFabricBlock } from '../../api';
+import { IFabricBlock, FabricTransactionValidationCode, IFabricTransaction } from '../../api';
 
 export class TransportFabricBlockParser {
     // --------------------------------------------------------------------------
@@ -22,16 +22,30 @@ export class TransportFabricBlockParser {
             return;
         }
 
-        let transactions: Array<ITransportFabricTransaction> = [];
-        for (let data of block.data.data) {
-            transactions.push(this.parseTransaction(data));
+        let metadata = block.metadata.metadata;
+        let validationCodes = _.isArray(metadata) && !_.isEmpty(metadata) ? metadata[metadata.length - 1] : [];
+
+        let transactions = [];
+        for (let i = 0; i < block.data.data.length; i++) {
+            let item = this.parseBlockData(block.data.data[i]);
+            if (_.isNil(item)) {
+                continue;
+            }
+            item.validationCode = validationCodes[i];
+            transactions.push(item);
         }
-        item.transactions = _.compact(transactions);
+        item.transactions = transactions;
+
+        let events = [];
+        item.events = events;
+
         return item;
     }
 
-    public parseTransaction(data: BlockData): ITransportFabricTransaction {
-        return this.parseBlockData(data);
+    public parseTransaction(data: IFabricTransaction): ITransportFabricTransaction {
+        let item = this.parseBlockData(data.transactionEnvelope);
+        item.validationCode = data.validationCode;
+        return item;
     }
 
     // --------------------------------------------------------------------------
@@ -48,9 +62,9 @@ export class TransportFabricBlockParser {
         let header = data.payload.header.channel_header;
 
         let item: ITransportFabricTransaction = {} as any;
-        item.id = header.tx_id;
-        item.timestamp = header.timestamp;
-        item.channelId = header.channel_id;
+        item.hash = header.tx_id;
+        item.channel = header.channel_id;
+        item.createdDate = new Date(header.timestamp);
 
         if (!_.isNil(data.payload.data) && !_.isEmpty(data.payload.data.actions)) {
             for (let action of data.payload.data.actions) {

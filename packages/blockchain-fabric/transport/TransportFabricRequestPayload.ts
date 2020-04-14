@@ -2,11 +2,12 @@ import { TransportCommand, TransportCommandAsync } from '@ts-core/common/transpo
 import { TransportInvalidDataError } from '@ts-core/common/transport/error';
 import { TransformUtil, ValidateUtil } from '@ts-core/common/util';
 import { ClassType } from 'class-transformer/ClassTransformer';
-import { IsBoolean, IsDefined, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsDefined, IsOptional, IsString } from 'class-validator';
 import { ChaincodeStub } from 'fabric-shim';
 import { ITransportFabricCommandOptions } from './ITransportFabricCommandOptions';
 import { ITransportFabricStub, TransportFabricStub } from './stub';
 import { ITransportCommandFabric, ITransportCommandFabricAsync, TransportFabric } from './TransportFabric';
+import { TransportFabricCryptoAlgorithm } from './crypto';
 
 // --------------------------------------------------------------------------
 //
@@ -19,8 +20,10 @@ export interface ITransportFabricRequestPayload<U = any> {
     name: string;
     request: U;
     options: ITransportFabricCommandOptions;
-    isNeedReply: boolean;
+
     signature: string;
+    algorithm: string;
+    isNeedReply: boolean;
 }
 
 // --------------------------------------------------------------------------
@@ -90,6 +93,10 @@ export class TransportFabricRequestPayload<U = any> implements ITransportFabricR
 
     @IsOptional()
     public signature: string;
+
+    @IsOptional()
+    @IsEnum(TransportFabricCryptoAlgorithm)
+    public algorithm: TransportFabricCryptoAlgorithm;
 }
 
 // --------------------------------------------------------------------------

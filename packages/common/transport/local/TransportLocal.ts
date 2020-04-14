@@ -72,7 +72,7 @@ export class TransportLocal extends Transport<ITransportLocalSettings> {
     }
 
     public dispatch<T>(event: ITransportEvent<T>): void {
-        let item = this.dispatchers.get(name);
+        let item = this.dispatchers.get(event.name);
         if (_.isNil(item)) {
             return;
         }

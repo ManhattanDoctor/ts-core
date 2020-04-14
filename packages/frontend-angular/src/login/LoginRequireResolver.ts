@@ -1,5 +1,6 @@
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
 import { LoginBaseService, LoginBaseServiceEvent } from './LoginBaseService';
+import { PromiseHandler } from '@ts-core/common/promise';
 
 export class LoginRequireResolver implements Resolve<void> {
     // --------------------------------------------------------------------------
@@ -21,16 +22,16 @@ export class LoginRequireResolver implements Resolve<void> {
             return Promise.resolve();
         }
 
-        return new Promise<void>((resolve, reject) => {
-            let subscription = this.login.events.subscribe(data => {
-                if (data.type === LoginBaseServiceEvent.LOGIN_ERROR) {
-                    reject(data.error.message);
-                } else if (data.type === LoginBaseServiceEvent.LOGIN_COMPLETE) {
-                    resolve();
-                } else if (data.type === LoginBaseServiceEvent.LOGIN_FINISHED) {
-                    subscription.unsubscribe();
-                }
-            });
+        let promise = PromiseHandler.create<void>();
+        let subscription = this.login.events.subscribe(data => {
+            if (data.type === LoginBaseServiceEvent.LOGIN_ERROR) {
+                promise.reject(data.error.toString());
+            } else if (data.type === LoginBaseServiceEvent.LOGIN_COMPLETE) {
+                promise.resolve();
+            } else if (data.type === LoginBaseServiceEvent.LOGIN_FINISHED) {
+                subscription.unsubscribe();
+            }
         });
+        return promise.promise;
     }
 }

@@ -79,6 +79,7 @@
             right: -16px;
             bottom: -16px;
             display: none !important;
+            pointer-events: none;
         }
     }
 
@@ -174,10 +175,14 @@
         font-weight: inherit;
     }
 
+    mat-paginator {
+        background: none !important;
+    }
+
     .cdk-global-scrollblock {
         overflow-y: auto;
     }
-    
+
     .cdk-overlay-pane {
         &.window,
         &.notification {
@@ -229,6 +234,14 @@
         margin: 0;
     }
 
+    .text-underline {
+        text-decoration: underline !important;
+    }
+    .text-highlight {
+        color: inherit;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
     .text-one-line {
         @include text-one-line();
     }
@@ -354,7 +367,6 @@
     ::-webkit-scrollbar-thumb {
         background-color: $thumb-color;
     }
-    
 }
 
 @mixin vi-mat-checkbox-multiline() {

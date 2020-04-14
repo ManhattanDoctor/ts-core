@@ -1,0 +1,28 @@
+{
+    "id": "18a062a9a37d0320ced382283b9910cb65a84840933265551c25edf786545b4f",
+    "timestamp": "2020-03-31T17:44:26.399Z",
+    "channelId": "mychannel",
+    "request": {
+        "options": {
+            "fabricUserId": "Renat",
+            "fabricUserPublicKey": "e365007e85508c6b44d5101a1d59d0061a48fd1bcd393186ccb5e7ae938a59a8",
+            "timeout": 30000,
+            "waitDelay": 3000,
+            "waitMaxCount": 3000
+        },
+        "isNeedReply": false,
+        "id": "0f927669-a5cd-41f3-bb1e-3737196fa2b4",
+        "name": "TestCommand",
+        "request": "Five",
+        "signature": "3643e144eadac38770a332286fc14b77a1d30975772c717f8ea26d4e5a5fb972403319f691ac77d5ce6c9f5fa6526bbb63d0a0961bddd9fbd46fb66b6c0f7402"
+    },
+    "chaincode": {
+        "path": "",
+        "name": "test",
+        "version": "1.18"
+    },
+    "response": {
+        "id": "0f927669-a5cd-41f3-bb1e-3737196fa2b4",
+        "response": "Five"
+    }
+}

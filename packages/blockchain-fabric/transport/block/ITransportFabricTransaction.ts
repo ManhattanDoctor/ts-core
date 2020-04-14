@@ -1,13 +1,20 @@
 import { ITransportFabricRequestPayload } from '../TransportFabricRequestPayload';
 import { ITransportFabricResponsePayload } from '../TransportFabricResponsePayload';
+import { FabricTransactionValidationCode } from '../../api/IFabricTransaction';
 
 export interface ITransportFabricTransaction<U = any, V = any> {
-    id: string;
-    timestamp: string;
-    channelId: string;
-    validationCode: number;
-    chaincode: { name: string; version: string; path: string };
+    hash: string;
+    channel: string;
+    createdDate: Date;
+    chaincode: ITransportFabricTransactionChaincode;
+    validationCode: FabricTransactionValidationCode;
 
     request: ITransportFabricRequestPayload<U>;
     response: ITransportFabricResponsePayload<V>;
+}
+
+export interface ITransportFabricTransactionChaincode {
+    name: string;
+    path: string;
+    version: string;
 }

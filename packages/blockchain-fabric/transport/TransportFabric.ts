@@ -4,7 +4,6 @@ import { ILogger } from '@ts-core/common/logger';
 import { ObservableData } from '@ts-core/common/observer';
 import { PromiseHandler } from '@ts-core/common/promise';
 
-import { FileUtil } from '@ts-core/backend/file';
 import {
     ITransportCommand,
     ITransportCommandAsync,
@@ -22,8 +21,8 @@ import { Contract, Gateway, InMemoryWallet, Network, Wallet, X509WalletMixin } f
 import { ChaincodeStub } from 'fabric-shim';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
-import { TransportFabricCryptoManagerEd25519 } from './crypto';
-import { ITransportFabricCryptoManager } from './crypto/ITransportFabricCryptoManager';
+import { TransportFabricCryptoManagerFactory } from './crypto';
+import { ITransportFabricCryptoManager, TransportFabricCryptoAlgorithm } from './crypto/ITransportFabricCryptoManager';
 import { ITransportFabricCommandOptions } from './ITransportFabricCommandOptions';
 import { ITransportFabricRequestOptions } from './ITransportFabricRequestOptions';
 import { ITransportFabricSettings } from './ITransportFabricSettings';
@@ -37,8 +36,6 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     //  Constants
     //
     // --------------------------------------------------------------------------
-
-    private static CRYPTO_MANAGER: ITransportFabricCryptoManager;
 
     private static parseEndorsementError<U>(command: ITransportCommand<U>, error: any): ExtendedError {
         let defaultError = new ExtendedError(`Unable to send "${command.name}" command request: ${error.message}`);
@@ -61,14 +58,6 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     //  Static Methods
     //
     // --------------------------------------------------------------------------
-
-    public static get cryptoManager(): ITransportFabricCryptoManager {
-        if (!_.isNil(TransportFabric.CRYPTO_MANAGER)) {
-            return TransportFabric.CRYPTO_MANAGER;
-        }
-        TransportFabric.CRYPTO_MANAGER = new TransportFabricCryptoManagerEd25519();
-        return TransportFabric.CRYPTO_MANAGER;
-    }
 
     public static get chaincodeMethod(): string {
         return 'fabricTransportExecute';
@@ -389,8 +378,8 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
         if (_.isNil(payload.options) || _.isNil(payload.options.fabricUserPublicKey)) {
             throw new ExtendedError(`Command "${payload.name}" has nil publicKey for verification`);
         }
-        if (!this.cryptoManager.verify(payload.request, payload.signature, payload.options.fabricUserPublicKey)) {
-            throw new ExtendedError(`Command "${payload.name}" has incorrect signature`);
+        if (!this.getCryptoManager(payload.algorithm).verify(payload.request, payload.signature, payload.options.fabricUserPublicKey)) {
+            throw new ExtendedError(`Command "${payload.name}" invalid signature`);
         }
         return true;
     }
@@ -412,15 +401,14 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
         ObjectUtil.copyProperties(command, payload, ['id', 'name', 'request']);
 
         if (this.isNeedSign(command.name)) {
-            payload.signature = this.sign(command, options);
+            this.sign(command, options, payload);
         }
 
         let request: ITransportFabricRequestOptions = { method: TransportFabric.chaincodeMethod, payload };
-
         return request;
     }
 
-    protected sign<U>(command: ITransportCommand<U>, options: ITransportFabricCommandOptions): string {
+    protected sign<U>(command: ITransportCommand<U>, options: ITransportFabricCommandOptions, payload: TransportFabricRequestPayload<U>): void {
         let publicKey = !_.isNil(options.fabricUserPublicKey) ? options.fabricUserPublicKey : this.settings.fabricUserPublicKey;
         let privateKey = !_.isNil(options.fabricUserPrivateKey) ? options.fabricUserPrivateKey : this.settings.fabricUserPrivateKey;
 
@@ -431,7 +419,10 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
             throw new ExtendedError(`Unable to sign "${command.name}" command: public key is nil`);
         }
         options.fabricUserPublicKey = publicKey;
-        return this.cryptoManager.sign(command.request, privateKey);
+
+        let manager = this.getCryptoManager(this.settings.fabricCryptoAlgorithm);
+        payload.signature = manager.sign(command.request, privateKey);
+        payload.algorithm = manager.algorithm;
     }
 
     protected isNeedSign(name: string): boolean {
@@ -529,6 +520,13 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
         return this._wallet;
     }
 
+    protected getCryptoManager(algorithm: TransportFabricCryptoAlgorithm): ITransportFabricCryptoManager {
+        if (_.isNil(algorithm)) {
+            algorithm = TransportFabricCryptoAlgorithm.ED25519;
+        }
+        return TransportFabricCryptoManagerFactory.get(algorithm);
+    }
+
     // --------------------------------------------------------------------------
     //
     //  Public Properties
@@ -549,10 +547,6 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
 
     public get contract(): Contract {
         return this._contract;
-    }
-
-    public get cryptoManager(): ITransportFabricCryptoManager {
-        return !_.isNil(this.settings.fabricCryptoManager) ? this.settings.fabricCryptoManager : TransportFabric.cryptoManager;
     }
 }
 

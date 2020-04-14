@@ -4,7 +4,7 @@ import { TransformUtil } from '@ts-core/common/util';
 import * as _ from 'lodash';
 
 @Catch(ExtendedError)
-export class ExtendedErrorHttpExceptionFilter implements ExceptionFilter<ExtendedError> {
+export class ExtendedErrorFilter implements ExceptionFilter<ExtendedError> {
     // --------------------------------------------------------------------------
     //
     //  Public Methods

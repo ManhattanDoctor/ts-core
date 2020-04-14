@@ -69,11 +69,13 @@ export class LanguageService extends Loadable<LanguageTranslatorEvent, Language>
         if (this.isDestroyed) {
             return;
         }
+
         items = items.filter(item => item.isComplete);
         if (_.isEmpty(items)) {
             this.status = LoadableStatus.ERROR;
-            this.observer.next(new ObservableData(LoadableEvent.ERROR, language, new ExtendedError(`Can't to load language: ${language}`)));
+            this.observer.next(new ObservableData(LoadableEvent.ERROR, language, new ExtendedError(`Can't to load language: ${language.name}`)));
             this.observer.next(new ObservableData(LoadableEvent.FINISHED, language));
+            return;
         }
 
         let translation = {};

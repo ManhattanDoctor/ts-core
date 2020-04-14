@@ -4,6 +4,7 @@ import { TransportAmqp2 } from '@ts-core/backend/transport/amqp';
 import { Logger } from '@ts-core/common/logger';
 import { FileUtil } from '@ts-core/backend/file';
 import { PromiseHandler } from '@ts-core/common/promise';
+import { MapCollection } from '@ts-core/common/map';
 import { ITransport, Transport, TransportCommandAsync, TransportCommandWaitDelay } from '@ts-core/common/transport';
 import { TransportLocal } from '@ts-core/common/transport/local';
 import { AppSettings } from './AppSettings';
@@ -87,20 +88,26 @@ export class AppModule implements OnApplicationBootstrap {
     private async fabricClientTest(): Promise<void> {
         await PromiseHandler.delay(1000);
 
+        let a = { id: '1' };
+        let b = { id: '2' };
+        let c = { id: '3' };
+
+        let map = new MapCollection('id',0);
+        map.addItems([a, b, c]);
+        console.log(map.collection);
+        /*
         let parser = new TransportFabricBlockParser();
         let blockLast = await this.api.getBlockNumber();
         this.logger.log(`Last block is ${blockLast}`);
 
-        for (let i = blockLast; i < blockLast; i++) {
+        for (let i = blockLast - 1; i < blockLast; i++) {
             this.logger.log(`Getting block ${i}...`);
             let block = await this.api.getBlock(i);
             await FileUtil.jsonSave(`block${i}.json`, block);
             await FileUtil.jsonSave(`block${i}_parsed.json`, parser.parse(block));
         }
+        */
 
-        let transaction = await this.api.getTransaction('18a062a9a37d0320ced382283b9910cb65a84840933265551c25edf786545b4f');
-
-        await FileUtil.jsonSave('transaction.json', parser.parseTransaction(transaction.transactionEnvelope));
         // this.fabric.send(new TestCommand(`Five`), this.settings.fabricUserOptions);
         // this.fabric.send(new TestCommand(`Six`), this.settings.fabricUserOptions);
 
