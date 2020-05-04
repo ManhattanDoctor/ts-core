@@ -1,7 +1,7 @@
-import { IsNumberString } from 'class-validator';
+import { IsNumberString, IsString, IsOptional } from 'class-validator';
 import * as _ from 'lodash';
-import { Filterable } from './Filterable';
 import { IPaginable } from './IPaginable';
+import { Filterable } from '@ts-core/common/dto';
 
 export class Paginable<U> extends Filterable<U> implements IPaginable<U> {
     // --------------------------------------------------------------------------
@@ -11,7 +11,6 @@ export class Paginable<U> extends Filterable<U> implements IPaginable<U> {
     // --------------------------------------------------------------------------
 
     public static DEFAULT_PAGE_SIZE = 10;
-    public static DEFAULT_PAGE_INDEX = 0;
 
     // --------------------------------------------------------------------------
     //
@@ -25,7 +24,6 @@ export class Paginable<U> extends Filterable<U> implements IPaginable<U> {
         }
         item = Filterable.transform(item) as IPaginable<U>;
         item.pageSize = !_.isNil(item.pageSize) ? parseInt(item.pageSize.toString(), 10) : Paginable.DEFAULT_PAGE_SIZE;
-        item.pageIndex = !_.isNil(item.pageIndex) ? parseInt(item.pageIndex.toString(), 10) : Paginable.DEFAULT_PAGE_INDEX;
         return item;
     }
 
@@ -38,6 +36,9 @@ export class Paginable<U> extends Filterable<U> implements IPaginable<U> {
     @IsNumberString()
     pageSize: number;
 
-    @IsNumberString()
-    pageIndex: number;
+    @IsString()
+    pageBookmark: string;
+
+    @IsOptional()
+    details?: Array<keyof U>;
 }

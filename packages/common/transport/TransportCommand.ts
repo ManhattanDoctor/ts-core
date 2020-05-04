@@ -1,6 +1,7 @@
-import { Exclude, Expose } from 'class-transformer';
 import * as uuid from 'uuid';
 import { ITransportCommand } from './ITransport';
+import { IsString, IsDefined } from 'class-validator';
+import * as _ from 'lodash';
 
 export class TransportCommand<T> implements ITransportCommand<T> {
     // --------------------------------------------------------------------------
@@ -9,12 +10,14 @@ export class TransportCommand<T> implements ITransportCommand<T> {
     //
     // --------------------------------------------------------------------------
 
-    @Exclude()
-    protected _id: string;
-    @Exclude()
-    protected _name: string;
-    @Exclude()
-    protected _request: T;
+    @IsString()
+    public id: string;
+
+    @IsString()
+    public name: string;
+
+    @IsDefined()
+    public request: T;
 
     // --------------------------------------------------------------------------
     //
@@ -23,9 +26,9 @@ export class TransportCommand<T> implements ITransportCommand<T> {
     // --------------------------------------------------------------------------
 
     constructor(name: string, request?: T, id?: string) {
-        this._id = id || uuid();
-        this._name = name;
-        this._request = this.validateRequest(request || ({} as any));
+        this.id = !_.isNil(id) ? id : uuid();
+        this.name = name;
+        this.request = this.validateRequest(request || ({} as any));
     }
 
     // --------------------------------------------------------------------------
@@ -36,26 +39,5 @@ export class TransportCommand<T> implements ITransportCommand<T> {
 
     protected validateRequest(value: T): T {
         return value;
-    }
-
-    // --------------------------------------------------------------------------
-    //
-    //  Public Properties
-    //
-    // --------------------------------------------------------------------------
-
-    @Expose()
-    public get id(): string {
-        return this._id;
-    }
-
-    @Expose()
-    public get name(): string {
-        return this._name;
-    }
-
-    @Expose()
-    public get request(): T {
-        return this._request;
     }
 }

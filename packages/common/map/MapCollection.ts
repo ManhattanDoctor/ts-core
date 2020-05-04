@@ -167,11 +167,25 @@ export class MapCollection<U> extends Destroyable {
     }
 
     protected checkMaxLength(): void {
-        if (!_.isNumber(this._maxLength) || _.isNaN(this._maxLength) || this._maxLength <= 0 || this._length <= this._maxLength) {
+        if (_.isNaN(this._maxLength) || this._maxLength <= 0 || _.isNaN(this._length)) {
             return;
         }
-        let item = this._collection[0];
-        this.remove(this.getUidValue(item));
+
+        let delta = this._length - this._maxLength;
+        if (_.isNaN(delta) || delta <= 0) {
+            return;
+        }
+
+        for (let i = 0; i < delta; i++) {
+            let item = this.getExcessItem();
+            if (_.isNil(item)) {
+                this.remove(this.getUidValue(item));
+            }
+        }
+    }
+
+    protected getExcessItem(): U {
+        return this._collection[0];
     }
 
     // --------------------------------------------------------------------------

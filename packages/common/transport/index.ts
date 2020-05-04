@@ -10,5 +10,6 @@ export * from './TransportCommand';
 export * from './TransportCommandAsync';
 export * from './TransportCommandAsyncHandler';
 export * from './TransportCommandHandler';
+export * from './TransportCommandOptions';
 export * from './TransportEvent';
 export * from './AbstractTransportCommandHandler';

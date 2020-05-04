@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { ExtendedError } from '../error';
 import { ITransportEvent } from './ITransport';
+import { IsString, IsOptional } from 'class-validator';
 
 export class TransportEvent<T> implements ITransportEvent<T> {
     // --------------------------------------------------------------------------
@@ -9,8 +10,11 @@ export class TransportEvent<T> implements ITransportEvent<T> {
     //
     // --------------------------------------------------------------------------
 
-    protected _name: string;
-    protected _data: T;
+    @IsString()
+    public name: string;
+
+    @IsOptional()
+    public data: T;
 
     // --------------------------------------------------------------------------
     //
@@ -19,13 +23,12 @@ export class TransportEvent<T> implements ITransportEvent<T> {
     // --------------------------------------------------------------------------
 
     constructor(name: string, data?: T) {
-        this._name = name;
+        this.name = name;
 
-        if (_.isNil(data)) {
-            return;
+        if (!_.isNil(data)) {
+            this.validateData(data);
+            this.data = data;
         }
-        this.validateData(data);
-        this._data = data;
     }
 
     // --------------------------------------------------------------------------
@@ -38,20 +41,6 @@ export class TransportEvent<T> implements ITransportEvent<T> {
         if (_.isNil(value)) {
             throw new ExtendedError('Data is undefined');
         }
-    }
-
-    // --------------------------------------------------------------------------
-    //
-    //  Public Properties
-    //
-    // --------------------------------------------------------------------------
-
-    public get name(): string {
-        return this._name;
-    }
-
-    public get data(): T {
-        return this._data;
     }
 
     // --------------------------------------------------------------------------

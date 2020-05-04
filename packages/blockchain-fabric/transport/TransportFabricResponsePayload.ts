@@ -30,6 +30,10 @@ export class TransportFabricResponsePayload<U = any, V = any> implements ITransp
     // --------------------------------------------------------------------------
 
     public static parse<U, V>(buffer: Buffer): TransportFabricResponsePayload<U, V> {
+        if (_.isNil(buffer) || buffer.length === 0) {
+            throw new TransportInvalidDataError(`Invalid payload: nil response message`, buffer);
+        }
+
         let payload: TransportFabricResponsePayload<U, V> = null;
         try {
             payload = TransformUtil.toClassBuffer<TransportFabricResponsePayload<U, V>>(TransportFabricResponsePayload, buffer);

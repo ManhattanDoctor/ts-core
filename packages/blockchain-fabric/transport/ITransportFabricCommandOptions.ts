@@ -1,9 +1,7 @@
 import { ITransportCommandOptions } from '@ts-core/common/transport';
+import { ISignature } from '@ts-core/common/crypto';
 
 export interface ITransportFabricCommandOptions extends ITransportCommandOptions {
-    fabricUserId?: string;
-    fabricUserPublicKey?: string;
-    fabricUserPrivateKey?: string;
-
-    internalLinkId?: string;
+    userId: string;
+    signature: ISignature;
 }

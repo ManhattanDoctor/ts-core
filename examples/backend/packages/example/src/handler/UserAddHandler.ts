@@ -9,6 +9,7 @@ import { ObjectUtil, TransformUtil } from '@ts-core/common/util';
 import { User } from '../lib/user/User';
 import { UserAccount, UserAccountType } from '../lib/user/UserAccount';
 import { IUserAddDto, UserAddCommand } from './UserAddCommand';
+import { TransportFabricChaincode } from '@ts-core/blockchain-fabric/chaincode';
 
 @Injectable()
 export class UserAddHandler extends TransportCommandFabricAsyncHandler<IUserAddDto, User, UserAddCommand> {
@@ -18,7 +19,7 @@ export class UserAddHandler extends TransportCommandFabricAsyncHandler<IUserAddD
     //
     // --------------------------------------------------------------------------
 
-    constructor(logger: Logger, transport: TransportFabric) {
+    constructor(logger: Logger, transport: TransportFabricChaincode) {
         super(logger, transport, UserAddCommand.NAME);
     }
 
@@ -28,8 +29,8 @@ export class UserAddHandler extends TransportCommandFabricAsyncHandler<IUserAddD
     //
     // --------------------------------------------------------------------------
 
-    protected async execute(params: IUserAddDto, stub: ITransportFabricStub): Promise<User> {
-        if (await stub.hasState(User.getUid(params.id))) {
+    protected async execute(params: IUserAddDto, command: UserAddCommand): Promise<User> {
+        if (await command.stub.hasState(User.getUid(params.id))) {
             throw new ExtendedError(`Unable to create user: user "${params.id}" already exists`);
         }
 
@@ -39,8 +40,8 @@ export class UserAddHandler extends TransportCommandFabricAsyncHandler<IUserAddD
 
         let account = (user.account = new UserAccount());
         account.type = UserAccountType.ADMINISTRATOR;
-        
-        return stub.putState(user.uid, user);
+    
+        return command.stub.putState(user.uid, user);
     }
 
     protected checkResponse(params: User): User {

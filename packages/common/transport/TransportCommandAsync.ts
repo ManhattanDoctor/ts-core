@@ -4,6 +4,7 @@ import { TransformUtil } from '../util';
 import { ITransportCommandAsync } from './ITransport';
 import { ITransportResponse } from './ITransportResponse';
 import { TransportCommand } from './TransportCommand';
+import { IsOptional } from 'class-validator';
 
 export class TransportCommandAsync<U, V> extends TransportCommand<U> implements ITransportResponse<V>, ITransportCommandAsync<U, V> {
     // --------------------------------------------------------------------------
@@ -12,10 +13,11 @@ export class TransportCommandAsync<U, V> extends TransportCommand<U> implements 
     //
     // --------------------------------------------------------------------------
 
-    @Exclude()
-    protected _data: V;
-    @Exclude()
-    protected _error: ExtendedError;
+    @IsOptional()
+    public data: V;
+
+    @IsOptional()
+    public error: ExtendedError;
 
     // --------------------------------------------------------------------------
     //
@@ -25,11 +27,11 @@ export class TransportCommandAsync<U, V> extends TransportCommand<U> implements 
 
     public response(value: V | ExtendedError | Error): void {
         try {
-            this._data = this.validateResponse(value);
-            this._error = null;
+            this.data = this.validateResponse(value);
+            this.error = null;
         } catch (error) {
-            this._data = null;
-            this._error = error;
+            this.data = null;
+            this.error = error;
         }
     }
 
@@ -54,21 +56,5 @@ export class TransportCommandAsync<U, V> extends TransportCommand<U> implements 
 
     protected checkResponse(value: V): V {
         return value;
-    }
-
-    // --------------------------------------------------------------------------
-    //
-    //  Public Properties
-    //
-    // --------------------------------------------------------------------------
-
-    @Expose()
-    public get data(): V {
-        return this._data;
-    }
-
-    @Expose()
-    public get error(): ExtendedError {
-        return this._error;
     }
 }

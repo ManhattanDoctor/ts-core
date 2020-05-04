@@ -32,7 +32,7 @@ export class TypeormUtil {
     // --------------------------------------------------------------------------
 
     private static applyConditions<U, T>(query: SelectQueryBuilder<U>, conditions: FilterableConditions<T>): SelectQueryBuilder<U> {
-        if (!conditions) {
+        if (_.isNil(conditions)) {
             return query;
         }
 
@@ -84,7 +84,7 @@ export class TypeormUtil {
     }
 
     private static applySort<U, T>(query: SelectQueryBuilder<U>, sort: FilterableSort<T>): SelectQueryBuilder<U> {
-        if (!sort) {
+        if (_.isNil(sort)) {
             return query;
         }
         for (let key of Object.keys(sort)) {

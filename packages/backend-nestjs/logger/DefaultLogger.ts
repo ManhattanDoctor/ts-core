@@ -6,6 +6,14 @@ import * as _ from 'lodash';
 export class DefaultLogger extends LoggerWrapper {
     // --------------------------------------------------------------------------
     //
+    //  Public Properties
+    //
+    // --------------------------------------------------------------------------
+
+    public isTimeDiffEnabled: boolean = true;
+
+    // --------------------------------------------------------------------------
+    //
     //  Constructor
     //
     // --------------------------------------------------------------------------
@@ -22,6 +30,8 @@ export class DefaultLogger extends LoggerWrapper {
     // --------------------------------------------------------------------------
 
     private printMessage = (message: any, color: Function, context: string = '', isTimeDiffEnabled: boolean): void => {
+        isTimeDiffEnabled = this.isTimeDiffEnabled;
+
         let output = _.isObject(message) ? `\n${JSON.stringify(message, null, 4)}\n` : color(message);
         let date = new Date();
         let timestamp = `${date

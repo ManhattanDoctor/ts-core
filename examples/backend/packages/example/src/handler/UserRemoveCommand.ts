@@ -22,13 +22,4 @@ export class UserRemoveCommand extends TransportCommandFabricAsync<string, User>
         super(UserRemoveCommand.NAME, request);
     }
 
-    // --------------------------------------------------------------------------
-    //
-    //  Protected Methods
-    //
-    // --------------------------------------------------------------------------
-
-    protected checkResponse(item: User): User {
-        return TransformUtil.toClass(User, item);
-    }
 }

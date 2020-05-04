@@ -1,9 +1,9 @@
 import { TransformUtil, ValidateUtil } from '@ts-core/common/util';
 import { ClassType } from 'class-transformer/ClassTransformer';
-import { ChaincodeStub } from 'fabric-shim';
+import { ChaincodeStub, Iterators } from 'fabric-shim';
 import * as _ from 'lodash';
-import { TransportFabricRequestPayload } from '../TransportFabricRequestPayload';
 import { ITransportFabricStub } from './ITransportFabricStub';
+import { ITransportFabricCommandOptions } from '../ITransportFabricCommandOptions';
 
 export class TransportFabricStub implements ITransportFabricStub {
     // --------------------------------------------------------------------------
@@ -12,11 +12,10 @@ export class TransportFabricStub implements ITransportFabricStub {
     //
     // --------------------------------------------------------------------------
 
+    private _stub: ChaincodeStub;
+
     private _userId: string;
     private _userPublicKey: string;
-
-    private _stub: ChaincodeStub;
-    private _isSignatureVerified: boolean;
 
     // --------------------------------------------------------------------------
     //
@@ -24,16 +23,15 @@ export class TransportFabricStub implements ITransportFabricStub {
     //
     // --------------------------------------------------------------------------
 
-    constructor(payload: TransportFabricRequestPayload, stub: ChaincodeStub, isSignatureVerified: boolean) {
+    constructor(options: ITransportFabricCommandOptions, stub: ChaincodeStub) {
         this._stub = stub;
-        this._userId = payload.options.fabricUserId;
-        this._userPublicKey = payload.options.fabricUserPublicKey;
-        this._isSignatureVerified = isSignatureVerified;
+        this._userId = options.userId;
+        this._userPublicKey = options.signature.publicKey;
     }
 
     // --------------------------------------------------------------------------
     //
-    //  Public Methods
+    //  Public State Methods
     //
     // --------------------------------------------------------------------------
 
@@ -43,11 +41,7 @@ export class TransportFabricStub implements ITransportFabricStub {
     }
 
     public async getState<U>(key: string, type: ClassType<U> = null, isNeedValidate: boolean = true): Promise<U> {
-        let buffer = await this.stub.getState(key);
-        if (_.isNil(buffer) || buffer.length === 0) {
-            return null;
-        }
-        let value = TransformUtil.toJSON(buffer.toString(TransformUtil.ENCODING));
+        let value = TransformUtil.toJSON(await this.getStateRaw(key));
         if (_.isNil(type) || _.isNil(value)) {
             return value;
         }
@@ -58,17 +52,43 @@ export class TransportFabricStub implements ITransportFabricStub {
         return item;
     }
 
+    public async getStateRaw(key: string): Promise<string> {
+        let buffer = await this.stub.getState(key);
+        if (_.isNil(buffer) || buffer.length === 0) {
+            return null;
+        }
+        return buffer.toString(TransformUtil.ENCODING);
+    }
+
     public async putState<U>(key: string, value: U, isNeedValidate: boolean = true, isNeedTransform: boolean = true): Promise<U> {
         if (isNeedValidate) {
             ValidateUtil.validate(value);
         }
         let item = isNeedTransform ? TransformUtil.fromClass(value) : value;
-        await this.stub.putState(key, Buffer.from(TransformUtil.fromJSON(item), TransformUtil.ENCODING));
+        await this.putStateRaw(key, TransformUtil.fromJSON(item));
         return item;
     }
 
-    public async deleteState(key: string): Promise<void> {
+    public async putStateRaw(key: string, item: string): Promise<void> {
+        return this.stub.putState(key, Buffer.from(item, TransformUtil.ENCODING));
+    }
+
+    public async removeState(key: string): Promise<void> {
         return this.stub.deleteState(key);
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    //  Public Properties
+    //
+    // --------------------------------------------------------------------------
+
+    public createCompositeKey(prefix: string, attributes: Array<string>): string {
+        return this.stub.createCompositeKey(prefix, attributes);
+    }
+
+    public getStateByPartialCompositeKey(prefix: string, attributes: Array<string>): Promise<Iterators.StateQueryIterator> {
+        return this.stub.getStateByPartialCompositeKey(prefix, attributes);
     }
 
     // --------------------------------------------------------------------------
@@ -87,9 +107,5 @@ export class TransportFabricStub implements ITransportFabricStub {
 
     public get stub(): ChaincodeStub {
         return this._stub;
-    }
-
-    public get isSignatureVerified(): boolean {
-        return this._isSignatureVerified;
     }
 }

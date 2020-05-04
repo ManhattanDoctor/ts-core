@@ -6,6 +6,7 @@ import { Logger } from '@ts-core/common/logger';
 
 import { User } from '../lib/user/User';
 import { UserGetCommand } from './UserGetCommand';
+import { TransportFabricChaincode } from '@ts-core/blockchain-fabric/chaincode';
 
 @Injectable()
 export class UserGetHandler extends TransportCommandFabricAsyncHandler<string, User, UserGetCommand> {
@@ -15,7 +16,7 @@ export class UserGetHandler extends TransportCommandFabricAsyncHandler<string, U
     //
     // --------------------------------------------------------------------------
 
-    constructor(logger: Logger, transport: TransportFabric) {
+    constructor(logger: Logger, transport: TransportFabricChaincode) {
         super(logger, transport, UserGetCommand.NAME);
     }
 
@@ -25,7 +26,7 @@ export class UserGetHandler extends TransportCommandFabricAsyncHandler<string, U
     //
     // --------------------------------------------------------------------------
 
-    protected async execute(params: string, stub: ITransportFabricStub): Promise<User> {
-        return stub.getState<User>(User.getUid(params), User);
+    protected async execute(params: string, command: UserGetCommand): Promise<User> {
+        return command.stub.getState<User>(User.getUid(params), User);
     }
 }

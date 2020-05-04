@@ -1,6 +1,6 @@
 import { TransportCommandFabricAsync } from '@ts-core/blockchain-fabric/transport/command';
 
-export class TestCommand extends TransportCommandFabricAsync<string, string> {
+export class TestCommand extends TransportCommandFabricAsync<any, any> {
     // --------------------------------------------------------------------------
     //
     //  Public Static Properties
@@ -15,7 +15,7 @@ export class TestCommand extends TransportCommandFabricAsync<string, string> {
     //
     // --------------------------------------------------------------------------
 
-    constructor(request: string) {
+    constructor(request: any) {
         super(TestCommand.NAME, request);
     }
 }

@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 
 import { User } from '../lib/user/User';
 import { UserRemoveCommand } from './UserRemoveCommand';
+import { TransportFabricChaincode } from '@ts-core/blockchain-fabric/chaincode';
 
 @Injectable()
 export class UserRemoveHandler extends TransportCommandFabricAsyncHandler<string, User, UserRemoveCommand> {
@@ -17,7 +18,7 @@ export class UserRemoveHandler extends TransportCommandFabricAsyncHandler<string
     //
     // --------------------------------------------------------------------------
 
-    constructor(logger: Logger, transport: TransportFabric) {
+    constructor(logger: Logger, transport: TransportFabricChaincode) {
         super(logger, transport, UserRemoveCommand.NAME);
     }
 
@@ -27,10 +28,10 @@ export class UserRemoveHandler extends TransportCommandFabricAsyncHandler<string
     //
     // --------------------------------------------------------------------------
 
-    protected async execute(params: string, stub: ITransportFabricStub): Promise<User> {
-        let item = await stub.getState<User>(User.getUid(params));
+    protected async execute(params: string, command: UserRemoveCommand): Promise<User> {
+        let item = await command.stub.getState<User>(User.getUid(params));
         if (!_.isNil(item)) {
-            await stub.deleteState(User.getUid(params));
+            await command.stub.removeState(User.getUid(params));
         }
         return item;
     }

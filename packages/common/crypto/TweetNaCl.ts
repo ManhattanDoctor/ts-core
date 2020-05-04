@@ -1,5 +1,7 @@
 import * as _ from 'lodash';
-import * as nacl from 'tweetnacl';
+import { Ed25519 } from './ED25519';
+import { Sha512 } from './hash';
+import { IKeyAsymmetric } from './IKeyAsymmetric';
 
 export class TweetNaCl {
     // --------------------------------------------------------------------------
@@ -8,32 +10,31 @@ export class TweetNaCl {
     //
     // --------------------------------------------------------------------------
 
-    public static keyPair(): { privateKey: string; publicKey: string } {
-        let keys = nacl.sign.keyPair();
-        return { publicKey: Buffer.from(keys.publicKey).toString('hex'), privateKey: Buffer.from(keys.secretKey).toString('hex') };
+    public static keyPair(): IKeyAsymmetric {
+        return Ed25519.keys();
     }
 
     public static sign(message: string, privateKey: string): string {
-        return Buffer.from(nacl.sign.detached(Buffer.from(message), Buffer.from(privateKey, 'hex'))).toString('hex');
+        return Ed25519.sign(message, privateKey);
     }
 
     public static verify(message: string, signature: string, publicKey: string): boolean {
-        return nacl.sign.detached.verify(Buffer.from(message), Buffer.from(signature, 'hex'), Buffer.from(publicKey, 'hex'));
+        return Ed25519.verify(message, signature, publicKey);
     }
 
     public static encrypt(message: string, key: string, nonce: string): string {
-        return Buffer.from(nacl.secretbox(Buffer.from(message), Buffer.from(nonce), Buffer.from(key, 'hex'))).toString('hex');
+        return Ed25519.encrypt(message, key, nonce);
     }
 
     public static decrypt(message: string, key: string, nonce: string): string {
-        return Buffer.from(nacl.secretbox.open(Buffer.from(message, 'hex'), Buffer.from(nonce), Buffer.from(key, 'hex'))).toString('utf8');
+        return Ed25519.decrypt(message, key, nonce);
     }
 
     public static hash(message: string, nonce?: string): string {
-        if (_.isNil(nonce)) {
-            nonce = '';
+        if (!_.isNil(nonce)) {
+            message += nonce;
         }
-        return TweetNaCl.sha512(message + nonce).toString('hex');
+        return Sha512.hex(message);
     }
 
     // --------------------------------------------------------------------------
@@ -43,6 +44,6 @@ export class TweetNaCl {
     // --------------------------------------------------------------------------
 
     public static sha512(message: string): Buffer {
-        return Buffer.from(nacl.hash(Buffer.from(message)));
+        return Sha512.hash(Buffer.from(message));
     }
 }

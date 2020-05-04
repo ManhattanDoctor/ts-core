@@ -4,6 +4,7 @@ import { ILogger, LoggerLevel } from '@ts-core/common/logger';
 import { ITransportFabricSettings } from '@ts-core/blockchain-fabric/transport';
 import { ITransportFabricCommandOptions } from '@ts-core/blockchain-fabric/transport';
 import { AbstractSettingsStorage } from '@ts-core/common/settings';
+import { ISignature, IKeyAsymmetric } from '@ts-core/common/crypto';
 
 export class AppSettings extends EnvSettingsStorage implements ILoggerSettings, ITransportFabricSettings, ITransportAmqpSettings {
     // --------------------------------------------------------------------------
@@ -19,14 +20,6 @@ export class AppSettings extends EnvSettingsStorage implements ILoggerSettings, 
     //  Public Fabric Properties
     //
     // --------------------------------------------------------------------------
-
-    public get fabricUserOptions(): ITransportFabricCommandOptions {
-        return {
-            fabricUserId: this.getValue('FABRIC_USER_ID'),
-            fabricUserPublicKey: this.getValue('FABRIC_USER_PUBLIC_KEY'),
-            fabricUserPrivateKey: this.getValue('FABRIC_USER_PRIVATE_KEY')
-        };
-    }
 
     public get fabricIdentity(): string {
         return this.getValue('FABRIC_IDENTITY');
@@ -54,6 +47,25 @@ export class AppSettings extends EnvSettingsStorage implements ILoggerSettings, 
 
     public get fabricConnectionSettingsPath(): string {
         return this.getValue('FABRIC_CONNECTION_SETTINGS_PATH');
+    }
+
+    public get fabricUserId(): string {
+        return this.getValue('FABRIC_USER_ID');
+    }
+
+    public get fabricUserPublicKey(): string {
+        return this.getValue('FABRIC_USER_PUBLIC_KEY');
+    }
+
+    public get fabricUserPrivateKey(): string {
+        return this.getValue('FABRIC_USER_PRIVATE_KEY');
+    }
+
+    public get fabricUserKey(): IKeyAsymmetric {
+        return {
+            publicKey: this.fabricUserPublicKey,
+            privateKey: this.fabricUserPrivateKey
+        };
     }
 
     // --------------------------------------------------------------------------

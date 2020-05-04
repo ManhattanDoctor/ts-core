@@ -7,8 +7,8 @@ import { ChaincodeInterface, ChaincodeResponse, ChaincodeStub } from 'fabric-shi
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 
-import { TransportFabric } from '../transport/TransportFabric';
 import { TransportFabricResponsePayload } from '../transport/TransportFabricResponsePayload';
+import { TransportFabricChaincode } from './TransportFabricChaincode';
 
 export abstract class ChaincodeTransportBased<T> extends LoggerWrapper implements ChaincodeInterface {
     // --------------------------------------------------------------------------
@@ -25,7 +25,7 @@ export abstract class ChaincodeTransportBased<T> extends LoggerWrapper implement
     //
     // --------------------------------------------------------------------------
 
-    constructor(logger: ILogger, protected transport: TransportFabric) {
+    constructor(logger: ILogger, protected transport: TransportFabricChaincode) {
         super(logger);
         this.observer = new Subject();
     }
@@ -45,7 +45,7 @@ export abstract class ChaincodeTransportBased<T> extends LoggerWrapper implement
     public async Invoke(stub: ChaincodeStub): Promise<ChaincodeResponse> {
         this.observer.next(new ObservableData(ChaincodeTransportBasedEvent.INVOKE_STARTED, stub));
 
-        let response = await this.transport.invokeChaincode(stub);
+        let response = await this.transport.invoke(stub);
 
         // No need to response
         let content = _.isNil(response) ? Buffer.from('') : TransformUtil.fromClassBuffer(response);

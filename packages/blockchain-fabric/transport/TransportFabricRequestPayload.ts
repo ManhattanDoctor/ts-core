@@ -1,13 +1,13 @@
-import { TransportCommand, TransportCommandAsync } from '@ts-core/common/transport';
+import { TransportCommandAsync, ITransportCommandAsync } from '@ts-core/common/transport';
 import { TransportInvalidDataError } from '@ts-core/common/transport/error';
 import { TransformUtil, ValidateUtil } from '@ts-core/common/util';
-import { ClassType } from 'class-transformer/ClassTransformer';
-import { IsBoolean, IsEnum, IsDefined, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDefined, IsOptional, ValidateNested, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ChaincodeStub } from 'fabric-shim';
 import { ITransportFabricCommandOptions } from './ITransportFabricCommandOptions';
-import { ITransportFabricStub, TransportFabricStub } from './stub';
-import { ITransportCommandFabric, ITransportCommandFabricAsync, TransportFabric } from './TransportFabric';
-import { TransportFabricCryptoAlgorithm } from './crypto';
+import { ITransportFabricStub, TransportFabricStub, ITransportFabricStubHolder } from './stub';
+import { ITransportCommandFabricAsync, TransportFabric } from './TransportFabric';
+import { TransportFabricCommandOptions } from './TransportFabricCommandOptions';
 
 // --------------------------------------------------------------------------
 //
@@ -20,9 +20,6 @@ export interface ITransportFabricRequestPayload<U = any> {
     name: string;
     request: U;
     options: ITransportFabricCommandOptions;
-
-    signature: string;
-    algorithm: string;
     isNeedReply: boolean;
 }
 
@@ -59,15 +56,8 @@ export class TransportFabricRequestPayload<U = any> implements ITransportFabricR
         return payload;
     }
 
-    public static createCommand<U>(
-        payload: TransportFabricRequestPayload<U>,
-        stub: ChaincodeStub,
-        isUserSignatureVerified: boolean
-    ): ITransportCommandFabric<U> {
-        // let type: ClassType<ITransportCommandFabric<U>> = payload.isNeedReply ? TransportCommandFabricAsyncImpl : TransportCommandFabricImpl;
-        let type: ClassType<ITransportCommandFabric<U>> = TransportCommandFabricAsyncImpl;
-        let command = new type(payload, stub, isUserSignatureVerified);
-        return command;
+    public static createCommand<U, V = any>(payload: TransportFabricRequestPayload<U>, stub: ChaincodeStub): ITransportCommandAsync<U, V> {
+        return new TransportCommandFabricAsyncImpl(payload, stub);
     }
 
     // --------------------------------------------------------------------------
@@ -85,18 +75,13 @@ export class TransportFabricRequestPayload<U = any> implements ITransportFabricR
     @IsOptional()
     public request: U;
 
+    @Type(() => TransportFabricCommandOptions)
     @IsDefined()
-    public options: ITransportFabricCommandOptions;
+    @ValidateNested()
+    public options: TransportFabricCommandOptions;
 
     @IsBoolean()
     public isNeedReply: boolean;
-
-    @IsOptional()
-    public signature: string;
-
-    @IsOptional()
-    @IsEnum(TransportFabricCryptoAlgorithm)
-    public algorithm: TransportFabricCryptoAlgorithm;
 }
 
 // --------------------------------------------------------------------------
@@ -105,14 +90,15 @@ export class TransportFabricRequestPayload<U = any> implements ITransportFabricR
 //
 // --------------------------------------------------------------------------
 
-class TransportCommandFabricAsyncImpl<U, V> extends TransportCommandAsync<U, V> implements ITransportCommandFabricAsync<U, V> {
+class TransportCommandFabricAsyncImpl<U, V> extends TransportCommandAsync<U, V> implements ITransportCommandFabricAsync<U, V>, ITransportFabricStubHolder {
     // --------------------------------------------------------------------------
     //
     //  Properties
     //
     // --------------------------------------------------------------------------
 
-    public stub: ITransportFabricStub;
+    private _stub: ITransportFabricStub;
+    private _options: ITransportFabricCommandOptions;
 
     // --------------------------------------------------------------------------
     //
@@ -120,8 +106,28 @@ class TransportCommandFabricAsyncImpl<U, V> extends TransportCommandAsync<U, V> 
     //
     // --------------------------------------------------------------------------
 
-    constructor(payload: TransportFabricRequestPayload, stub: ChaincodeStub, isUserSignatureVerified: boolean) {
+    constructor(payload: TransportFabricRequestPayload, stub: ChaincodeStub) {
         super(payload.name, payload.request, payload.id);
-        this.stub = new TransportFabricStub(payload, stub, isUserSignatureVerified);
+
+        this._stub = new TransportFabricStub(payload.options, stub);
+        this._options = payload.options;
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    //  Public Properties
+    //
+    // --------------------------------------------------------------------------
+
+    public get stub(): ITransportFabricStub {
+        return this._stub;
+    }
+
+    public get options(): ITransportFabricCommandOptions {
+        return this._options;
+    }
+
+    public get isQuery(): boolean {
+        return false;
     }
 }

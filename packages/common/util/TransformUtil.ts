@@ -11,7 +11,7 @@ export class TransformUtil {
     //
     // --------------------------------------------------------------------------
 
-    public static ENCODING: BufferEncoding = 'utf-8';
+    public static ENCODING: BufferEncoding = 'utf8';
 
     // --------------------------------------------------------------------------
     //
@@ -54,17 +54,33 @@ export class TransformUtil {
         return !_.isNil(item) ? (classToPlain(item, options) as any) : null;
     }
 
+    public static fromClassMany<V = any, U = any>(items: Array<U>, options?: ClassTransformOptions): Array<V> {
+        return items.map(item => TransformUtil.fromClass(item, options));
+    }
+
     public static fromClassBuffer<U = any>(item: U, options?: ClassTransformOptions): Buffer {
         let value = TransformUtil.fromJSON(TransformUtil.fromClass(item, options));
         return !_.isNil(value) ? Buffer.from(value, TransformUtil.ENCODING) : null;
+    }
+
+    public static fromClassBufferMany<U = any>(items: Array<U>, options?: ClassTransformOptions): Array<Buffer> {
+        return items.map(item => TransformUtil.fromClassBuffer(item, options));
     }
 
     public static toClass<U, V = any>(type: ClassType<U>, item: V, options?: ClassTransformOptions): U {
         return !_.isNil(item) ? plainToClass<U, any>(type, item, options) : null;
     }
 
+    public static toClassMany<U, V = any>(type: ClassType<U>, items: Array<V>, options?: ClassTransformOptions): Array<U> {
+        return items.map(item => TransformUtil.toClass(type, item, options));
+    }
+
     public static toClassBuffer<U>(type: ClassType<U>, item: Buffer, options?: ClassTransformOptions): U {
         let value = TransformUtil.toJSON(item.toString(TransformUtil.ENCODING));
         return !_.isNil(value) ? TransformUtil.toClass(type, value, options) : null;
+    }
+
+    public static toClassBufferMany<U>(type: ClassType<U>, items: Array<Buffer>, options?: ClassTransformOptions): Array<U> {
+        return items.map(item => TransformUtil.toClassBuffer(type, item, options));
     }
 }

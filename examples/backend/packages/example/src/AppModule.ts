@@ -8,7 +8,7 @@ import { MapCollection } from '@ts-core/common/map';
 import { ITransport, Transport, TransportCommandAsync, TransportCommandWaitDelay } from '@ts-core/common/transport';
 import { TransportLocal } from '@ts-core/common/transport/local';
 import { AppSettings } from './AppSettings';
-import { TransportFabric } from '@ts-core/blockchain-fabric/transport';
+import { TransportFabric, ITransportFabricCommandOptions } from '@ts-core/blockchain-fabric/transport';
 import { TestCommand } from './handler/TestCommand';
 import { TestHandler } from './handler/TestHandler';
 import { UserAddHandler } from './handler/UserAddHandler';
@@ -20,7 +20,11 @@ import { Chaincode } from './service/Chaincode';
 import { FabricApi } from '@ts-core/blockchain-fabric/api';
 import { TransportFabricBlockParser } from '@ts-core/blockchain-fabric/transport/block';
 import { UserAddCommand } from './handler/UserAddCommand';
-import { ObjectUtil } from '@ts-core/common/util';
+import { ObjectUtil, DateUtil } from '@ts-core/common/util';
+import { ISignature } from '@ts-core/common/crypto';
+import { TransportCryptoManagerEd25519, TransportCryptoManagerFactory } from '@ts-core/common/transport/crypto';
+import { TransportFabricChaincode } from '@ts-core/blockchain-fabric/chaincode';
+import { TransportFabricCryptoManagerEd25519 } from '@ts-core/blockchain-fabric/transport/crypto';
 
 export class AppModule implements OnApplicationBootstrap {
     // --------------------------------------------------------------------------
@@ -39,11 +43,17 @@ export class AppModule implements OnApplicationBootstrap {
                     useValue: settings
                 },
                 {
+                    provide: TransportFabricChaincode,
+                    inject: [Logger],
+                    useFactory: async (logger: Logger) => {
+                        return new TransportFabricChaincode(logger);
+                    }
+                },
+                {
                     provide: TransportFabric,
                     inject: [Logger],
                     useFactory: async (logger: Logger) => {
                         let item = new TransportFabric(logger, settings);
-                        item.readonlyCommands = [UserGetCommand.NAME];
                         await item.connect();
                         return item;
                     }
@@ -88,13 +98,16 @@ export class AppModule implements OnApplicationBootstrap {
     private async fabricClientTest(): Promise<void> {
         await PromiseHandler.delay(1000);
 
-        let a = { id: '1' };
-        let b = { id: '2' };
-        let c = { id: '3' };
+        let nonce = Date.now().toString();
+        let command = new TestCommand({ name: 'Five' });
 
-        let map = new MapCollection('id',0);
-        map.addItems([a, b, c]);
-        console.log(map.collection);
+        console.log(
+            await this.fabric.sendListen(command, {
+                userId: this.settings.fabricUserId,
+                signature: command.sign(TransportCryptoManagerFactory.get(TransportCryptoManagerEd25519.ALGORITHM), this.settings.fabricUserKey, nonce)
+            })
+        );
+
         /*
         let parser = new TransportFabricBlockParser();
         let blockLast = await this.api.getBlockNumber();
@@ -108,7 +121,6 @@ export class AppModule implements OnApplicationBootstrap {
         }
         */
 
-        // this.fabric.send(new TestCommand(`Five`), this.settings.fabricUserOptions);
         // this.fabric.send(new TestCommand(`Six`), this.settings.fabricUserOptions);
 
         /*
