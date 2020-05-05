@@ -343,7 +343,7 @@ export class TransportAmqp extends Transport<ITransportAmqpSettings> {
         this.connection = null;
 
         this.error(message);
-        process.exit(1);
+        process.exit(0);
     }
 
     private async startListenReply<U, V>(queueName: string, command: ITransportCommandAsync<U, V>) {

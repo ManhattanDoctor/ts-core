@@ -123,7 +123,7 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
 
         if (this.settings.isExitApplicationOnDisconnect) {
             this.log(`Exit application: disconnected`);
-            process.exit(1);
+            process.exit(0);
         }
     }
 
