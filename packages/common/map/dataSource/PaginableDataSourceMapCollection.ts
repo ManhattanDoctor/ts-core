@@ -2,34 +2,19 @@ import * as _ from 'lodash';
 import { IPage } from '../../dto/IPage';
 import { IPaginable } from '../../dto/IPaginable';
 import { IPagination } from '../../dto/IPagination';
-import { DataSourceMapCollection } from './DataSourceMapCollection';
 import { FilterableDataSourceMapCollection } from './FilterableDataSourceMapCollection';
 
-export abstract class PaginableDataSourceMapCollection<U, V> extends FilterableDataSourceMapCollection<U, IPagination<V>> implements IPage {
-    // --------------------------------------------------------------------------
-    //
-    //  Static Methods
-    //
-    // --------------------------------------------------------------------------
-
-    public static getResponseItems<T>(response: T): Array<any> {
-        return !_.isNil(response) ? DataSourceMapCollection.getResponseItems((response as any).items) : null;
-    }
-
+export abstract class PaginableDataSourceMapCollection<U, V = any> extends FilterableDataSourceMapCollection<U, IPagination<V>> implements IPage {
     // --------------------------------------------------------------------------
     //
     //  Properties
     //
     // --------------------------------------------------------------------------
 
-    protected _items: Array<U>;
-
     protected _total: number;
     protected _pages: number;
     protected _pageSize: number = 10;
     protected _pageIndex: number = 0;
-
-    public isClearAfterLoad: boolean = false;
 
     // --------------------------------------------------------------------------
     //
@@ -38,14 +23,12 @@ export abstract class PaginableDataSourceMapCollection<U, V> extends FilterableD
     // --------------------------------------------------------------------------
 
     public reload(): Promise<void> {
-        this._items = [];
         this._pageIndex = 0;
         return super.reload();
     }
 
     public destroy(): void {
         super.destroy();
-        this._items = null;
         this._pageSize = null;
         this._pageIndex = null;
     }
@@ -57,38 +40,44 @@ export abstract class PaginableDataSourceMapCollection<U, V> extends FilterableD
     // --------------------------------------------------------------------------
 
     protected createRequestData(): IPaginable<U> {
-        let params: IPaginable<V> = super.createRequestData() as any;
+        let params: IPaginable<U> = super.createRequestData() as any;
         params.pageIndex = this.pageIndex;
         params.pageSize = this.pageSize;
-        return params as any;
+        return params;
     }
 
     protected parseResponse(response: IPagination<V>): void {
-        super.parseResponse(response);
-        let items = this.getResponseItems(response);
         this._total = response.total;
         this._pages = response.pages;
-        this._isAllLoaded = _.isEmpty(items);
-
-        if (this._isAllLoaded) {
-            return;
-        }
-
-        if (this.isClearAfterLoad) {
-            this.clear();
-        }
-
-        this.parseItems(items);
-        this.checkIsAllLoaded(response, items);
-    }
-
-    protected checkIsAllLoaded(response: IPagination<V>, items: Array<any>): void {
-        this._isAllLoaded = !this.isClearAfterLoad && (response.pageIndex >= response.pages - 1 || response.pageSize > items.length);
+        this._pageSize = response.pageSize;
+        this._pageIndex = response.pageIndex;
+        super.parseResponse(response);
     }
 
     protected getResponseItems(response: IPagination<V>): Array<any> {
-        return PaginableDataSourceMapCollection.getResponseItems(response);
+        return !_.isNil(response) ? response.items : null;
     }
+
+    protected isAbleToLoad(): boolean {
+        if (this.pageIndex > this.pages - 1) {
+            return false;
+        }
+        return !this.isLoading;
+    }
+
+    protected checkIsAllLoaded(response: IPagination<V>, items: Array<any>): void {
+        this._isAllLoaded = this.pageIndex >= this.pages - 1 || this.pageSize > items.length;
+    }
+
+    protected isNeedClearAfterLoad(response: IPagination<V>): boolean {
+        return true;
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    //  Static Methods
+    //
+    // --------------------------------------------------------------------------
 
     protected commitPageSizeProperties(): void {}
 
@@ -122,10 +111,6 @@ export abstract class PaginableDataSourceMapCollection<U, V> extends FilterableD
         }
         this._pageIndex = value;
         this.commitPageIndexProperties();
-    }
-
-    public get items(): Array<U> {
-        return this._items;
     }
 
     public get pages(): number {

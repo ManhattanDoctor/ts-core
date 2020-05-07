@@ -8,16 +8,6 @@ import { DestroyableMapCollection } from '../DestroyableMapCollection';
 export abstract class DataSourceMapCollection<U, V = any> extends DestroyableMapCollection<U> {
     // --------------------------------------------------------------------------
     //
-    //  Static Methods
-    //
-    // --------------------------------------------------------------------------
-
-    public static getResponseItems<V>(response: V): Array<any> {
-        return _.isArray(response) ? (response as any) : null;
-    }
-
-    // --------------------------------------------------------------------------
-    //
     //  Properties
     //
     // --------------------------------------------------------------------------
@@ -28,7 +18,7 @@ export abstract class DataSourceMapCollection<U, V = any> extends DestroyableMap
 
     protected reloadTimer: any;
     protected reloadHandler: () => void;
-    protected isNeedCleanAfterLoad: boolean = false;
+    protected isReloadRequest: boolean = false;
 
     protected subscription: Subscription;
     protected observer: Subject<ObservableData<LoadableEvent | DataSourceMapCollectionEvent, V | Array<U>>>;
@@ -58,32 +48,31 @@ export abstract class DataSourceMapCollection<U, V = any> extends DestroyableMap
     protected parseResponse(response: V): void {
         let items = this.getResponseItems(response);
         this.parseItems(items);
-        this._isAllLoaded = true;
+        this.checkIsAllLoaded(response, items);
     }
 
     protected parseItems(items: Array<any>): void {
-        let parsedItems: Array<U> = new Array();
-        if (!_.isEmpty(items)) {
-            for (let item of items) {
-                let value: U = this.parseItem(item);
-                if (_.isNil(value)) {
-                    continue;
-                }
-                this.add(value);
-                parsedItems.push(value);
-            }
-        }
-        this.observer.next(new ObservableData(DataSourceMapCollectionEvent.DATA_LOADED_AND_PARSED, parsedItems));
+        let parsed = _.compact(items.map(item => this.parseItem(item)));
+        this.addItems(parsed);
+        this.observer.next(new ObservableData(DataSourceMapCollectionEvent.DATA_LOADED_AND_PARSED, parsed));
     }
 
     protected parseError(error: ExtendedError): void {}
 
     protected getResponseItems(response: V): Array<any> {
-        return DataSourceMapCollection.getResponseItems(response);
+        return _.isArray(response) ? response : [];
+    }
+
+    protected checkIsAllLoaded(response: V, items: Array<any>): void {
+        this._isAllLoaded = true;
     }
 
     protected isAbleToLoad(): boolean {
-        return true;
+        return !this.isLoading && !this.isAllLoaded;
+    }
+
+    protected isNeedClearAfterLoad(response: V): boolean {
+        return this.isReloadRequest;
     }
 
     protected setLength(value: number): void {
@@ -117,7 +106,7 @@ export abstract class DataSourceMapCollection<U, V = any> extends DestroyableMap
         }
         this._isDirty = true;
         this._isAllLoaded = false;
-        this.isNeedCleanAfterLoad = true;
+        this.isReloadRequest = true;
         return this.load();
     }
 
@@ -127,7 +116,7 @@ export abstract class DataSourceMapCollection<U, V = any> extends DestroyableMap
     }
 
     public async load(): Promise<void> {
-        if (this.isLoading || this.isAllLoaded || !this.isAbleToLoad()) {
+        if (!this.isAbleToLoad()) {
             return;
         }
 
@@ -137,11 +126,11 @@ export abstract class DataSourceMapCollection<U, V = any> extends DestroyableMap
 
         try {
             let response = await this.request();
-            if (this.isNeedCleanAfterLoad) {
-                this.isNeedCleanAfterLoad = false;
+            if (this.isNeedClearAfterLoad(response)) {
                 this.clear();
             }
             this.parseResponse(response);
+            this.isReloadRequest = false;
             this.observer.next(new ObservableData(LoadableEvent.COMPLETE, response));
         } catch (error) {
             error = ExtendedError.create(error);
@@ -157,7 +146,7 @@ export abstract class DataSourceMapCollection<U, V = any> extends DestroyableMap
         this._isDirty = false;
         this._isLoading = false;
         this._isAllLoaded = false;
-        this.isNeedCleanAfterLoad = false;
+        this.isReloadRequest = false;
 
         clearTimeout(this.reloadTimer);
         this.reloadTimer = null;

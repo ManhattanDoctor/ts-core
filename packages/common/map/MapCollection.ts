@@ -99,7 +99,7 @@ export class MapCollection<U> extends Destroyable {
 
     public clear() {
         this.map.clear();
-        this._collection.splice(0, this.length);
+        this._collection.splice(0, this._collection.length);
         this.setLength(this._collection.length);
     }
 

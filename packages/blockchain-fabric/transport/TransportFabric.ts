@@ -196,7 +196,7 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
                 this.responseMessageReceived(command.id, response);
             }
         } catch (error) {
-            error = TransportFabric.parseEndorsementError(command, error);
+            error = ExtendedError.instanceOf(error) ? error : TransportFabric.parseEndorsementError(command, error);
 
             this.error(error);
             if (!this.isCommandAsync(command)) {

@@ -18,7 +18,7 @@ export class TransportCommandFabric<T> extends TransportCommand<T> implements IT
     // --------------------------------------------------------------------------
 
     public static sign<U>(command: TransportCommand<U>, manager: ITransportCryptoManager, key: IKeyAsymmetric, nonce?: string): ISignature {
-        if (_.isNaN(nonce)) {
+        if (_.isNil(nonce)) {
             nonce = Date.now().toString();
         }
         return {

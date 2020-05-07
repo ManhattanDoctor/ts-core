@@ -25,7 +25,7 @@ export class SmartTableDataSource<U> extends LocalDataSource implements IDestroy
     //
     // --------------------------------------------------------------------------
 
-    constructor(protected map: DataSourceMapCollection<U, any>) {
+    constructor(protected map: DataSourceMapCollection<U>) {
         super();
 
         this.subscription = map.events.subscribe(data => {

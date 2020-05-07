@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { FilterableConditions, FilterableSort, IFilterable } from '../../dto/IFilterable';
 import { DataSourceMapCollection } from './DataSourceMapCollection';
 
-export abstract class FilterableDataSourceMapCollection<U, V> extends DataSourceMapCollection<U, V> {
+export abstract class FilterableDataSourceMapCollection<U, V = any> extends DataSourceMapCollection<U, V> {
     // --------------------------------------------------------------------------
     //
     //  Properties
