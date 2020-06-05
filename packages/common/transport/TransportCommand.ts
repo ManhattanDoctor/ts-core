@@ -2,6 +2,7 @@ import * as uuid from 'uuid';
 import { ITransportCommand } from './ITransport';
 import { IsString, IsDefined } from 'class-validator';
 import * as _ from 'lodash';
+import { ValidateUtil } from '../util';
 
 export class TransportCommand<T> implements ITransportCommand<T> {
     // --------------------------------------------------------------------------
@@ -33,11 +34,12 @@ export class TransportCommand<T> implements ITransportCommand<T> {
 
     // --------------------------------------------------------------------------
     //
-    //  Protected Properties
+    //  Protected Methods
     //
     // --------------------------------------------------------------------------
 
     protected validateRequest(value: T): T {
+        ValidateUtil.validate(value);
         return value;
     }
 }

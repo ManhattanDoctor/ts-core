@@ -46,11 +46,6 @@ export class TransportHttp extends Transport<ITransportHttpSettings> {
 
     constructor(logger: ILogger, settings: ITransportHttpSettings, context?: string) {
         super(logger, settings, context);
-        /*
-        if (_.isNil(settings)) {
-            this.settings = { method: 'get', headers: {}, isHandleLoading: true, isHandleError: true };
-        }
-        */
     }
 
     // --------------------------------------------------------------------------
@@ -81,7 +76,6 @@ export class TransportHttp extends Transport<ITransportHttpSettings> {
             this.logCommand(command, TransportLogType.RESPONSE_NO_REPLY);
             return;
         }
-
         command.response(result);
         this.responseSend(command);
     }
@@ -108,6 +102,10 @@ export class TransportHttp extends Transport<ITransportHttpSettings> {
     //
     // --------------------------------------------------------------------------
 
+    protected isError(data: any): boolean {
+        return TransportHttp.isError(data);
+    }
+
     protected parseError<U>(data: any, command: ITransportCommand<U>): ExtendedError {
         if (data instanceof ExtendedError) {
             return data;
@@ -129,7 +127,6 @@ export class TransportHttp extends Transport<ITransportHttpSettings> {
         if (message.includes(`timeout of`)) {
             return new TransportTimeoutError(command);
         }
-
         let response = data.response;
         if (!_.isNil(response)) {
             if (ExtendedError.instanceOf(response.data)) {
@@ -159,7 +156,7 @@ export class TransportHttp extends Transport<ITransportHttpSettings> {
         } catch (error) {
             result = error;
         }
-        this.complete(command, TransportHttp.isError(result) ? this.parseError(result, command) : result);
+        this.complete(command, this.isError(result) ? this.parseError(result, command) : result);
     }
 
     protected responseSend<U, V>(command: ITransportCommandAsync<U, V>): void {

@@ -4,7 +4,6 @@ import { Exclude } from 'class-transformer';
 import { ITransportFabricStub, ITransportFabricStubHolder } from '../stub';
 import { ITransportCommandFabric } from '../TransportFabric';
 import { ITransportFabricCommandOptions } from '../ITransportFabricCommandOptions';
-import { ValidateUtil } from '@ts-core/common/util';
 import * as _ from 'lodash';
 import { ITransportCryptoManager } from '@ts-core/common/transport/crypto';
 import { ISignature, IKeyAsymmetric } from '@ts-core/common/crypto';
@@ -59,7 +58,6 @@ export class TransportCommandFabric<T> extends TransportCommand<T> implements IT
         if (!_.isObject(value)) {
             throw new ExtendedError(`Request must be an object`);
         }
-        ValidateUtil.validate(value);
         return super.validateRequest(value);
     }
 

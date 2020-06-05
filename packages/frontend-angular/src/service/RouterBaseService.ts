@@ -94,8 +94,9 @@ export class RouterBaseService extends DestroyableContainer {
     public navigate(url: string, extras?: NavigationExtras): void {
         let params = {} as NavigationExtras;
         params.queryParams = this.getQueryParams();
-        if (extras) Object.assign(params, extras);
-
+        if (extras) {
+            Object.assign(params, extras);
+        }
         this.router.navigateByUrl(url, params);
     }
 

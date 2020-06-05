@@ -112,7 +112,7 @@ export abstract class Transport<T extends ITransportSettings = any> extends Logg
     public destroy(): void {
         super.destroy();
 
-        if (this.listeners) {
+        if (this.requests) {
             this.requests.clear();
             this.requests = null;
         }
@@ -158,10 +158,9 @@ export abstract class Transport<T extends ITransportSettings = any> extends Logg
     }
 
     private verboseData<U>(data: U, type: TransportLogType): void {
-        if (_.isNil(data)) {
-            return;
+        if (!_.isNil(data)) {
+            this.verbose(`${this.getLogMark(type)} ${util.inspect(data, { colors: true, showHidden: false, depth: null, compact: false })}`);
         }
-        this.verbose(`${this.getLogMark(type)} ${util.inspect(data, { colors: true, showHidden: false, depth: null, compact: false })}`);
     }
 
     private logRequest<U>(command: ITransportCommand<U>, type: TransportLogType): void {
@@ -169,6 +168,7 @@ export abstract class Transport<T extends ITransportSettings = any> extends Logg
             this.verboseData(command.request, type);
         }
     }
+
     private logResponse<U>(command: ITransportCommand<U>, type: TransportLogType): void {
         if (_.isNil(command) || !this.isCommandAsync(command)) {
             return;
@@ -347,6 +347,7 @@ export interface ITransportPromise<U = any, V = any> {
     command: ITransportCommandAsync<U, V>;
     options: ITransportCommandOptions;
 }
+
 export interface ITransportRequestStorage extends ITransportCommandOptions {
     waitCount: number;
     expiredDate: Date;

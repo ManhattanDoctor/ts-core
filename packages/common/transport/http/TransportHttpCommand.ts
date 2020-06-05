@@ -14,6 +14,16 @@ export class TransportHttpCommand<T> extends TransportCommand<ITransportHttpRequ
 
     // --------------------------------------------------------------------------
     //
+    //  Protected Methods
+    //
+    // --------------------------------------------------------------------------
+
+    protected validateRequest(value: ITransportHttpRequest<T>): ITransportHttpRequest<T> {
+        return super.validateRequest(value.data);
+    }
+
+    // --------------------------------------------------------------------------
+    //
     //  Public Properties
     //
     // --------------------------------------------------------------------------

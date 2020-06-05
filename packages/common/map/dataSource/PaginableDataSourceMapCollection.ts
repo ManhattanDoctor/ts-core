@@ -54,7 +54,7 @@ export abstract class PaginableDataSourceMapCollection<U, V = any> extends Filte
         super.parseResponse(response);
     }
 
-    protected getResponseItems(response: IPagination<V>): Array<any> {
+    protected getResponseItems(response: IPagination<V>): Array<V> {
         return !_.isNil(response) ? response.items : null;
     }
 

@@ -25,11 +25,14 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     // --------------------------------------------------------------------------
 
     private static parseEndorsementError<U>(command: ITransportCommand<U>, error: any): ExtendedError {
+        if (!_.isEmpty(error.endorsements)) {
+            return TransportFabric.parseEndorsementError(command, error.endorsements[0]);
+        }
+
         let defaultError = new ExtendedError(`Unable to send "${command.name}" command request: ${error.message}`);
-        if (_.isEmpty(error.endorsements)) {
+        if (_.isNil(error.message)) {
             return defaultError;
         }
-        error = error.endorsements[0];
         let message = error.message.replace('transaction returned with failure:', '').trim();
         if (!ObjectUtil.isJSON(message)) {
             return defaultError;

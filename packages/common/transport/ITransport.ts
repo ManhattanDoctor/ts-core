@@ -1,16 +1,19 @@
 import { Observable } from 'rxjs';
 import { ExtendedError } from '../error';
 
-export interface ITransport {
+export interface ITransport extends ITransportSender, ITransportReceiver {}
+
+export interface ITransportSender {
     send<U>(command: ITransportCommand<U>, options?: ITransportCommandOptions): void;
     sendListen<U, V>(command: ITransportCommandAsync<U, V>, options?: ITransportCommandOptions): Promise<V>;
+    getDispatcher<T>(name: string): Observable<T>;
+}
 
+export interface ITransportReceiver {
     wait<U>(command: ITransportCommand<U>): void;
     listen<U>(name: string): Observable<U>;
     complete<U, V>(command: ITransportCommand<U>, result?: V | ExtendedError): void;
-
     dispatch<T>(event: ITransportEvent<T>): void;
-    getDispatcher<T>(name: string): Observable<T>;
 }
 
 export interface ITransportCommand<U> {

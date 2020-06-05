@@ -25,6 +25,8 @@ import { ISignature } from '@ts-core/common/crypto';
 import { TransportCryptoManagerEd25519, TransportCryptoManagerFactory } from '@ts-core/common/transport/crypto';
 import { TransportFabricChaincode } from '@ts-core/blockchain-fabric/chaincode';
 import { TransportFabricCryptoManagerEd25519 } from '@ts-core/blockchain-fabric/transport/crypto';
+import { validate, validateSync, ValidationError, ValidatorOptions } from 'class-validator';
+import { TransportHttpRpc } from './lib/rpc/TransportHttpRpc';
 
 export class AppModule implements OnApplicationBootstrap {
     // --------------------------------------------------------------------------
@@ -70,7 +72,8 @@ export class AppModule implements OnApplicationBootstrap {
                         return item;
                     }
                 },
-                Chaincode
+                TransportHttpRpc
+                //Chaincode
             ],
             controllers: [UserGetHandler, UserAddHandler, UserRemoveHandler, TestHandler]
         };
@@ -82,7 +85,7 @@ export class AppModule implements OnApplicationBootstrap {
     //
     // --------------------------------------------------------------------------
 
-    constructor(@Inject(Logger) private logger: Logger, private settings: AppSettings, private fabric: TransportFabric, private api: FabricApi) {}
+    constructor(@Inject(Logger) private logger: Logger, private settings: AppSettings, private fabric: TransportFabric, private rpc: TransportHttpRpc) {}
 
     // --------------------------------------------------------------------------
     //
@@ -92,7 +95,7 @@ export class AppModule implements OnApplicationBootstrap {
 
     public async onApplicationBootstrap(): Promise<void> {
         // this.transportTest();
-        this.fabricClientTest();
+        // this.fabricClientTest();
     }
 
     private async fabricClientTest(): Promise<void> {

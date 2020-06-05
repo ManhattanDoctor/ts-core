@@ -45,6 +45,10 @@ export abstract class IWindowContent<T = any> extends DestroyableContainer imple
         this.emit(WindowEvent.CONTENT_READY);
     }
 
+    public ngOnDestroy(): void {
+        // do nothing, window will destroy content after closing
+    }
+
     public blink(): void {
         if (this.window) {
             this.window.blink();

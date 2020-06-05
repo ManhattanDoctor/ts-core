@@ -1,6 +1,7 @@
 import { TransportCommandAsync } from '../../../common/transport';
 import { ITransportResponse } from '../ITransportResponse';
 import { ITransportHttpRequest } from './ITransportHttpRequest';
+import * as _ from 'lodash';
 
 // V is first for convenience
 export class TransportHttpCommandAsync<V, U = any> extends TransportCommandAsync<ITransportHttpRequest<U>, V> implements ITransportResponse<V> {
@@ -12,6 +13,16 @@ export class TransportHttpCommandAsync<V, U = any> extends TransportCommandAsync
 
     constructor(path: string, request?: ITransportHttpRequest<U>) {
         super(path, request);
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    //  Protected Methods
+    //
+    // --------------------------------------------------------------------------
+
+    protected validateRequest(value: ITransportHttpRequest<U>): ITransportHttpRequest<U> {
+        return super.validateRequest(value.data);
     }
 
     // --------------------------------------------------------------------------

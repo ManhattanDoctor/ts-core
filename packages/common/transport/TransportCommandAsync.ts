@@ -1,10 +1,10 @@
-import { Exclude, Expose } from 'class-transformer';
 import { ExtendedError } from '../error';
 import { TransformUtil } from '../util';
 import { ITransportCommandAsync } from './ITransport';
 import { ITransportResponse } from './ITransportResponse';
 import { TransportCommand } from './TransportCommand';
 import { IsOptional } from 'class-validator';
+import { ValidateUtil } from '../util';
 
 export class TransportCommandAsync<U, V> extends TransportCommand<U> implements ITransportResponse<V>, ITransportCommandAsync<U, V> {
     // --------------------------------------------------------------------------
@@ -51,6 +51,7 @@ export class TransportCommandAsync<U, V> extends TransportCommand<U> implements 
         if (value instanceof Error) {
             throw ExtendedError.create(value);
         }
+        ValidateUtil.validate(value);
         return this.checkResponse(value);
     }
 

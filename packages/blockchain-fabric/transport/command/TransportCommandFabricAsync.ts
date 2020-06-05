@@ -4,7 +4,6 @@ import { ITransportFabricStub, ITransportFabricStubHolder } from '../stub';
 import { Exclude } from 'class-transformer';
 import { ITransportCommandFabricAsync } from '../TransportFabric';
 import { ITransportFabricCommandOptions } from '../ITransportFabricCommandOptions';
-import { ValidateUtil } from '@ts-core/common/util';
 import * as _ from 'lodash';
 import { ITransportCryptoManager } from '@ts-core/common/transport/crypto';
 import { IKeyAsymmetric, ISignature } from '@ts-core/common/crypto';
@@ -42,8 +41,6 @@ export class TransportCommandFabricAsync<U, V> extends TransportCommandAsync<U, 
         if (!_.isObject(value)) {
             throw new ExtendedError(`Request must be an object`);
         }
-
-        ValidateUtil.validate(value);
         return super.validateRequest(value);
     }
 
@@ -51,7 +48,6 @@ export class TransportCommandFabricAsync<U, V> extends TransportCommandAsync<U, 
         if (!_.isObject(value)) {
             throw new ExtendedError(`Response must be an object`);
         }
-        ValidateUtil.validate(value);
         return super.validateResponse(value);
     }
 

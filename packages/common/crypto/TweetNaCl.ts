@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Ed25519 } from './ED25519';
+import { Ed25519 } from './Ed25519';
 import { Sha512 } from './hash';
 import { IKeyAsymmetric } from './IKeyAsymmetric';
 
