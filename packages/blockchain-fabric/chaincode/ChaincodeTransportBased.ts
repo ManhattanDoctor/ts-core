@@ -6,7 +6,6 @@ import * as shim from 'fabric-shim';
 import { ChaincodeInterface, ChaincodeResponse, ChaincodeStub } from 'fabric-shim';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
-
 import { TransportFabricResponsePayload } from '../transport/TransportFabricResponsePayload';
 import { TransportFabricChaincode } from './TransportFabricChaincode';
 
@@ -17,7 +16,7 @@ export abstract class ChaincodeTransportBased<T> extends LoggerWrapper implement
     //
     // --------------------------------------------------------------------------
 
-    protected observer: Subject<ObservableData<T | ChaincodeTransportBasedEvent, ChaincodeStub | ExtendedError | TransportFabricResponsePayload>>;
+    protected observer: Subject<ObservableData<T | ChaincodeTransportBasedEvent, IChaincodeTransportEventData>>;
 
     // --------------------------------------------------------------------------
     //
@@ -38,26 +37,38 @@ export abstract class ChaincodeTransportBased<T> extends LoggerWrapper implement
 
     public async Init(stub: ChaincodeStub): Promise<ChaincodeResponse> {
         this.debug(`Chaincode "${this.name}" inited`);
-        this.observer.next(new ObservableData(ChaincodeTransportBasedEvent.INITED, stub));
+        this.observer.next(new ObservableData(ChaincodeTransportBasedEvent.INITED, { stub }));
         return shim.success();
     }
 
     public async Invoke(stub: ChaincodeStub): Promise<ChaincodeResponse> {
-        this.observer.next(new ObservableData(ChaincodeTransportBasedEvent.INVOKE_STARTED, stub));
+        this.observer.next(new ObservableData(ChaincodeTransportBasedEvent.INVOKE_STARTED, { stub }));
 
         let response = await this.transport.invoke(stub);
 
-        // No need to response
-        let content = _.isNil(response) ? Buffer.from('') : TransformUtil.fromClassBuffer(response);
-        let isError = !_.isNil(response) && ExtendedError.instanceOf(response.response);
-        if (isError) {
-            this.observer.next(new ObservableData(ChaincodeTransportBasedEvent.INVOKE_ERROR, response));
-        } else {
-            this.observer.next(new ObservableData(ChaincodeTransportBasedEvent.INVOKE_COMPLETE, response));
-        }
+        let event = { stub, response };
+        let isHasResponse = !_.isNil(response);
 
-        this.observer.next(new ObservableData(ChaincodeTransportBasedEvent.INVOKE_FINISHED, stub));
+        let isError = isHasResponse && ExtendedError.instanceOf(response.response);
+        if (isError) {
+            this.observer.next(new ObservableData(ChaincodeTransportBasedEvent.INVOKE_ERROR, event));
+        } else {
+            this.observer.next(new ObservableData(ChaincodeTransportBasedEvent.INVOKE_COMPLETE, event));
+        }
+        this.observer.next(new ObservableData(ChaincodeTransportBasedEvent.INVOKE_FINISHED, event));
+
+        let content = this.getContent(response);
         return isError ? shim.error(content) : shim.success(content);
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    // 	Protected Methods
+    //
+    // --------------------------------------------------------------------------
+
+    protected getContent<U>(response: TransportFabricResponsePayload<U>): Buffer {
+        return !_.isNil(response) ? TransformUtil.fromClassBuffer(response) : Buffer.from('');
     }
 
     // --------------------------------------------------------------------------
@@ -66,11 +77,16 @@ export abstract class ChaincodeTransportBased<T> extends LoggerWrapper implement
     //
     // --------------------------------------------------------------------------
 
-    public get events(): Observable<ObservableData<T | ChaincodeTransportBasedEvent, ChaincodeStub | ExtendedError | TransportFabricResponsePayload>> {
+    public get events(): Observable<ObservableData<T | ChaincodeTransportBasedEvent, IChaincodeTransportEventData>> {
         return this.observer.asObservable();
     }
 
     public abstract get name(): string;
+}
+
+export interface IChaincodeTransportEventData {
+    stub: ChaincodeStub;
+    response?: TransportFabricResponsePayload;
 }
 
 export enum ChaincodeTransportBasedEvent {

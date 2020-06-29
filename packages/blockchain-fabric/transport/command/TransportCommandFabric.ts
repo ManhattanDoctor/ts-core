@@ -50,19 +50,6 @@ export class TransportCommandFabric<T> extends TransportCommand<T> implements IT
 
     // --------------------------------------------------------------------------
     //
-    //  Protected Properties
-    //
-    // --------------------------------------------------------------------------
-
-    protected validateRequest(value: T): T {
-        if (!_.isObject(value)) {
-            throw new ExtendedError(`Request must be an object`);
-        }
-        return super.validateRequest(value);
-    }
-
-    // --------------------------------------------------------------------------
-    //
     //  Public Methods
     //
     // --------------------------------------------------------------------------
@@ -70,6 +57,8 @@ export class TransportCommandFabric<T> extends TransportCommand<T> implements IT
     public sign(manager: ITransportCryptoManager, key: IKeyAsymmetric, nonce?: string): ISignature {
         return TransportCommandFabric.sign(this, manager, key, nonce);
     }
+
+    public destroy(): void {}
 
     // --------------------------------------------------------------------------
     //

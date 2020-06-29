@@ -98,7 +98,6 @@ class TransportCommandFabricAsyncImpl<U, V> extends TransportCommandAsync<U, V> 
     // --------------------------------------------------------------------------
 
     private _stub: ITransportFabricStub;
-    private _options: ITransportFabricCommandOptions;
 
     // --------------------------------------------------------------------------
     //
@@ -108,9 +107,18 @@ class TransportCommandFabricAsyncImpl<U, V> extends TransportCommandAsync<U, V> 
 
     constructor(payload: TransportFabricRequestPayload, stub: ChaincodeStub) {
         super(payload.name, payload.request, payload.id);
+        this._stub = new TransportFabricStub(stub, payload.options);
+    }
 
-        this._stub = new TransportFabricStub(payload.options, stub);
-        this._options = payload.options;
+    // --------------------------------------------------------------------------
+    //
+    //  Public Methods
+    //
+    // --------------------------------------------------------------------------
+
+    public destroy(): void {
+        this._stub.destroy();
+        this._stub = null;
     }
 
     // --------------------------------------------------------------------------
@@ -121,10 +129,6 @@ class TransportCommandFabricAsyncImpl<U, V> extends TransportCommandAsync<U, V> 
 
     public get stub(): ITransportFabricStub {
         return this._stub;
-    }
-
-    public get options(): ITransportFabricCommandOptions {
-        return this._options;
     }
 
     public get isQuery(): boolean {

@@ -33,26 +33,6 @@ export class TransportCommandFabricAsync<U, V> extends TransportCommandAsync<U, 
 
     // --------------------------------------------------------------------------
     //
-    //  Protected Properties
-    //
-    // --------------------------------------------------------------------------
-
-    protected validateRequest(value: U): U {
-        if (!_.isObject(value)) {
-            throw new ExtendedError(`Request must be an object`);
-        }
-        return super.validateRequest(value);
-    }
-
-    protected validateResponse(value: V): V {
-        if (!_.isObject(value)) {
-            throw new ExtendedError(`Response must be an object`);
-        }
-        return super.validateResponse(value);
-    }
-
-    // --------------------------------------------------------------------------
-    //
     //  Public Methods
     //
     // --------------------------------------------------------------------------
@@ -60,6 +40,8 @@ export class TransportCommandFabricAsync<U, V> extends TransportCommandAsync<U, 
     public sign(manager: ITransportCryptoManager, key: IKeyAsymmetric, nonce?: string): ISignature {
         return TransportCommandFabric.sign(this, manager, key, nonce);
     }
+
+    public destroy(): void {}
 
     // --------------------------------------------------------------------------
     //

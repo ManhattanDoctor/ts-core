@@ -403,7 +403,6 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
 
 export interface ITransportCommandFabric<U> extends ITransportCommand<U> {
     readonly stub: ITransportFabricStub;
-    readonly options: ITransportFabricCommandOptions;
     readonly isQuery: boolean;
 }
 

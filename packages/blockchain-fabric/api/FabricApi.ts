@@ -111,7 +111,8 @@ export class FabricApi extends LoggerWrapper {
             await this.gateway.connect(this.settings.fabricConnectionSettingsPath, {
                 wallet: await this.getWallet(),
                 identity: this.settings.fabricIdentity,
-                discovery: { enabled: true, asLocalhost: true }
+                clientTlsIdentity: this.settings.fabricTlsIdentity,
+                discovery: { enabled: this.settings.fabriIsDiscoveryEnabled, asLocalhost: true }
             });
 
             this._network = await this.gateway.getNetwork(this.settings.fabricNetworkName);
@@ -134,6 +135,17 @@ export class FabricApi extends LoggerWrapper {
                     this.settings.fabricIdentityPrivateKey
                 )
             );
+
+            if (!_.isNil(this.settings.fabricTlsIdentity)) {
+                await this._wallet.import(
+                    this.settings.fabricTlsIdentity,
+                    X509WalletMixin.createIdentity(
+                        this.settings.fabricTlsIdentityMspId,
+                        this.settings.fabricTlsIdentityCertificate,
+                        this.settings.fabricTlsIdentityPrivateKey
+                    )
+                );
+            }
         }
         return this._wallet;
     }
@@ -242,10 +254,16 @@ export class FabricApi extends LoggerWrapper {
 export interface IFabricApiSettings {
     fabricNetworkName: string;
     fabricChaincodeName: string;
+    fabriIsDiscoveryEnabled: boolean;
     fabricConnectionSettingsPath: string;
 
     fabricIdentity: string;
     fabricIdentityMspId: string;
     fabricIdentityPrivateKey: string;
     fabricIdentityCertificate: string;
+
+    fabricTlsIdentity?: string;
+    fabricTlsIdentityMspId?: string;
+    fabricTlsIdentityPrivateKey?: string;
+    fabricTlsIdentityCertificate?: string;
 }

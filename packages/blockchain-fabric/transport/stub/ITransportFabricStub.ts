@@ -1,7 +1,8 @@
 import { ClassType } from 'class-transformer/ClassTransformer';
-import { ChaincodeStub, Iterators } from 'fabric-shim';
+import { ChaincodeStub } from 'fabric-shim';
+import { IDestroyable } from '@ts-core/common/IDestroyable';
 
-export interface ITransportFabricStub {
+export interface ITransportFabricStub extends IDestroyable {
     readonly stub: ChaincodeStub;
 
     readonly userId: string;
@@ -17,6 +18,6 @@ export interface ITransportFabricStub {
     removeState(key: string): Promise<void>;
 }
 
-export interface ITransportFabricStubHolder {
+export interface ITransportFabricStubHolder extends IDestroyable {
     readonly stub: ITransportFabricStub;
 }

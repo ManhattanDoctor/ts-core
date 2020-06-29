@@ -5,11 +5,11 @@ import { Logger } from '@ts-core/common/logger';
 import { FileUtil } from '@ts-core/backend/file';
 import { PromiseHandler } from '@ts-core/common/promise';
 import { MapCollection } from '@ts-core/common/map';
-import { ITransport, Transport, TransportCommandAsync, TransportCommandWaitDelay } from '@ts-core/common/transport';
+import { ITransport, Transport, TransportCommandAsync, TransportCommandWaitDelay, ITransportCommandAsync } from '@ts-core/common/transport';
 import { TransportLocal } from '@ts-core/common/transport/local';
 import { AppSettings } from './AppSettings';
 import { TransportFabric, ITransportFabricCommandOptions } from '@ts-core/blockchain-fabric/transport';
-import { TestCommand } from './handler/TestCommand';
+import { UserAddCommand } from './handler/TestCommand';
 import { TestHandler } from './handler/TestHandler';
 import { UserAddHandler } from './handler/UserAddHandler';
 import { UserGetCommand } from './handler/UserGetCommand';
@@ -19,10 +19,9 @@ import * as _ from 'lodash';
 import { Chaincode } from './service/Chaincode';
 import { FabricApi } from '@ts-core/blockchain-fabric/api';
 import { TransportFabricBlockParser } from '@ts-core/blockchain-fabric/transport/block';
-import { UserAddCommand } from './handler/UserAddCommand';
 import { ObjectUtil, DateUtil } from '@ts-core/common/util';
-import { ISignature } from '@ts-core/common/crypto';
-import { TransportCryptoManagerEd25519, TransportCryptoManagerFactory } from '@ts-core/common/transport/crypto';
+import { ISignature, IKeyAsymmetric, Ed25519 } from '@ts-core/common/crypto';
+import { TransportCryptoManagerEd25519, TransportCryptoManagerFactory, ITransportCryptoManager } from '@ts-core/common/transport/crypto';
 import { TransportFabricChaincode } from '@ts-core/blockchain-fabric/chaincode';
 import { TransportFabricCryptoManagerEd25519 } from '@ts-core/blockchain-fabric/transport/crypto';
 import { validate, validateSync, ValidationError, ValidatorOptions } from 'class-validator';
@@ -101,8 +100,16 @@ export class AppModule implements OnApplicationBootstrap {
     private async fabricClientTest(): Promise<void> {
         await PromiseHandler.delay(1000);
 
-        let nonce = Date.now().toString();
-        let command = new TestCommand({ name: 'Five' });
+        let keys: IKeyAsymmetric = Ed25519.keys();
+        let nonce: string = Date.now().toString();
+        let manager: ITransportCryptoManager = new TransportCryptoManagerEd25519();
+
+        let command = new UserAddCommand({ name: 'Vasya', age: 25 });
+
+        await this.fabric.sendListen(command, {
+            userId: this.settings.fabricUserId,
+            signature: command.sign(manager, keys, nonce)
+        });
 
         console.log(
             await this.fabric.sendListen(command, {

@@ -1,10 +1,10 @@
-import { Block, BlockData } from 'fabric-client';
+import { BlockData } from 'fabric-client';
 import { ITransportFabricBlock } from './ITransportFabricBlock';
 import * as _ from 'lodash';
 import { ITransportFabricTransaction } from './ITransportFabricTransaction';
 import { TransportFabric } from '../TransportFabric';
 import { TransformUtil } from '@ts-core/common/util';
-import { IFabricBlock, FabricTransactionValidationCode, IFabricTransaction } from '../../api';
+import { IFabricBlock, IFabricTransaction } from '../../api';
 
 export class TransportFabricBlockParser {
     // --------------------------------------------------------------------------

@@ -20,6 +20,7 @@ import * as _ from 'lodash';
 import { TransportFabricResponsePayload, TransportFabricRequestPayload } from '../transport';
 import { ISignature } from '@ts-core/common/crypto';
 import { TransportCryptoManagerFactory } from '@ts-core/common/transport/crypto';
+import { IDestroyable } from '@ts-core/common/IDestroyable';
 
 export class TransportFabricChaincode extends Transport<ITransportSettings> {
     // --------------------------------------------------------------------------
@@ -61,6 +62,9 @@ export class TransportFabricChaincode extends Transport<ITransportSettings> {
 
         this.logCommand(command, request.isNeedReply ? TransportLogType.RESPONSE_SENDED : TransportLogType.RESPONSE_NO_REPLY);
         request.handler.resolve(new TransportFabricResponsePayload<U, V>(command));
+        if (IDestroyable.instanceOf(command)) {
+            command.destroy();
+        }
     }
 
     public wait<U>(command: ITransportCommand<U>): void {

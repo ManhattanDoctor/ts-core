@@ -5,6 +5,7 @@ import { ITransportResponse } from './ITransportResponse';
 import { TransportCommand } from './TransportCommand';
 import { IsOptional } from 'class-validator';
 import { ValidateUtil } from '../util';
+import { retry } from 'rxjs/operators';
 
 export class TransportCommandAsync<U, V> extends TransportCommand<U> implements ITransportResponse<V>, ITransportCommandAsync<U, V> {
     // --------------------------------------------------------------------------
@@ -51,8 +52,10 @@ export class TransportCommandAsync<U, V> extends TransportCommand<U> implements 
         if (value instanceof Error) {
             throw ExtendedError.create(value);
         }
+
+        value = this.checkResponse(value);
         ValidateUtil.validate(value);
-        return this.checkResponse(value);
+        return value;
     }
 
     protected checkResponse(value: V): V {

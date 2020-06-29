@@ -1,6 +1,6 @@
 import { TransformUtil, ValidateUtil } from '@ts-core/common/util';
 import { ClassType } from 'class-transformer/ClassTransformer';
-import { ChaincodeStub, Iterators } from 'fabric-shim';
+import { ChaincodeStub, Iterators, StateQueryResponse } from 'fabric-shim';
 import * as _ from 'lodash';
 import { ITransportFabricStub } from './ITransportFabricStub';
 import { ITransportFabricCommandOptions } from '../ITransportFabricCommandOptions';
@@ -13,7 +13,6 @@ export class TransportFabricStub implements ITransportFabricStub {
     // --------------------------------------------------------------------------
 
     private _stub: ChaincodeStub;
-
     private _userId: string;
     private _userPublicKey: string;
 
@@ -23,10 +22,12 @@ export class TransportFabricStub implements ITransportFabricStub {
     //
     // --------------------------------------------------------------------------
 
-    constructor(options: ITransportFabricCommandOptions, stub: ChaincodeStub) {
+    constructor(stub: ChaincodeStub, options?: ITransportFabricCommandOptions) {
         this._stub = stub;
-        this._userId = options.userId;
-        this._userPublicKey = options.signature.publicKey;
+        if (!_.isNil(options)) {
+            this._userId = options.userId;
+            this._userPublicKey = options.signature.publicKey;
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -69,6 +70,19 @@ export class TransportFabricStub implements ITransportFabricStub {
         return item;
     }
 
+    public async getStateByRange(startKey: string, endKey: string): Promise<Iterators.StateQueryIterator> {
+        return this.stub.getStateByRange(startKey, endKey);
+    }
+
+    public async getStateByRangeWithPagination(
+        startKey: string,
+        endKey: string,
+        pageSize: number,
+        bookmark?: string
+    ): Promise<StateQueryResponse<Iterators.StateQueryIterator>> {
+        return this.stub.getStateByRangeWithPagination(startKey, endKey, pageSize, bookmark);
+    }
+
     public async putStateRaw(key: string, item: string): Promise<void> {
         return this.stub.putState(key, Buffer.from(item, TransformUtil.ENCODING));
     }
@@ -79,16 +93,12 @@ export class TransportFabricStub implements ITransportFabricStub {
 
     // --------------------------------------------------------------------------
     //
-    //  Public Properties
+    //  Public Methods
     //
     // --------------------------------------------------------------------------
 
-    public createCompositeKey(prefix: string, attributes: Array<string>): string {
-        return this.stub.createCompositeKey(prefix, attributes);
-    }
-
-    public getStateByPartialCompositeKey(prefix: string, attributes: Array<string>): Promise<Iterators.StateQueryIterator> {
-        return this.stub.getStateByPartialCompositeKey(prefix, attributes);
+    public destroy(): void {
+        this._stub = null;
     }
 
     // --------------------------------------------------------------------------
