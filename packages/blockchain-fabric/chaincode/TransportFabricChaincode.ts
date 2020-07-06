@@ -131,7 +131,7 @@ export class TransportFabricChaincode extends Transport<ITransportSettings> {
         let payload: TransportFabricRequestPayload<U> = null;
         try {
             payload = TransportFabricRequestPayload.parse(stub);
-            command = TransportFabricRequestPayload.createCommand(payload, stub);
+            command = TransportFabricRequestPayload.createCommand(payload, stub, this);
             this.validateSignature(command, payload.options.signature);
         } catch (error) {
             error = ExtendedError.create(error);

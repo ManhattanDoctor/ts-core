@@ -5,7 +5,6 @@ import { ITransportResponse } from './ITransportResponse';
 import { TransportCommand } from './TransportCommand';
 import { IsOptional } from 'class-validator';
 import { ValidateUtil } from '../util';
-import { retry } from 'rxjs/operators';
 
 export class TransportCommandAsync<U, V> extends TransportCommand<U> implements ITransportResponse<V>, ITransportCommandAsync<U, V> {
     // --------------------------------------------------------------------------

@@ -38,6 +38,21 @@ export class FabricApi extends LoggerWrapper {
         return null;
     }
 
+    public static async createWallet(settings: IFabricApiSettings): Promise<Wallet> {
+        let item = new InMemoryWallet();
+        await item.import(
+            settings.fabricIdentity,
+            X509WalletMixin.createIdentity(settings.fabricIdentityMspId, settings.fabricIdentityCertificate, settings.fabricIdentityPrivateKey)
+        );
+        if (!_.isNil(settings.fabricTlsIdentity)) {
+            await item.import(
+                settings.fabricTlsIdentity,
+                X509WalletMixin.createIdentity(settings.fabricTlsIdentityMspId, settings.fabricTlsIdentityCertificate, settings.fabricTlsIdentityPrivateKey)
+            );
+        }
+        return item;
+    }
+
     // --------------------------------------------------------------------------
     //
     //  Properties
@@ -112,7 +127,7 @@ export class FabricApi extends LoggerWrapper {
                 wallet: await this.getWallet(),
                 identity: this.settings.fabricIdentity,
                 clientTlsIdentity: this.settings.fabricTlsIdentity,
-                discovery: { enabled: this.settings.fabriIsDiscoveryEnabled, asLocalhost: true }
+                discovery: { enabled: this.settings.fabricIsDiscoveryEnabled, asLocalhost: true }
             });
 
             this._network = await this.gateway.getNetwork(this.settings.fabricNetworkName);
@@ -126,26 +141,7 @@ export class FabricApi extends LoggerWrapper {
 
     protected async getWallet(): Promise<Wallet> {
         if (_.isNil(this._wallet)) {
-            this._wallet = new InMemoryWallet();
-            await this._wallet.import(
-                this.settings.fabricIdentity,
-                X509WalletMixin.createIdentity(
-                    this.settings.fabricIdentityMspId,
-                    this.settings.fabricIdentityCertificate,
-                    this.settings.fabricIdentityPrivateKey
-                )
-            );
-
-            if (!_.isNil(this.settings.fabricTlsIdentity)) {
-                await this._wallet.import(
-                    this.settings.fabricTlsIdentity,
-                    X509WalletMixin.createIdentity(
-                        this.settings.fabricTlsIdentityMspId,
-                        this.settings.fabricTlsIdentityCertificate,
-                        this.settings.fabricTlsIdentityPrivateKey
-                    )
-                );
-            }
+            this._wallet = await FabricApi.createWallet(this.settings);
         }
         return this._wallet;
     }
@@ -254,7 +250,7 @@ export class FabricApi extends LoggerWrapper {
 export interface IFabricApiSettings {
     fabricNetworkName: string;
     fabricChaincodeName: string;
-    fabriIsDiscoveryEnabled: boolean;
+    fabricIsDiscoveryEnabled: boolean;
     fabricConnectionSettingsPath: string;
 
     fabricIdentity: string;

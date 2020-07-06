@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { ITransportCommand, ITransportCommandAsync, ITransportEvent, Transport, TransportLogType, TransportTimeoutError } from '@ts-core/common/transport';
 import { DateUtil, ObjectUtil, TransformUtil, ValidateUtil } from '@ts-core/common/util';
 import { Channel } from 'fabric-client';
-import { Contract, Gateway, InMemoryWallet, Network, Wallet, X509WalletMixin } from 'fabric-network';
+import { Contract, Gateway, Network, Wallet } from 'fabric-network';
 import * as _ from 'lodash';
 import { ITransportFabricCommandOptions } from './ITransportFabricCommandOptions';
 import { ITransportFabricRequestOptions } from './ITransportFabricRequestOptions';
@@ -16,6 +16,7 @@ import { ITransportFabricStub } from './stub';
 import { TransportFabricRequestPayload } from './TransportFabricRequestPayload';
 import { TransportFabricResponsePayload } from './TransportFabricResponsePayload';
 import { TransportFabricCommandOptions } from './TransportFabricCommandOptions';
+import { FabricApi } from '../api';
 
 export class TransportFabric extends Transport<ITransportFabricSettings> {
     // --------------------------------------------------------------------------
@@ -344,7 +345,7 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
             await this.gateway.connect(this.settings.fabricConnectionSettingsPath, {
                 wallet: await this.getWallet(),
                 identity: this.settings.fabricIdentity,
-                discovery: { enabled: true, asLocalhost: true }
+                discovery: { enabled: this.settings.fabricIsDiscoveryEnabled, asLocalhost: true }
             });
 
             this._network = await this.gateway.getNetwork(this.settings.fabricNetworkName);
@@ -365,15 +366,7 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
 
     protected async getWallet(): Promise<Wallet> {
         if (_.isNil(this._wallet)) {
-            this._wallet = new InMemoryWallet();
-            await this._wallet.import(
-                this.settings.fabricIdentity,
-                X509WalletMixin.createIdentity(
-                    this.settings.fabricIdentityMspId,
-                    this.settings.fabricIdentityCertificate,
-                    this.settings.fabricIdentityPrivateKey
-                )
-            );
+            this._wallet = await FabricApi.createWallet(this.settings);
         }
         return this._wallet;
     }

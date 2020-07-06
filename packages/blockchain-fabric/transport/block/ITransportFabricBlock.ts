@@ -1,5 +1,5 @@
-import { ITransportFabricEvent } from './ITransportFabricEvent';
 import { ITransportFabricTransaction } from './ITransportFabricTransaction';
+import { ITransportFabricEvent } from '../block';
 
 export interface ITransportFabricBlock {
     hash: string;

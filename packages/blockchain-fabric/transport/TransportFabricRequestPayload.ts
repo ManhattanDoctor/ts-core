@@ -8,6 +8,7 @@ import { ITransportFabricCommandOptions } from './ITransportFabricCommandOptions
 import { ITransportFabricStub, TransportFabricStub, ITransportFabricStubHolder } from './stub';
 import { ITransportCommandFabricAsync, TransportFabric } from './TransportFabric';
 import { TransportFabricCommandOptions } from './TransportFabricCommandOptions';
+import { TransportFabricChaincode } from '../chaincode';
 
 // --------------------------------------------------------------------------
 //
@@ -56,8 +57,12 @@ export class TransportFabricRequestPayload<U = any> implements ITransportFabricR
         return payload;
     }
 
-    public static createCommand<U, V = any>(payload: TransportFabricRequestPayload<U>, stub: ChaincodeStub): ITransportCommandAsync<U, V> {
-        return new TransportCommandFabricAsyncImpl(payload, stub);
+    public static createCommand<U, V = any>(
+        payload: TransportFabricRequestPayload<U>,
+        stub: ChaincodeStub,
+        chaincode: TransportFabricChaincode
+    ): ITransportCommandAsync<U, V> {
+        return new TransportCommandFabricAsyncImpl(payload, stub, chaincode);
     }
 
     // --------------------------------------------------------------------------
@@ -105,9 +110,9 @@ class TransportCommandFabricAsyncImpl<U, V> extends TransportCommandAsync<U, V> 
     //
     // --------------------------------------------------------------------------
 
-    constructor(payload: TransportFabricRequestPayload, stub: ChaincodeStub) {
+    constructor(payload: TransportFabricRequestPayload, stub: ChaincodeStub, chaincode: TransportFabricChaincode) {
         super(payload.name, payload.request, payload.id);
-        this._stub = new TransportFabricStub(stub, payload.options);
+        this._stub = new TransportFabricStub(stub, payload.options, chaincode);
     }
 
     // --------------------------------------------------------------------------

@@ -1,16 +1,8 @@
 import { ITransportSettings } from '@ts-core/common/transport';
+import { IFabricApiSettings } from '../api';
 
-export interface ITransportFabricSettings extends ITransportSettings {
+export interface ITransportFabricSettings extends IFabricApiSettings, ITransportSettings {
     reconnectDelay?: number;
     reconnectMaxAttempts?: number;
     isExitApplicationOnDisconnect?: boolean;
-
-    fabricNetworkName: string;
-    fabricChaincodeName: string;
-    fabricConnectionSettingsPath: string;
-
-    fabricIdentity: string;
-    fabricIdentityMspId: string;
-    fabricIdentityPrivateKey: string;
-    fabricIdentityCertificate: string;
 }

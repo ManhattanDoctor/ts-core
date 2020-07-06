@@ -21,6 +21,7 @@ import { Observable, Subject } from 'rxjs';
 import * as uuid from 'uuid';
 import { ITransportAmqpSettings } from './ITransportAmqpSettings';
 import { TransportInvalidHeadersError } from './TransportInvalidHeadersError';
+import { TransformUtil } from '@ts-core/common/util';
 
 export class TransportAmqp extends Transport<ITransportAmqpSettings> {
     // --------------------------------------------------------------------------
@@ -266,10 +267,13 @@ export class TransportAmqp extends Transport<ITransportAmqpSettings> {
 
     public dispatch<T>(event: ITransportEvent<T>): void {
         this.assertEventExchange();
+        /*
         if (event instanceof TransportEvent) {
             event = event.toObject();
         }
         this.channel.publish(TransportAmqp.EVENT_EXCHANGE, '', Buffer.from(JSON.stringify(event)));
+        */
+        this.channel.publish(TransportAmqp.EVENT_EXCHANGE, '', TransformUtil.fromClassBuffer(event));
     }
 
     public getRetryCount<U, V>(command: ITransportCommand<U>): number {

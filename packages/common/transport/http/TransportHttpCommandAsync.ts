@@ -22,7 +22,8 @@ export class TransportHttpCommandAsync<V, U = any> extends TransportCommandAsync
     // --------------------------------------------------------------------------
 
     protected validateRequest(value: ITransportHttpRequest<U>): ITransportHttpRequest<U> {
-        return super.validateRequest(value.data);
+        super.validateRequest(value.data);
+        return value;
     }
 
     // --------------------------------------------------------------------------

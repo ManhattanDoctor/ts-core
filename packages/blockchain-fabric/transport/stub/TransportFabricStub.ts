@@ -4,6 +4,8 @@ import { ChaincodeStub, Iterators, StateQueryResponse } from 'fabric-shim';
 import * as _ from 'lodash';
 import { ITransportFabricStub } from './ITransportFabricStub';
 import { ITransportFabricCommandOptions } from '../ITransportFabricCommandOptions';
+import { ITransportEvent } from '@ts-core/common/transport';
+import { TransportFabricChaincode } from '../../chaincode';
 
 export class TransportFabricStub implements ITransportFabricStub {
     // --------------------------------------------------------------------------
@@ -13,6 +15,8 @@ export class TransportFabricStub implements ITransportFabricStub {
     // --------------------------------------------------------------------------
 
     private _stub: ChaincodeStub;
+    private _chaincode: TransportFabricChaincode;
+
     private _userId: string;
     private _userPublicKey: string;
 
@@ -22,8 +26,10 @@ export class TransportFabricStub implements ITransportFabricStub {
     //
     // --------------------------------------------------------------------------
 
-    constructor(stub: ChaincodeStub, options?: ITransportFabricCommandOptions) {
+    constructor(stub: ChaincodeStub, options: ITransportFabricCommandOptions, chaincode: TransportFabricChaincode) {
         this._stub = stub;
+        this._chaincode = chaincode;
+
         if (!_.isNil(options)) {
             this._userId = options.userId;
             this._userPublicKey = options.signature.publicKey;
@@ -93,12 +99,37 @@ export class TransportFabricStub implements ITransportFabricStub {
 
     // --------------------------------------------------------------------------
     //
+    //  Public Event Methods
+    //
+    // --------------------------------------------------------------------------
+
+    public async dispatch<T>(value: ITransportEvent<T>, isNeedValidate: boolean = true): Promise<void> {
+        if (isNeedValidate) {
+            ValidateUtil.validate(value);
+        }
+        this.chaincode.dispatch(value);
+        this.stub.setEvent(value.name, TransformUtil.fromClassBuffer(value));
+    }
+
+    // --------------------------------------------------------------------------
+    //
     //  Public Methods
     //
     // --------------------------------------------------------------------------
 
     public destroy(): void {
         this._stub = null;
+        this._chaincode = null;
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    //  Private Properties
+    //
+    // --------------------------------------------------------------------------
+
+    public get chaincode(): TransportFabricChaincode {
+        return this._chaincode;
     }
 
     // --------------------------------------------------------------------------

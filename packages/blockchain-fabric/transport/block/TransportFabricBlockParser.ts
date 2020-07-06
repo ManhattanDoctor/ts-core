@@ -3,8 +3,9 @@ import { ITransportFabricBlock } from './ITransportFabricBlock';
 import * as _ from 'lodash';
 import { ITransportFabricTransaction } from './ITransportFabricTransaction';
 import { TransportFabric } from '../TransportFabric';
-import { TransformUtil } from '@ts-core/common/util';
+import { TransformUtil, ObjectUtil } from '@ts-core/common/util';
 import { IFabricBlock, IFabricTransaction } from '../../api';
+import { ITransportFabricEvent } from './ITransportFabricEvent';
 
 export class TransportFabricBlockParser {
     // --------------------------------------------------------------------------
@@ -18,6 +19,9 @@ export class TransportFabricBlockParser {
         item.hash = block.hash;
         item.number = block.number;
         item.createdDate = block.createdDate;
+
+        let events = (item.events = []);
+        let transactions = (item.transactions = []);
         if (_.isNil(block.data) || _.isEmpty(block.data.data)) {
             return;
         }
@@ -25,36 +29,34 @@ export class TransportFabricBlockParser {
         let metadata = block.metadata.metadata;
         let validationCodes = _.isArray(metadata) && !_.isEmpty(metadata) ? metadata[metadata.length - 1] : [];
 
-        let transactions = [];
         for (let i = 0; i < block.data.data.length; i++) {
-            let item = this.parseBlockData(block.data.data[i]);
-            if (_.isNil(item)) {
-                continue;
+            let transaction = this.parseTransactionBlockData(block.data.data[i]);
+            if (!_.isNil(transaction)) {
+                transaction.validationCode = validationCodes[i];
+                transactions.push(transaction);
             }
-            item.validationCode = validationCodes[i];
-            transactions.push(item);
+            let event = this.parseEventBlockData(block.data.data[i]);
+            if (!_.isNil(event)) {
+                events.push(event);
+            }
         }
-        item.transactions = transactions;
-
-        let events = [];
-        item.events = events;
 
         return item;
     }
 
     public parseTransaction(data: IFabricTransaction): ITransportFabricTransaction {
-        let item = this.parseBlockData(data.transactionEnvelope);
+        let item = this.parseTransactionBlockData(data.transactionEnvelope);
         item.validationCode = data.validationCode;
         return item;
     }
 
     // --------------------------------------------------------------------------
     //
-    //  Private Methods
+    //  Transaction Methods
     //
     // --------------------------------------------------------------------------
 
-    private parseBlockData(data: BlockData): ITransportFabricTransaction {
+    private parseTransactionBlockData(data: BlockData): ITransportFabricTransaction {
         if (_.isNil(data) || _.isNil(data.payload) || _.isNil(data.payload.header) || _.isNil(data.payload.header.channel_header)) {
             return null;
         }
@@ -68,13 +70,13 @@ export class TransportFabricBlockParser {
 
         if (!_.isNil(data.payload.data) && !_.isEmpty(data.payload.data.actions)) {
             for (let action of data.payload.data.actions) {
-                this.parseBlockAction(item, action);
+                this.parseTransactionBlockAction(item, action);
             }
         }
         return item;
     }
 
-    private parseBlockAction(transaction: ITransportFabricTransaction, action: any): void {
+    private parseTransactionBlockAction(transaction: ITransportFabricTransaction, action: any): void {
         if (
             _.isNil(action.payload) ||
             _.isNil(action.payload.chaincode_proposal_payload) ||
@@ -114,5 +116,46 @@ export class TransportFabricBlockParser {
             return;
         }
         transaction.response = TransformUtil.toJSON(response.payload);
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    //  Event Methods
+    //
+    // --------------------------------------------------------------------------
+
+    private parseEventBlockData(data: BlockData): ITransportFabricEvent {
+        if (_.isNil(data) || _.isNil(data.payload) || _.isNil(data.payload.header) || _.isNil(data.payload.header.channel_header)) {
+            return null;
+        }
+
+        let header = data.payload.header.channel_header;
+
+        let item: ITransportFabricEvent = {} as any;
+        item.channel = header.channel_id;
+        item.transactionHash = header.tx_id;
+        item.createdDate = new Date(header.timestamp);
+
+        if (!_.isNil(data.payload.data) && !_.isEmpty(data.payload.data.actions)) {
+            for (let action of data.payload.data.actions) {
+                this.parseEventBlockAction(item, action);
+            }
+        }
+        return item;
+    }
+
+    private parseEventBlockAction(event: ITransportFabricEvent, action: any): void {
+        if (
+            !_.isNil(action.payload.action) &&
+            !_.isNil(action.payload.action.proposal_response_payload) &&
+            !_.isNil(action.payload.action.proposal_response_payload.extension)
+        ) {
+            let events = action.payload.action.proposal_response_payload.extension.events;
+
+            ObjectUtil.copyProperties(
+                { name: events.event_name, chaincode: events.chaincode_id, data: TransformUtil.toJSON(events.payload.toString()) },
+                event
+            );
+        }
     }
 }

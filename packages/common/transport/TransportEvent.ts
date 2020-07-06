@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
-import { ExtendedError } from '../error';
 import { ITransportEvent } from './ITransport';
 import { IsString, IsOptional } from 'class-validator';
+import { ValidateUtil } from '../util';
 
 export class TransportEvent<T> implements ITransportEvent<T> {
     // --------------------------------------------------------------------------
@@ -24,32 +24,19 @@ export class TransportEvent<T> implements ITransportEvent<T> {
 
     constructor(name: string, data?: T) {
         this.name = name;
-
         if (!_.isNil(data)) {
-            this.validateData(data);
-            this.data = data;
+            this.data = this.validateData(data);
         }
     }
 
     // --------------------------------------------------------------------------
     //
-    //  Protected Properties
+    //  Protected Methods
     //
     // --------------------------------------------------------------------------
 
-    protected validateData(value: T): void {
-        if (_.isNil(value)) {
-            throw new ExtendedError('Data is undefined');
-        }
-    }
-
-    // --------------------------------------------------------------------------
-    //
-    //  Public Methods
-    //
-    // --------------------------------------------------------------------------
-
-    public toObject(): ITransportEvent<T> {
-        return { name: this.name, data: this.data };
+    protected validateData(value: T): T {
+        ValidateUtil.validate(value);
+        return value;
     }
 }
