@@ -1,6 +1,6 @@
 {
     "name": "@ts-core/blockchain-fabric",
-    "version": "1.0.61",
+    "version": "1.0.62",
     "description": "Classes and utils for HLF",
     "main": "index.js",
     "scripts": {},

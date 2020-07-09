@@ -54,10 +54,12 @@ export class TransportCommandFabric<T> extends TransportCommand<T> implements IT
     //
     // --------------------------------------------------------------------------
 
+    /*
     public sign(manager: ITransportCryptoManager, key: IKeyAsymmetric, nonce?: string): ISignature {
         return TransportCommandFabric.sign(this, manager, key, nonce);
     }
-
+    */
+   
     public destroy(): void {}
 
     // --------------------------------------------------------------------------

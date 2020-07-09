@@ -5,6 +5,7 @@ import { ExtendedError } from '@ts-core/common/error';
 import { Logger } from '@ts-core/common/logger';
 import { Transport } from '@ts-core/common/transport';
 import { TransportLocal } from '@ts-core/common/transport/local';
+import { TransportHttp, ITransportHttpSettings } from '@ts-core/common/transport/http';
 
 @Global()
 export class TransportModule {
@@ -27,12 +28,21 @@ export class TransportModule {
                     }
                 });
                 break;
+            case TransportType.HTTP:
+                providers.push({
+                    provide: Transport,
+                    inject: [Logger],
+                    useFactory: (logger: Logger) => {
+                        return new TransportHttp(logger, settings.options as ITransportHttpSettings);
+                    }
+                });
+                break;
             case TransportType.AMQP:
                 providers.push({
                     provide: Transport,
                     inject: [Logger],
                     useFactory: async (logger: Logger) => {
-                        let item = new TransportAmqp(logger, settings.options);
+                        let item = new TransportAmqp(logger, settings.options as ITransportAmqpSettings);
                         await item.connect();
                         return item;
                     }
@@ -43,7 +53,7 @@ export class TransportModule {
                     provide: Transport,
                     inject: [Logger],
                     useFactory: async (logger: Logger) => {
-                        let item = new TransportAmqp2(logger, settings.options);
+                        let item = new TransportAmqp2(logger, settings.options as ITransportAmqpSettings);
                         await item.connect();
                         return item;
                     }
@@ -64,11 +74,12 @@ export class TransportModule {
 
 export interface ITransportModuleSettings {
     type: TransportType;
-    options?: ITransportAmqpSettings;
+    options?: ITransportAmqpSettings | ITransportHttpSettings;
 }
 
 export enum TransportType {
     LOCAL = 'LOCAL',
     AMQP = 'AMQP',
+    HTTP = 'HTTP',
     AMQP2 = 'AMQP2'
 }

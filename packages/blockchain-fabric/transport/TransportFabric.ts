@@ -4,10 +4,18 @@ import { ILogger } from '@ts-core/common/logger';
 import { ObservableData } from '@ts-core/common/observer';
 import { PromiseHandler } from '@ts-core/common/promise';
 import { Observable } from 'rxjs';
-import { ITransportCommand, ITransportCommandAsync, ITransportEvent, Transport, TransportLogType, TransportTimeoutError } from '@ts-core/common/transport';
+import {
+    ITransportCommand,
+    ITransportCommandAsync,
+    ITransportEvent,
+    Transport,
+    TransportLogType,
+    TransportTimeoutError,
+    TransportEvent
+} from '@ts-core/common/transport';
 import { DateUtil, ObjectUtil, TransformUtil, ValidateUtil } from '@ts-core/common/util';
-import { Channel } from 'fabric-client';
-import { Contract, Gateway, Network, Wallet } from 'fabric-network';
+import Client, { Channel } from 'fabric-client';
+import { ContractEventListener, Contract, Gateway, Network, Wallet } from 'fabric-network';
 import * as _ from 'lodash';
 import { ITransportFabricCommandOptions } from './ITransportFabricCommandOptions';
 import { ITransportFabricRequestOptions } from './ITransportFabricRequestOptions';
@@ -17,6 +25,7 @@ import { TransportFabricRequestPayload } from './TransportFabricRequestPayload';
 import { TransportFabricResponsePayload } from './TransportFabricResponsePayload';
 import { TransportFabricCommandOptions } from './TransportFabricCommandOptions';
 import { FabricApi } from '../api';
+import { ITransportFabricEvent } from './block';
 
 export class TransportFabric extends Transport<ITransportFabricSettings> {
     // --------------------------------------------------------------------------
@@ -60,6 +69,8 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     //
     // --------------------------------------------------------------------------
 
+    private contractEvents: Map<string, Promise<ContractEventListener>>;
+
     private connectionPromise: PromiseHandler<void, ExtendedError>;
     private connectionAttempts: number;
 
@@ -79,6 +90,7 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
 
     constructor(logger: ILogger, settings: ITransportFabricSettings, context?: string) {
         super(logger, settings, context);
+        this.contractEvents = new Map();
     }
 
     // --------------------------------------------------------------------------
@@ -121,6 +133,11 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
         this.gateway = null;
         this._isConnected = false;
 
+        for (let item of this.contractEvents.values()) {
+            item.then(item => item.unregister());
+        }
+        this.contractEvents.clear();
+
         if (!_.isNil(error)) {
             this.error(error);
         }
@@ -155,6 +172,13 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
         return handler.promise;
     }
 
+    public getDispatcher<T>(name: string): Observable<T> {
+        if (!this.contractEvents.has(name)) {
+            this.contractEvents.set(name, this.contract.addContractListener(name, name, this.contractEventCallback));
+        }
+        return super.getDispatcher(name);
+    }
+
     public complete<U, V>(command: ITransportCommand<U>, result?: V | Error): void {
         throw new ExtendedError(`Method is not supported, implemented only in chaincode`);
     }
@@ -175,6 +199,7 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
         super.destroy();
         this.disconnect();
         this.requests = null;
+        this.contractEvents = null;
     }
 
     // --------------------------------------------------------------------------
@@ -229,7 +254,6 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     // --------------------------------------------------------------------------
     //
     //  Recevie Message Methods
-    //
     //
     // --------------------------------------------------------------------------
 
@@ -332,7 +356,7 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
 
     // --------------------------------------------------------------------------
     //
-    //  Protected Amqp Methods
+    //  Protected Methods
     //
     // --------------------------------------------------------------------------
 
@@ -370,6 +394,21 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
         }
         return this._wallet;
     }
+
+    protected contractEventCallback = <T>(error: Error, event: Client.ChaincodeEvent): void => {
+        if (!_.isNil(error)) {
+            this.error(error);
+            return;
+        }
+        if (_.isNil(event)) {
+            this.warn(`Received nil event`);
+            return;
+        }
+        if (!this.dispatchers.has(event.event_name)) {
+            return;
+        }
+        this.dispatchers.get(event.event_name).next(TransformUtil.toJSON(event.payload.toString()));
+    };
 
     // --------------------------------------------------------------------------
     //
