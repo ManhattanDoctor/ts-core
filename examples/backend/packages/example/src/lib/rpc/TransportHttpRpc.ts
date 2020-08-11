@@ -34,7 +34,7 @@ export class TransportHttpRpc extends TransportHttp {
             return new ExtendedError('Unknown error', data.error);
         }
         if (ExtendedError.instanceOf(data.error)) {
-            return TransformUtil.toClass(ExtendedError, data);
+            return ExtendedError.create(data.error);
         }
         return new ExtendedError(`Unknown RPC error`, ExtendedError.DEFAULT_ERROR_CODE, data);
     }

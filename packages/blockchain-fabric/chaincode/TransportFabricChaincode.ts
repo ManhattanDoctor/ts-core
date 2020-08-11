@@ -25,12 +25,21 @@ import { IDestroyable } from '@ts-core/common/IDestroyable';
 export class TransportFabricChaincode extends Transport<ITransportSettings> {
     // --------------------------------------------------------------------------
     //
+    //  Properties
+    //
+    // --------------------------------------------------------------------------
+
+    protected anonymousCommands: Array<string>;
+
+    // --------------------------------------------------------------------------
+    //
     //  Constructor
     //
     // --------------------------------------------------------------------------
 
-    constructor(logger: ILogger, context?: string) {
+    constructor(logger: ILogger, context?: string, anonymousCommands?: Array<string>) {
         super(logger, null, context);
+        this.anonymousCommands = anonymousCommands;
     }
 
     // --------------------------------------------------------------------------
@@ -103,6 +112,8 @@ export class TransportFabricChaincode extends Transport<ITransportSettings> {
         this.requests.forEach((item: ITransportFabricRequestStorage) => item.handler.reject(new ExtendedError(`Chaincode destroyed`)));
         this.requests.clear();
         this.requests = null;
+
+        this.anonymousCommands = null;
     }
 
     // --------------------------------------------------------------------------
@@ -123,7 +134,6 @@ export class TransportFabricChaincode extends Transport<ITransportSettings> {
     //
     //  Recevie Message Methods
     //
-    //
     // --------------------------------------------------------------------------
 
     public invoke<U = any>(stub: ChaincodeStub): Promise<TransportFabricResponsePayload<U>> {
@@ -132,7 +142,9 @@ export class TransportFabricChaincode extends Transport<ITransportSettings> {
         try {
             payload = TransportFabricRequestPayload.parse(stub);
             command = TransportFabricRequestPayload.createCommand(payload, stub, this);
-            this.validateSignature(command, payload.options.signature);
+            if (!this.isAnonymousCommand(command)) {
+                this.validateSignature(command, payload.options.signature);
+            }
         } catch (error) {
             error = ExtendedError.create(error);
             this.warn(`Unable to create command: ${error.message}`);
@@ -176,9 +188,13 @@ export class TransportFabricChaincode extends Transport<ITransportSettings> {
         return item;
     }
 
+    protected isAnonymousCommand<U>(command: ITransportCommand<U>): boolean {
+        return !_.isEmpty(this.anonymousCommands) && this.anonymousCommands.includes(command.name);
+    }
+
     protected validateSignature<U>(command: ITransportCommand<U>, signature: ISignature): void {
         if (_.isNil(signature)) {
-            throw new ExtendedError(`Command "${command.name}" has invalid signature`);
+            throw new ExtendedError(`Command "${command.name}" has nil signature`);
         }
         if (_.isNil(signature.nonce)) {
             throw new ExtendedError(`Command "${command.name}" signature has invalid nonce`);

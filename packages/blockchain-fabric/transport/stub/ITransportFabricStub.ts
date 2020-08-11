@@ -9,6 +9,9 @@ export interface ITransportFabricStub extends IDestroyable {
     readonly userId: string;
     readonly userPublicKey: string;
 
+    readonly transactionHash: string;
+    readonly transactionDate: Date;
+
     getState<U>(key: string, type?: ClassType<U>, isNeedValidate?: boolean): Promise<U>;
     getStateRaw(key: string): Promise<string>;
 

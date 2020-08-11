@@ -32,7 +32,9 @@ export class TransportFabricStub implements ITransportFabricStub {
 
         if (!_.isNil(options)) {
             this._userId = options.userId;
-            this._userPublicKey = options.signature.publicKey;
+            if (!_.isNil(options.signature)) {
+                this._userPublicKey = options.signature.publicKey;
+            }
         }
     }
 
@@ -144,6 +146,14 @@ export class TransportFabricStub implements ITransportFabricStub {
 
     public get userPublicKey(): string {
         return this._userPublicKey;
+    }
+
+    public get transactionHash(): string {
+        return !_.isNil(this.stub) ? this.stub.getTxID() : null;
+    }
+
+    public get transactionDate(): Date {
+        return !_.isNil(this.stub) ? this.stub.getTxTimestamp().toDate() : null;
     }
 
     public get stub(): ChaincodeStub {

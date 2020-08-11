@@ -112,6 +112,7 @@ class TransportCommandFabricAsyncImpl<U, V> extends TransportCommandAsync<U, V> 
 
     constructor(payload: TransportFabricRequestPayload, stub: ChaincodeStub, chaincode: TransportFabricChaincode) {
         super(payload.name, payload.request, payload.id);
+
         this._stub = new TransportFabricStub(stub, payload.options, chaincode);
     }
 

@@ -46,7 +46,7 @@ export class TransportCommandAsync<U, V> extends TransportCommand<U> implements 
             throw value;
         }
         if (ExtendedError.instanceOf(value)) {
-            throw TransformUtil.toClass(ExtendedError, value);
+            throw ExtendedError.create(value);
         }
         if (value instanceof Error) {
             throw ExtendedError.create(value);

@@ -70,11 +70,18 @@ export class MathUtil {
         return MathUtil.toString(new constructor(first).dividedBy(new constructor(second)));
     }
 
+    public static ceil(value: string): string {
+        if (MathUtil.isInvalid(value)) {
+            return null;
+        }
+        let constructor = MathUtil.create();
+        return MathUtil.toString(new constructor(value).ceil());
+    }
+
     public static floor(value: string): string {
         if (MathUtil.isInvalid(value)) {
             return null;
         }
-
         let constructor = MathUtil.create();
         return MathUtil.toString(new constructor(value).floor());
     }

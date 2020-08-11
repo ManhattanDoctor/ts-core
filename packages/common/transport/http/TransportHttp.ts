@@ -111,7 +111,7 @@ export class TransportHttp extends Transport<ITransportHttpSettings> {
             return data;
         }
         if (ExtendedError.instanceOf(data)) {
-            return TransformUtil.toClass(ExtendedError, data);
+            return ExtendedError.create(data);
         }
         if (TransportHttp.isAxiosError(data)) {
             return this.parseAxiosError(data, command);
@@ -120,22 +120,28 @@ export class TransportHttp extends Transport<ITransportHttpSettings> {
     }
 
     protected parseAxiosError<U, V>(data: AxiosError, command: ITransportCommand<U>): ExtendedError {
-        let message = data.message ? data.message.toLocaleLowerCase() : ``;
+        let message = !_.isNil(data.message) ? data.message.toLocaleLowerCase() : ``;
         if (message.includes(`network error`)) {
             return new TransportNoConnectionError(command);
         }
         if (message.includes(`timeout of`)) {
             return new TransportTimeoutError(command);
         }
-        let response = data.response;
-        if (!_.isNil(response)) {
-            if (ExtendedError.instanceOf(response.data)) {
-                return TransformUtil.toClass(ExtendedError, response.data);
-            } else {
-                return new ExtendedError(response.statusText, response.status, response.data);
-            }
+
+        if (_.isNil(data.response)) {
+            return new ExtendedError(`Unknown axios error`, ExtendedError.DEFAULT_ERROR_CODE, data);
         }
-        return new ExtendedError(`Unknown axios error`, ExtendedError.DEFAULT_ERROR_CODE, data);
+
+        let response = data.response;
+        if (ExtendedError.instanceOf(response.data)) {
+            return ExtendedError.create(response.data);
+        }
+
+        message = response.statusText;
+        if (_.isEmpty(message) && !_.isNil(response.data) && !_.isNil(response.data.error)) {
+            message = response.data.error;
+        }
+        return new ExtendedError(message, response.status, response.data);
     }
 
     // --------------------------------------------------------------------------

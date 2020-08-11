@@ -48,7 +48,7 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
             return defaultError;
         }
         let response = TransformUtil.toClass(TransportFabricResponsePayload, TransformUtil.toJSON(message));
-        let item = ExtendedError.instanceOf(response.response) ? TransformUtil.toClass(ExtendedError, response.response) : defaultError;
+        let item = ExtendedError.instanceOf(response.response) ? ExtendedError.create(response.response) : defaultError;
         item.stack = null;
         return item;
     }
