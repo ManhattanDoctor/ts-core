@@ -17,21 +17,21 @@ export class ExtendedError<T = any> extends Error implements Error {
     //
     // --------------------------------------------------------------------------
 
-    public static create(error: Error | ExtendedError, code?: number): ExtendedError {
-        if (error instanceof ExtendedError) {
-            return error;
+    public static create(item: Error | ExtendedError, code?: number): ExtendedError {
+        if (item instanceof ExtendedError) {
+            return item;
         }
 
-        if (!(error instanceof Error)) {
-            throw new ExtendedError(`Object isn't instance of error`);
+        if (_.isNil(code) && ObjectUtil.hasOwnProperty(item, 'code')) {
+            code = item['code'];
         }
 
-        let message = error.message;
-        if (error.name) {
-            message = `[${error.name}'] ${message}`;
+        let message = item.message;
+        if (!_.isEmpty(item.name)) {
+            message = `[${item.name}'] ${message}`;
         }
 
-        return new ExtendedError(message, _.isNil(code) ? ExtendedError.DEFAULT_ERROR_CODE : code, error.stack);
+        return new ExtendedError(message, !_.isNil(code) ? code : ExtendedError.DEFAULT_ERROR_CODE, item.stack);
     }
 
     public static instanceOf(data: any): data is ExtendedError {

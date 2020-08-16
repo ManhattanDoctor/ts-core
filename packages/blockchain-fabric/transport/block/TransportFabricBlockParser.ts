@@ -6,6 +6,7 @@ import { TransportFabric } from '../TransportFabric';
 import { TransformUtil, ObjectUtil } from '@ts-core/common/util';
 import { IFabricBlock, IFabricTransaction } from '../../api';
 import { ITransportFabricEvent } from './ITransportFabricEvent';
+import { ITransportEvent } from '@ts-core/common/transport';
 
 export class TransportFabricBlockParser {
     // --------------------------------------------------------------------------
@@ -36,8 +37,8 @@ export class TransportFabricBlockParser {
                 transactions.push(transaction);
             }
             let event = this.parseEventBlockData(block.data.data[i]);
-            if (!_.isNil(event)) {
-                events.push(event);
+            if (!_.isEmpty(event)) {
+                events.push(...event);
             }
         }
 
@@ -124,38 +125,58 @@ export class TransportFabricBlockParser {
     //
     // --------------------------------------------------------------------------
 
-    private parseEventBlockData(data: BlockData): ITransportFabricEvent {
+    private parseEventBlockData(data: BlockData): Array<ITransportFabricEvent> {
         if (_.isNil(data) || _.isNil(data.payload) || _.isNil(data.payload.header) || _.isNil(data.payload.header.channel_header)) {
-            return null;
+            return [];
         }
 
-        let header = data.payload.header.channel_header;
-
-        let item: ITransportFabricEvent = {} as any;
-        item.channel = header.channel_id;
-        item.transactionHash = header.tx_id;
-        item.createdDate = new Date(header.timestamp);
-
+        let items = [];
         if (!_.isNil(data.payload.data) && !_.isEmpty(data.payload.data.actions)) {
             for (let action of data.payload.data.actions) {
-                this.parseEventBlockAction(item, action);
+                items.push(...this.parseEventBlockAction(data.payload.header.channel_header, action));
             }
         }
-        return item;
+        return items;
     }
 
-    private parseEventBlockAction(event: ITransportFabricEvent, action: any): void {
+    private parseEventBlockAction(header: any, action: any): Array<ITransportFabricEvent> {
         if (
-            !_.isNil(action.payload.action) &&
-            !_.isNil(action.payload.action.proposal_response_payload) &&
-            !_.isNil(action.payload.action.proposal_response_payload.extension)
+            _.isNil(action.payload.action) ||
+            _.isNil(action.payload.action.proposal_response_payload) ||
+            _.isNil(action.payload.action.proposal_response_payload.extension) ||
+            _.isNil(action.payload.action.proposal_response_payload.extension.events)
         ) {
-            let events = action.payload.action.proposal_response_payload.extension.events;
-
-            ObjectUtil.copyProperties(
-                { name: events.event_name, chaincode: events.chaincode_id, data: TransformUtil.toJSON(events.payload.toString()) },
-                event
-            );
+            return [];
         }
+
+        let data = action.payload.action.proposal_response_payload.extension.events;
+
+        let name = data.event_name;
+        let payload = data.payload.toString();
+        let chaincode = data.chaincode_id;
+
+        if (name !== TransportFabric.chaincodeEvent) {
+            if (ObjectUtil.isJSON(payload)) {
+                payload = TransformUtil.toJSON(payload);
+                if (ObjectUtil.instanceOf(payload, ['data', 'name']) || payload.name === name) {
+                    payload = payload.data;
+                }
+            }
+            return [this.createEvent(name, header, chaincode, payload)];
+        }
+
+        let items = TransformUtil.toJSONMany(JSON.parse(payload));
+        return items.map(item => this.createEvent(item.name, header, chaincode, item.data));
+    }
+
+    private createEvent(name: string, header: any, chaincode: string, data: string): ITransportFabricEvent {
+        return {
+            name,
+            chaincode,
+            data,
+            channel: header.channel_id,
+            transactionHash: header.tx_id,
+            createdDate: new Date(header.timestamp)
+        };
     }
 }

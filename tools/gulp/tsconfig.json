@@ -13,13 +13,9 @@
         "noEmitOnError": true,
         "noImplicitAny": false,
         "target": "es2015",
-        "types": [
-            "node"
-        ],
+        "types": ["node"],
         "typeRoots": ["./typings", "../../node_modules/@types/"],
-        "baseUrl": ".",
+        "baseUrl": "."
     },
-    "files": [
-        "gulpfile.ts"
-    ]
+    "files": ["gulpfile.ts"]
 }

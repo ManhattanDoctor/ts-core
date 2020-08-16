@@ -26,8 +26,16 @@ export class TransformUtil {
         return _.isObject(item) ? JSON.stringify(item) : null;
     }
 
+    public static fromJSONMany(items: Array<any>): Array<string> {
+        return items.map(item => TransformUtil.fromJSON(item));
+    }
+
     public static toJSON(item: string): any {
         return ObjectUtil.isJSON(item) ? JSON.parse(item) : null;
+    }
+
+    public static toJSONMany(items: Array<string>): Array<any> {
+        return items.map(item => TransformUtil.toJSON(item));
     }
 
     // --------------------------------------------------------------------------

@@ -10,8 +10,7 @@ import {
     TransportLogType,
     ITransportSettings,
     ITransportCommandOptions,
-    ITransportCommandAsync,
-    TransportCommand
+    ITransportCommandAsync
 } from '@ts-core/common/transport';
 import { TransportWaitExceedError } from '@ts-core/common/transport/error';
 import { DateUtil, ObjectUtil } from '@ts-core/common/util';

@@ -102,7 +102,7 @@ class TransportCommandFabricAsyncImpl<U, V> extends TransportCommandAsync<U, V> 
     //
     // --------------------------------------------------------------------------
 
-    private _stub: ITransportFabricStub;
+    private _stub: TransportFabricStub;
 
     // --------------------------------------------------------------------------
     //
@@ -123,6 +123,7 @@ class TransportCommandFabricAsyncImpl<U, V> extends TransportCommandAsync<U, V> 
     // --------------------------------------------------------------------------
 
     public destroy(): void {
+        this._stub.dispatchEvents();
         this._stub.destroy();
         this._stub = null;
     }

@@ -1,6 +1,6 @@
 {
     "name": "@ts-core/blockchain-fabric",
-    "version": "1.0.66",
+    "version": "1.0.71",
     "description": "Classes and utils for HLF",
     "main": "index.js",
     "scripts": {},
@@ -11,7 +11,7 @@
     "license": "ISC",
     "dependencies": {
         "@ts-core/backend": "^1.0.17",
-        "@ts-core/common": "^1.0.104",
+        "@ts-core/common": "^1.0.107",
         "fabric-ca-client": "1.4.7",
         "fabric-client": "1.4.7",
         "fabric-contract-api": "1.4.5",

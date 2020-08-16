@@ -6,6 +6,7 @@ import { ITransportFabricStub } from './ITransportFabricStub';
 import { ITransportFabricCommandOptions } from '../ITransportFabricCommandOptions';
 import { ITransportEvent } from '@ts-core/common/transport';
 import { TransportFabricChaincode } from '../../chaincode';
+import { TransportFabric } from '../TransportFabric';
 
 export class TransportFabricStub implements ITransportFabricStub {
     // --------------------------------------------------------------------------
@@ -20,6 +21,8 @@ export class TransportFabricStub implements ITransportFabricStub {
     private _userId: string;
     private _userPublicKey: string;
 
+    private eventsToDispatch: Array<ITransportEvent<any>>;
+
     // --------------------------------------------------------------------------
     //
     //  Constructor
@@ -29,6 +32,8 @@ export class TransportFabricStub implements ITransportFabricStub {
     constructor(stub: ChaincodeStub, options: ITransportFabricCommandOptions, chaincode: TransportFabricChaincode) {
         this._stub = stub;
         this._chaincode = chaincode;
+
+        this.eventsToDispatch = new Array();
 
         if (!_.isNil(options)) {
             this._userId = options.userId;
@@ -110,7 +115,7 @@ export class TransportFabricStub implements ITransportFabricStub {
             ValidateUtil.validate(value);
         }
         this.chaincode.dispatch(value);
-        this.stub.setEvent(value.name, TransformUtil.fromClassBuffer(value));
+        this.eventsToDispatch.push(value);
     }
 
     // --------------------------------------------------------------------------
@@ -119,7 +124,18 @@ export class TransportFabricStub implements ITransportFabricStub {
     //
     // --------------------------------------------------------------------------
 
+    public dispatchEvents(): void {
+        if (_.isEmpty(this.eventsToDispatch)) {
+            return;
+        }
+
+        let items = TransformUtil.fromJSONMany(TransformUtil.fromClassMany(this.eventsToDispatch));
+        this.stub.setEvent(TransportFabric.chaincodeEvent, Buffer.from(JSON.stringify(items), TransformUtil.ENCODING));
+    }
+
     public destroy(): void {
+        this.eventsToDispatch = null;
+
         this._stub = null;
         this._chaincode = null;
     }

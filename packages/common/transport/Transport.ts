@@ -112,30 +112,32 @@ export abstract class Transport<T extends ITransportSettings = any> extends Logg
     public destroy(): void {
         super.destroy();
 
-        if (this.requests) {
+        if (!_.isNil(this.requests)) {
             this.requests.clear();
             this.requests = null;
         }
 
-        if (this.listeners) {
+        if (!_.isNil(this.listeners)) {
             this.listeners.forEach(item => item.complete());
             this.listeners.clear();
             this.listeners = null;
         }
 
-        if (this.dispatchers) {
+        if (!_.isNil(this.dispatchers)) {
             this.dispatchers.forEach(item => item.complete());
             this.dispatchers.clear();
             this.dispatchers = null;
         }
 
-        if (this.observer) {
+        if (!_.isNil(this.observer)) {
             this.observer.complete();
             this.observer = null;
         }
 
-        this.promises.clear();
-        this.promises = null;
+        if (!_.isNil(this.promises)) {
+            this.promises.clear();
+            this.promises = null;
+        }
     }
 
     // --------------------------------------------------------------------------

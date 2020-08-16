@@ -4,17 +4,9 @@ import { ILogger } from '@ts-core/common/logger';
 import { ObservableData } from '@ts-core/common/observer';
 import { PromiseHandler } from '@ts-core/common/promise';
 import { Observable } from 'rxjs';
-import {
-    ITransportCommand,
-    ITransportCommandAsync,
-    ITransportEvent,
-    Transport,
-    TransportLogType,
-    TransportTimeoutError,
-    TransportEvent
-} from '@ts-core/common/transport';
+import { ITransportCommand, ITransportCommandAsync, ITransportEvent, Transport, TransportLogType, TransportTimeoutError } from '@ts-core/common/transport';
 import { DateUtil, ObjectUtil, TransformUtil, ValidateUtil } from '@ts-core/common/util';
-import Client, { Channel } from 'fabric-client';
+import { Channel } from 'fabric-client';
 import { ContractEventListener, Contract, Gateway, Network, Wallet } from 'fabric-network';
 import * as _ from 'lodash';
 import { ITransportFabricCommandOptions } from './ITransportFabricCommandOptions';
@@ -25,7 +17,6 @@ import { TransportFabricRequestPayload } from './TransportFabricRequestPayload';
 import { TransportFabricResponsePayload } from './TransportFabricResponsePayload';
 import { TransportFabricCommandOptions } from './TransportFabricCommandOptions';
 import { FabricApi } from '../api';
-import { ITransportFabricEvent } from './block';
 
 export class TransportFabric extends Transport<ITransportFabricSettings> {
     // --------------------------------------------------------------------------
@@ -61,6 +52,10 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
 
     public static get chaincodeMethod(): string {
         return 'fabricTransportExecute';
+    }
+
+    public static get chaincodeEvent(): string {
+        return 'fabricTransportEvent';
     }
 
     // --------------------------------------------------------------------------
@@ -395,7 +390,7 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
         return this._wallet;
     }
 
-    protected contractEventCallback = <T>(error: Error, event: Client.ChaincodeEvent): void => {
+    protected contractEventCallback = <T>(error: Error, event: any): void => {
         if (!_.isNil(error)) {
             this.error(error);
             return;
