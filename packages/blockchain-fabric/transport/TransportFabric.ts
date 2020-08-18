@@ -4,7 +4,15 @@ import { ILogger } from '@ts-core/common/logger';
 import { ObservableData } from '@ts-core/common/observer';
 import { PromiseHandler } from '@ts-core/common/promise';
 import { Observable } from 'rxjs';
-import { ITransportCommand, ITransportCommandAsync, ITransportEvent, Transport, TransportLogType, TransportTimeoutError } from '@ts-core/common/transport';
+import {
+    ITransportCommand,
+    ITransportCommandAsync,
+    ITransportEvent,
+    Transport,
+    TransportLogType,
+    TransportTimeoutError,
+    ITransportCommandOptions
+} from '@ts-core/common/transport';
 import { DateUtil, ObjectUtil, TransformUtil, ValidateUtil } from '@ts-core/common/util';
 import { Channel } from 'fabric-client';
 import { ContractEventListener, Contract, Gateway, Network, Wallet } from 'fabric-network';
@@ -149,11 +157,11 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     //
     // --------------------------------------------------------------------------
 
-    public send<U>(command: ITransportCommand<U>, options: ITransportFabricCommandOptions): void {
+    public send<U>(command: ITransportCommand<U>, options: ITransportCommandOptions): void {
         this.requestSend(command, this.getCommandOptions(command, options), false);
     }
 
-    public async sendListen<U, V>(command: ITransportCommandAsync<U, V>, options: ITransportFabricCommandOptions): Promise<V> {
+    public async sendListen<U, V>(command: ITransportCommandAsync<U, V>, options: ITransportCommandOptions): Promise<V> {
         if (this.promises.has(command.id)) {
             return this.promises.get(command.id).handler.promise;
         }

@@ -11,13 +11,13 @@ export class TransportCommandOptions implements ITransportCommandOptions {
 
     @IsOptional()
     @IsNumber()
-    public timeout: number;
+    public timeout?: number;
 
     @IsOptional()
     @IsNumber()
-    public waitMaxCount: number;
+    public waitMaxCount?: number;
 
     @IsOptional()
     @IsEnum(TransportCommandWaitDelay)
-    public waitDelay: TransportCommandWaitDelay;
+    public waitDelay?: TransportCommandWaitDelay;
 }
