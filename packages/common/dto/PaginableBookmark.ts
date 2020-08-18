@@ -1,9 +1,9 @@
 import { IsNumberString, IsString, IsOptional } from 'class-validator';
 import * as _ from 'lodash';
-import { IPaginable } from './IPaginable';
-import { Filterable } from '@ts-core/common/dto';
+import { IPaginableBookmark } from './IPaginableBookmark';
+import { Filterable } from './Filterable';
 
-export class Paginable<U> extends Filterable<U> implements IPaginable<U> {
+export class PaginableBookmark<U> extends Filterable<U> implements IPaginableBookmark<U> {
     // --------------------------------------------------------------------------
     //
     //  Constants
@@ -18,12 +18,12 @@ export class Paginable<U> extends Filterable<U> implements IPaginable<U> {
     //
     // --------------------------------------------------------------------------
 
-    public static transform<U>(item: IPaginable<U>): Paginable<U> {
+    public static transform<U>(item: IPaginableBookmark<U>): PaginableBookmark<U> {
         if (_.isNil(item)) {
             return item;
         }
-        item = Filterable.transform(item) as IPaginable<U>;
-        item.pageSize = !_.isNil(item.pageSize) ? parseInt(item.pageSize.toString(), 10) : Paginable.DEFAULT_PAGE_SIZE;
+        item = Filterable.transform(item) as IPaginableBookmark<U>;
+        item.pageSize = !_.isNil(item.pageSize) ? parseInt(item.pageSize.toString(), 10) : PaginableBookmark.DEFAULT_PAGE_SIZE;
         return item;
     }
 

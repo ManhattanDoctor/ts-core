@@ -9,6 +9,7 @@ export interface ITransportFabricStub extends IDestroyable {
     readonly userId: string;
     readonly userPublicKey: string;
 
+    readonly requestId: string;
     readonly transactionHash: string;
     readonly transactionDate: Date;
 

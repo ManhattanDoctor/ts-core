@@ -149,11 +149,11 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     //
     // --------------------------------------------------------------------------
 
-    public send<U>(command: ITransportCommandFabric<U>, options: ITransportFabricCommandOptions): void {
+    public send<U>(command: ITransportCommand<U>, options: ITransportFabricCommandOptions): void {
         this.requestSend(command, this.getCommandOptions(command, options), false);
     }
 
-    public async sendListen<U, V>(command: ITransportCommandFabricAsync<U, V>, options: ITransportFabricCommandOptions): Promise<V> {
+    public async sendListen<U, V>(command: ITransportCommandAsync<U, V>, options: ITransportFabricCommandOptions): Promise<V> {
         if (this.promises.has(command.id)) {
             return this.promises.get(command.id).handler.promise;
         }
@@ -203,14 +203,14 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     //
     // --------------------------------------------------------------------------
 
-    protected async requestSend<U>(command: ITransportCommandFabric<U>, options: ITransportFabricCommandOptions, isNeedReply: boolean): Promise<void> {
+    protected async requestSend<U>(command: ITransportCommand<U>, options: ITransportFabricCommandOptions, isNeedReply: boolean): Promise<void> {
         if (!this.isConnected) {
             throw new ExtendedError(`Unable to send "${command.name}" command request: transport is not connected`);
         }
 
         try {
             let request = this.createRequestOptions(command, options, isNeedReply);
-            let method = command.isQuery ? this.contract.evaluateTransaction : this.contract.submitTransaction;
+            let method = this.isCommandQuery(command) ? this.contract.evaluateTransaction : this.contract.submitTransaction;
 
             this.logCommand(command, isNeedReply ? TransportLogType.REQUEST_SENDED : TransportLogType.REQUEST_NO_REPLY);
             this.observer.next(new ObservableData(LoadableEvent.STARTED, command));
@@ -305,6 +305,16 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
 
     protected getCommandOptions<U>(command: ITransportCommand<U>, options: ITransportFabricCommandOptions): ITransportFabricCommandOptions {
         return super.getCommandOptions(command, options) as ITransportFabricCommandOptions;
+    }
+
+    protected isCommandQuery<U>(command: ITransportCommand<U>): boolean {
+        if (ObjectUtil.hasOwnProperty(command, 'isQuery')) {
+            return command['isQuery'] === true;
+        }
+        if (ObjectUtil.hasOwnProperty(command, 'isReadonly')) {
+            return command['isReadonly'] === true;
+        }
+        return false;
     }
 
     // --------------------------------------------------------------------------
@@ -430,7 +440,6 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
 
 export interface ITransportCommandFabric<U> extends ITransportCommand<U> {
     readonly stub: ITransportFabricStub;
-    readonly isQuery: boolean;
 }
 
 export interface ITransportCommandFabricAsync<U, V> extends ITransportCommandFabric<U>, ITransportCommandAsync<U, V> {}

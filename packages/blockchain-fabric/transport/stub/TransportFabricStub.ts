@@ -18,6 +18,8 @@ export class TransportFabricStub implements ITransportFabricStub {
     private _stub: ChaincodeStub;
     private _chaincode: TransportFabricChaincode;
 
+    private _requestId: string;
+
     private _userId: string;
     private _userPublicKey: string;
 
@@ -29,8 +31,9 @@ export class TransportFabricStub implements ITransportFabricStub {
     //
     // --------------------------------------------------------------------------
 
-    constructor(stub: ChaincodeStub, options: ITransportFabricCommandOptions, chaincode: TransportFabricChaincode) {
+    constructor(stub: ChaincodeStub, requestId: string, options: ITransportFabricCommandOptions, chaincode: TransportFabricChaincode) {
         this._stub = stub;
+        this._requestId = requestId;
         this._chaincode = chaincode;
 
         this.eventsToDispatch = new Array();
@@ -155,6 +158,10 @@ export class TransportFabricStub implements ITransportFabricStub {
     //  Public Properties
     //
     // --------------------------------------------------------------------------
+
+    public get requestId(): string {
+        return this._requestId;
+    }
 
     public get userId(): string {
         return this._userId;
