@@ -18,8 +18,8 @@ import { ChaincodeStub } from 'fabric-shim';
 import * as _ from 'lodash';
 import { TransportFabricResponsePayload, TransportFabricRequestPayload } from '../transport';
 import { ISignature } from '@ts-core/common/crypto';
-import { TransportCryptoManagerFactory } from '@ts-core/common/transport/crypto';
 import { IDestroyable } from '@ts-core/common/IDestroyable';
+import { ITransportCryptoManager } from '@ts-core/common/transport/crypto';
 
 export class TransportFabricChaincode extends Transport<ITransportSettings> {
     // --------------------------------------------------------------------------
@@ -28,6 +28,7 @@ export class TransportFabricChaincode extends Transport<ITransportSettings> {
     //
     // --------------------------------------------------------------------------
 
+    protected cryptoManagers: Array<ITransportCryptoManager>;
     protected anonymousCommands: Array<string>;
 
     // --------------------------------------------------------------------------
@@ -36,8 +37,9 @@ export class TransportFabricChaincode extends Transport<ITransportSettings> {
     //
     // --------------------------------------------------------------------------
 
-    constructor(logger: ILogger, context?: string, anonymousCommands?: Array<string>) {
+    constructor(logger: ILogger, context?: string, cryptoManagers?: Array<ITransportCryptoManager>, anonymousCommands?: Array<string>) {
         super(logger, null, context);
+        this.cryptoManagers = cryptoManagers;
         this.anonymousCommands = anonymousCommands;
     }
 
@@ -204,7 +206,13 @@ export class TransportFabricChaincode extends Transport<ITransportSettings> {
         if (_.isNil(signature.publicKey)) {
             throw new ExtendedError(`Command "${command.name}" signature has invalid publicKey`);
         }
-        if (!TransportCryptoManagerFactory.get(signature.algorithm).verify(command, signature)) {
+
+        let manager = _.find(this.cryptoManagers, item => item.algorithm === signature.algorithm);
+        if (_.isNil(manager)) {
+            throw new ExtendedError(`Command "${command.name}" signature algorithm (${signature.algorithm}) doesn't support`);
+        }
+
+        if (!manager.verify(command, signature)) {
             throw new ExtendedError(`Command "${command.name}" has invalid signature`);
         }
     }

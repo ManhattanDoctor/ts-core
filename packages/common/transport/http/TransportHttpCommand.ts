@@ -19,7 +19,8 @@ export class TransportHttpCommand<T> extends TransportCommand<ITransportHttpRequ
     // --------------------------------------------------------------------------
 
     protected validateRequest(value: ITransportHttpRequest<T>): ITransportHttpRequest<T> {
-        return super.validateRequest(value.data);
+        super.validateRequest(value.data);
+        return value;
     }
 
     // --------------------------------------------------------------------------

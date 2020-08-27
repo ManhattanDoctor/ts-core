@@ -23,7 +23,7 @@ export class ObjectUtil {
         return _.every(properties, property => existProperties.includes(property));
     }
 
-    public static sortKeys<T>(data: T): any {
+    public static sortKeys<T>(data: T, isDeep?: boolean): any {
         if (_.isNil(data)) {
             return null;
         }
@@ -36,10 +36,23 @@ export class ObjectUtil {
             return data;
         }
 
-        keys.sort();
+        keys.sort((first, second) => {
+            first = first.toLowerCase();
+            second = second.toLowerCase();
+            if (first === second) {
+                return 0;
+            }
+            return first < second ? -1 : 1;
+        });
+
         let item = {};
         for (let key of keys) {
-            item[key] = data[key];
+            let value = data[key];
+            if (_.isObject(value) && !_.isArray(value)) {
+                item[key] = !isDeep ? value : ObjectUtil.sortKeys(value);
+            } else {
+                item[key] = value;
+            }
         }
         return item;
     }

@@ -1,7 +1,7 @@
 import { TransportCommandOptions } from '@ts-core/common/transport';
 import { ISignature } from '@ts-core/common/crypto';
 import { ITransportFabricCommandOptions } from './ITransportFabricCommandOptions';
-import { IsDefined, IsOptional, ValidateNested, IsString } from 'class-validator';
+import { IsOptional, ValidateNested, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class Signature implements ISignature {

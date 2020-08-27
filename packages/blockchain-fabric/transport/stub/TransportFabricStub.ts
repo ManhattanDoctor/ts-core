@@ -1,4 +1,4 @@
-import { TransformUtil, ValidateUtil } from '@ts-core/common/util';
+import { TransformUtil, ValidateUtil, ObjectUtil } from '@ts-core/common/util';
 import { ClassType } from 'class-transformer/ClassTransformer';
 import { ChaincodeStub, Iterators, StateQueryResponse } from 'fabric-shim';
 import * as _ from 'lodash';
@@ -77,11 +77,23 @@ export class TransportFabricStub implements ITransportFabricStub {
         return buffer.toString(TransformUtil.ENCODING);
     }
 
-    public async putState<U>(key: string, value: U, isNeedValidate: boolean = true, isNeedTransform: boolean = true): Promise<U> {
+    public async putState<U>(
+        key: string,
+        value: U,
+        isNeedValidate: boolean = true,
+        isNeedTransform: boolean = true,
+        isNeedSortKeys: boolean = true
+    ): Promise<U> {
         if (isNeedValidate) {
             ValidateUtil.validate(value);
         }
-        let item = isNeedTransform ? TransformUtil.fromClass(value) : value;
+        let item = value;
+        if (isNeedTransform) {
+            item = TransformUtil.fromClass(value);
+        }
+        if (isNeedSortKeys) {
+            item = ObjectUtil.sortKeys(item, true);
+        }
         await this.putStateRaw(key, TransformUtil.fromJSON(item));
         return item;
     }
