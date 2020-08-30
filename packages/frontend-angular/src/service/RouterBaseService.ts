@@ -105,7 +105,9 @@ export class RouterBaseService extends DestroyableContainer {
     }
 
     public navigateIfNotBusy(url: string, extras?: NavigationExtras): void {
-        if (!this.isLoading) this.navigate(url, extras);
+        if (!this.isLoading) {
+            this.navigate(url, extras);
+        }
     }
 
     public isUrlActive(value: string): boolean {

@@ -47,7 +47,22 @@ export class LanguageMatPaginatorIntl extends MatPaginatorIntl {
         this.firstPageLabel = this.language.translate('general.firstPage');
         this.previousPageLabel = this.language.translate('general.previousPage');
         this.itemsPerPageLabel = this.language.translate('general.itemsPerPage');
+        this.getRangeLabel = this.languageRangeLabel;
     }
+
+    private languageRangeLabel = (page: number, pageSize: number, length: number): string => {
+        let translation = { current: '0', total: '0' };
+        if (length == 0 || pageSize == 0) {
+            translation.total = length.toString();
+        } else {
+            length = Math.max(length, 0);
+            let startIndex = page * pageSize;
+            let endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize;
+            translation.current = `${startIndex + 1} – ${endIndex}`;
+            translation.total = length.toString();
+        }
+        return this.language.translate('general.pageRange', translation);
+    };
 
     // --------------------------------------------------------------------------
     //

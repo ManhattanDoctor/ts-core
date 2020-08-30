@@ -1,16 +1,18 @@
-import { Destroyable, LoadableEvent } from '@ts-core/common';
+import { Destroyable, LoadableEvent, DestroyableContainer } from '@ts-core/common';
 import { ObservableData } from '@ts-core/common/observer';
 import { Observable, Subscription } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators';
 import { LoadingService } from '../service/LoadingService';
+import * as _ from 'lodash';
 
-export class LoadingServiceManager extends Destroyable {
+export class LoadingServiceManager extends DestroyableContainer {
     // --------------------------------------------------------------------------
     //
     // 	Properties
     //
     // --------------------------------------------------------------------------
 
-    private items: Map<LoadableItem, Subscription>;
+    private items: Map<ILoadableItem, Subscription>;
 
     // --------------------------------------------------------------------------
     //
@@ -25,36 +27,56 @@ export class LoadingServiceManager extends Destroyable {
 
     // --------------------------------------------------------------------------
     //
+    // 	Private Methods
+    //
+    // --------------------------------------------------------------------------
+
+    private loadableEventHandler = <V = any>(data: ObservableData<LoadableEvent, V>): void => {
+        switch (data.type) {
+            case LoadableEvent.STARTED:
+                this.loading.start();
+                break;
+            case LoadableEvent.FINISHED:
+                this.loading.finish();
+                break;
+        }
+    };
+
+    // --------------------------------------------------------------------------
+    //
     // 	Public Methods
     //
     // --------------------------------------------------------------------------
 
-    public addLoadable(item: LoadableItem): void {
-        if (this.items.has(item)) {
+    public addLoadable(...items: Array<ILoadableItem>): void {
+        if (_.isEmpty(items)) {
             return;
         }
 
-        this.items.set(
-            item,
-            item.events.subscribe(data => {
-                switch (data.type) {
-                    case LoadableEvent.STARTED:
-                        this.loading.start();
-                        break;
-                    case LoadableEvent.FINISHED:
-                        this.loading.finish();
-                        break;
-                }
-            })
-        );
+        items = items.filter(item => !this.items.has(item));
+        for (let item of items) {
+            this.items.set(
+                item,
+                item.events
+                    .pipe(
+                        filter(event => !_.isNil(LoadableEvent[event.type])),
+                        takeUntil(this.destroyed)
+                    )
+                    .subscribe(event => this.loadableEventHandler(event))
+            );
+        }
     }
 
-    public removeLoadable(item: LoadableItem): void {
-        if (!this.items.has(item)) {
+    public removeLoadable(...items: Array<ILoadableItem>): void {
+        if (_.isEmpty(items)) {
             return;
         }
-        this.items.get(item).unsubscribe();
-        this.items.delete(item);
+
+        items = items.filter(item => !this.items.has(item));
+        for (let item of items) {
+            this.items.get(item).unsubscribe();
+            this.items.delete(item);
+        }
     }
 
     public destroy(): void {
@@ -67,6 +89,6 @@ export class LoadingServiceManager extends Destroyable {
     }
 }
 
-export interface LoadableItem<U = any, V = any> {
+export interface ILoadableItem<U = any, V = any> {
     events: Observable<ObservableData<U, V>>;
 }

@@ -7,6 +7,7 @@ import { LanguageMatPaginatorIntl } from './LanguageMatPaginatorIntl';
 import { LanguagePipe } from './LanguagePipe';
 import { LanguagePurePipe } from './LanguagePurePipe';
 import { LanguageResolver } from './LanguageResolver';
+import { MatPaginatorIntl } from '@angular/material';
 
 @NgModule({
     imports: [CookieModule],
@@ -39,7 +40,7 @@ export class LanguageModule {
                     useClass: LanguageResolver
                 },
                 {
-                    provide: LanguageMatPaginatorIntl,
+                    provide: MatPaginatorIntl,
                     deps: [LanguageService],
                     useClass: LanguageMatPaginatorIntl
                 }
