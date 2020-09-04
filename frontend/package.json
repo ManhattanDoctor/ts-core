@@ -26,7 +26,7 @@
         "ng2-completer": "3.0.2",
         "ng2-smart-table": "1.5.0",
         "zone.js": "0.9.1",
-        "node-sass": "4.12.0",
+        "node-sass": "4.14.1",
         "css-element-queries": "1.2.0",
         "messageformat": "2.2.1",
         "interactjs": "1.4.10",
