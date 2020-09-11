@@ -13,6 +13,7 @@ export class DateUtil {
     public static MILISECONDS_HOUR = 60 * 60 * 1000;
     public static MILISECONDS_MINUTE = 60 * 1000;
     public static MILISECONDS_SECOND = 1000;
+    public static MILISECONDS_NANOSECOND = 1 / 1000000;
 
     // --------------------------------------------------------------------------
     //

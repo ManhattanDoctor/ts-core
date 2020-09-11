@@ -7,14 +7,6 @@ import { takeUntil } from 'rxjs/operators';
 export abstract class MessageBaseComponent extends DestroyableContainer {
     // --------------------------------------------------------------------------
     //
-    //	Constants
-    //
-    // --------------------------------------------------------------------------
-
-    public static MESSAGE_FILEDS: Array<string> = ['text', 'message', 'error'];
-
-    // --------------------------------------------------------------------------
-    //
     //	Properties
     //
     // --------------------------------------------------------------------------
@@ -64,13 +56,17 @@ export abstract class MessageBaseComponent extends DestroyableContainer {
     }
 
     protected getValue(data: any): string {
-        for (let item of MessageBaseComponent.MESSAGE_FILEDS) {
+        for (let item of this.getMessageFields()) {
             let value = data[item];
             if (!_.isEmpty(value)) {
                 return value;
             }
         }
         return null;
+    }
+
+    protected getMessageFields(): Array<string> {
+        return ['text', 'message', 'error'];
     }
 
     // --------------------------------------------------------------------------

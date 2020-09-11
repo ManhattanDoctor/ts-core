@@ -1,6 +1,6 @@
 import { PromiseHandler } from '@ts-core/common/promise';
 import { Network, Contract, Wallet, Gateway, InMemoryWallet, X509WalletMixin } from 'fabric-network';
-import { Channel, Block } from 'fabric-client';
+import Client, { Channel, Block } from 'fabric-client';
 import * as _ from 'lodash';
 import { ExtendedError } from '@ts-core/common/error';
 import { ObservableData } from '@ts-core/common/observer';
@@ -121,6 +121,7 @@ export class FabricApi extends LoggerWrapper {
     protected async reconnect(): Promise<void> {
         this.debug(`Connecting to Fabric "${this.settings.fabricIdentity}:${this.settings.fabricNetworkName}:${this.settings.fabricChaincodeName}"`);
 
+        let client = new Client();
         try {
             this.gateway = new Gateway();
             await this.gateway.connect(this.settings.fabricConnectionSettingsPath, {

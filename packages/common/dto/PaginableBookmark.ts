@@ -1,4 +1,4 @@
-import { IsNumberString, IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 import * as _ from 'lodash';
 import { IPaginableBookmark } from './IPaginableBookmark';
 import { Filterable } from './Filterable';
@@ -33,7 +33,6 @@ export class PaginableBookmark<U> extends Filterable<U> implements IPaginableBoo
     //
     // --------------------------------------------------------------------------
 
-    @IsNumberString()
     pageSize: number;
 
     @IsString()

@@ -1,4 +1,4 @@
-import { TransformUtil, ValidateUtil, ObjectUtil } from '@ts-core/common/util';
+import { TransformUtil, ValidateUtil, ObjectUtil, DateUtil } from '@ts-core/common/util';
 import { ClassType } from 'class-transformer/ClassTransformer';
 import { ChaincodeStub, Iterators, StateQueryResponse } from 'fabric-shim';
 import * as _ from 'lodash';
@@ -188,7 +188,17 @@ export class TransportFabricStub implements ITransportFabricStub {
     }
 
     public get transactionDate(): Date {
-        return !_.isNil(this.stub) ? this.stub.getTxTimestamp().toDate() : null;
+        if (_.isNil(this.stub)) {
+            return null;
+        }
+        let item = this.stub.getTxTimestamp() as any;
+        if (ObjectUtil.hasOwnProperty(item, 'toDate')) {
+            return item.toDate();
+        }
+        if (ObjectUtil.hasOwnProperties(item, ['seconds', 'nanos'])) {
+            return new Date(item.seconds * DateUtil.MILISECONDS_SECOND + Math.round(item.nanos * DateUtil.MILISECONDS_NANOSECOND));
+        }
+        return null;
     }
 
     public get stub(): ChaincodeStub {

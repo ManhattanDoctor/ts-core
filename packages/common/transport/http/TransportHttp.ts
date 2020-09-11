@@ -11,6 +11,7 @@ import { TransformUtil } from '../../util';
 import { TransportNoConnectionError, TransportTimeoutError } from '../error';
 import { ITransportHttpRequest } from './ITransportHttpRequest';
 import { ITransportHttpSettings } from './ITransportHttpSettings';
+import { ITransportResponse } from '../ITransportResponse';
 
 export class TransportHttp extends Transport<ITransportHttpSettings> {
     // --------------------------------------------------------------------------
@@ -208,3 +209,6 @@ export class TransportHttp extends Transport<ITransportHttpSettings> {
         }
     }
 }
+
+export interface ITransportHttpCommand<T> extends ITransportCommand<ITransportHttpRequest<T>> {}
+export interface ITransportHttpCommandAsync<U, V> extends ITransportCommandAsync<ITransportHttpRequest<U>, V> {}

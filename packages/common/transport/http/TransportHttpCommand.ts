@@ -1,7 +1,8 @@
 import { TransportCommand } from '../../../common/transport';
 import { ITransportHttpRequest } from './ITransportHttpRequest';
+import { ITransportHttpCommand } from './TransportHttp';
 
-export class TransportHttpCommand<T> extends TransportCommand<ITransportHttpRequest<T>> {
+export class TransportHttpCommand<T> extends TransportCommand<ITransportHttpRequest<T>> implements ITransportHttpCommand<T> {
     // --------------------------------------------------------------------------
     //
     //  Constructor
