@@ -1,14 +1,14 @@
-import { TransportCommandAsync, ITransportCommandAsync } from '@ts-core/common/transport';
+import { TransportCommandAsync, ITransportCommandAsync, ITransportCommand } from '@ts-core/common/transport';
 import { TransportInvalidDataError } from '@ts-core/common/transport/error';
 import { TransformUtil, ValidateUtil } from '@ts-core/common/util';
 import { IsBoolean, IsDefined, IsOptional, ValidateNested, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ChaincodeStub } from 'fabric-shim';
-import { ITransportFabricCommandOptions } from './ITransportFabricCommandOptions';
+import { ITransportFabricCommandOptions, ITransportCommandFabricAsync } from './ITransportFabricCommand';
 import { ITransportFabricStub, TransportFabricStub, ITransportFabricStubHolder } from './stub';
-import { ITransportCommandFabricAsync, TransportFabric } from './TransportFabric';
+import { TransportFabric } from './TransportFabric';
 import { TransportFabricCommandOptions } from './TransportFabricCommandOptions';
-import { TransportFabricChaincode } from '../chaincode';
+import { TransportFabricChaincodeTransport } from './chaincode';
 
 // --------------------------------------------------------------------------
 //
@@ -52,17 +52,16 @@ export class TransportFabricRequestPayload<U = any> implements ITransportFabricR
         } catch (error) {
             throw new TransportInvalidDataError(`Invalid payload: ${error.message}`, content);
         }
-
         ValidateUtil.validate(payload);
         return payload;
     }
 
-    public static createCommand<U, V = any>(
+    public static createCommand<U>(
         payload: TransportFabricRequestPayload<U>,
         stub: ChaincodeStub,
-        chaincode: TransportFabricChaincode
-    ): ITransportCommandAsync<U, V> {
-        return new TransportCommandFabricAsyncImpl(payload, stub, chaincode);
+        manager: TransportFabricChaincodeTransport
+    ): ITransportCommand<U> {
+        return new TransportCommandFabricAsyncImpl(payload, stub, manager);
     }
 
     // --------------------------------------------------------------------------
@@ -110,9 +109,9 @@ class TransportCommandFabricAsyncImpl<U, V> extends TransportCommandAsync<U, V> 
     //
     // --------------------------------------------------------------------------
 
-    constructor(payload: TransportFabricRequestPayload, stub: ChaincodeStub, chaincode: TransportFabricChaincode) {
+    constructor(payload: TransportFabricRequestPayload, stub: ChaincodeStub, transport: TransportFabricChaincodeTransport) {
         super(payload.name, payload.request, payload.id);
-        this._stub = new TransportFabricStub(stub, payload.id, payload.options, chaincode);
+        this._stub = new TransportFabricStub(stub, payload.id, payload.options, transport);
     }
 
     // --------------------------------------------------------------------------

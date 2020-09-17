@@ -1,6 +1,7 @@
 import { ITransportFabricRequestPayload } from '../TransportFabricRequestPayload';
 import { ITransportFabricResponsePayload } from '../TransportFabricResponsePayload';
 import { FabricTransactionValidationCode } from '../../api/IFabricTransaction';
+import { ITransportFabricTransactionChaincode } from './ITransportFabricTransactionChaincode';
 
 export interface ITransportFabricTransaction<U = any, V = any> {
     hash: string;
@@ -11,10 +12,4 @@ export interface ITransportFabricTransaction<U = any, V = any> {
 
     request: ITransportFabricRequestPayload<U>;
     response: ITransportFabricResponsePayload<V>;
-}
-
-export interface ITransportFabricTransactionChaincode {
-    name: string;
-    path: string;
-    version: string;
 }

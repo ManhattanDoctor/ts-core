@@ -1,5 +1,5 @@
 import { ExtendedError } from '@ts-core/common/error';
-import { ITransportCommandAsync, ITransportCommand, Transport } from '@ts-core/common/transport';
+import { ITransportCommand, Transport } from '@ts-core/common/transport';
 import { TransportInvalidDataError } from '@ts-core/common/transport/error/TransportInvalidDataError';
 import { TransformUtil, ValidateUtil } from '@ts-core/common/util';
 import { IsOptional, IsString } from 'class-validator';
@@ -13,7 +13,7 @@ import * as _ from 'lodash';
 
 export interface ITransportFabricResponsePayload<V = any> {
     id: string;
-    response?: ExtendedError | V;
+    response?: V | ExtendedError;
 }
 
 // --------------------------------------------------------------------------
@@ -61,7 +61,7 @@ export class TransportFabricResponsePayload<U = any, V = any> implements ITransp
     public id: string;
 
     @IsOptional()
-    public response: ExtendedError | V;
+    public response: V | ExtendedError;
 
     // --------------------------------------------------------------------------
     //

@@ -16,12 +16,13 @@ import { TransportWaitExceedError } from '@ts-core/common/transport/error';
 import { DateUtil, ObjectUtil } from '@ts-core/common/util';
 import { ChaincodeStub } from 'fabric-shim';
 import * as _ from 'lodash';
-import { TransportFabricResponsePayload, TransportFabricRequestPayload } from '../transport';
+import { TransportFabricResponsePayload } from '../TransportFabricResponsePayload';
+import { TransportFabricRequestPayload } from '../TransportFabricRequestPayload';
 import { ISignature } from '@ts-core/common/crypto';
 import { IDestroyable } from '@ts-core/common/IDestroyable';
 import { ITransportCryptoManager } from '@ts-core/common/transport/crypto';
 
-export class TransportFabricChaincode extends Transport<ITransportSettings> {
+export class TransportFabricChaincodeTransport extends Transport<ITransportSettings> {
     // --------------------------------------------------------------------------
     //
     //  Properties

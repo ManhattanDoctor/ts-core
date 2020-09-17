@@ -11,7 +11,7 @@ import { LoggerWrapper, ILogger } from '@ts-core/common/logger';
 import { IFabricBlock } from './IFabricBlock';
 import { IFabricTransaction } from './IFabricTransaction';
 
-export class FabricApi extends LoggerWrapper {
+export class FabricApiClient extends LoggerWrapper {
     // --------------------------------------------------------------------------
     //
     // 	Static Methods
@@ -22,7 +22,7 @@ export class FabricApi extends LoggerWrapper {
         let item: IFabricBlock = block as any;
         item.hash = block.header.data_hash.toString('hex');
         item.number = Number(block.header.number);
-        item.createdDate = FabricApi.getBlockCreatedDate(block);
+        item.createdDate = FabricApiClient.getBlockCreatedDate(block);
     }
 
     public static getBlockCreatedDate(block: Block): Date {
@@ -142,7 +142,7 @@ export class FabricApi extends LoggerWrapper {
 
     protected async getWallet(): Promise<Wallet> {
         if (_.isNil(this._wallet)) {
-            this._wallet = await FabricApi.createWallet(this.settings);
+            this._wallet = await FabricApiClient.createWallet(this.settings);
         }
         return this._wallet;
     }
@@ -201,7 +201,7 @@ export class FabricApi extends LoggerWrapper {
         } else {
             throw new ExtendedError(`Invalid block: value must be string or number`);
         }
-        FabricApi.parseBlock(item);
+        FabricApiClient.parseBlock(item);
         return item as IFabricBlock;
     }
 
@@ -210,7 +210,7 @@ export class FabricApi extends LoggerWrapper {
             channel = this.channel;
         }
         let item = await channel.queryBlockByTxID(id);
-        FabricApi.parseBlock(item);
+        FabricApiClient.parseBlock(item);
         return item as IFabricBlock;
     }
 

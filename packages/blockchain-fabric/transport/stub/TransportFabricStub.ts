@@ -3,9 +3,9 @@ import { ClassType } from 'class-transformer/ClassTransformer';
 import { ChaincodeStub, Iterators, StateQueryResponse } from 'fabric-shim';
 import * as _ from 'lodash';
 import { ITransportFabricStub } from './ITransportFabricStub';
-import { ITransportFabricCommandOptions } from '../ITransportFabricCommandOptions';
+import { ITransportFabricCommandOptions } from '../ITransportFabricCommand';
 import { ITransportEvent } from '@ts-core/common/transport';
-import { TransportFabricChaincode } from '../../chaincode';
+import { TransportFabricChaincodeTransport } from '../chaincode';
 import { TransportFabric } from '../TransportFabric';
 
 export class TransportFabricStub implements ITransportFabricStub {
@@ -16,7 +16,7 @@ export class TransportFabricStub implements ITransportFabricStub {
     // --------------------------------------------------------------------------
 
     private _stub: ChaincodeStub;
-    private _chaincode: TransportFabricChaincode;
+    private _transport: TransportFabricChaincodeTransport;
 
     private _requestId: string;
 
@@ -31,10 +31,10 @@ export class TransportFabricStub implements ITransportFabricStub {
     //
     // --------------------------------------------------------------------------
 
-    constructor(stub: ChaincodeStub, requestId: string, options: ITransportFabricCommandOptions, chaincode: TransportFabricChaincode) {
+    constructor(stub: ChaincodeStub, requestId: string, options: ITransportFabricCommandOptions, transport: TransportFabricChaincodeTransport) {
         this._stub = stub;
+        this._transport = transport;
         this._requestId = requestId;
-        this._chaincode = chaincode;
 
         this.eventsToDispatch = new Array();
 
@@ -53,8 +53,7 @@ export class TransportFabricStub implements ITransportFabricStub {
     // --------------------------------------------------------------------------
 
     public async hasState(key: string): Promise<boolean> {
-        let buffer = await this.stub.getState(key);
-        return !_.isNil(buffer) && buffer.length > 0;
+        return !_.isNil(await this.getStateRaw(key));
     }
 
     public async getState<U>(key: string, type: ClassType<U> = null, isNeedValidate: boolean = true): Promise<U> {
@@ -70,11 +69,8 @@ export class TransportFabricStub implements ITransportFabricStub {
     }
 
     public async getStateRaw(key: string): Promise<string> {
-        let buffer = await this.stub.getState(key);
-        if (_.isNil(buffer) || buffer.length === 0) {
-            return null;
-        }
-        return buffer.toString(TransformUtil.ENCODING);
+        let item = await this.stub.getState(key);
+        return !_.isNil(item) && item.length > 0 ? item.toString(TransformUtil.ENCODING) : null;
     }
 
     public async putState<U>(
@@ -129,7 +125,7 @@ export class TransportFabricStub implements ITransportFabricStub {
         if (isNeedValidate) {
             ValidateUtil.validate(value);
         }
-        this.chaincode.dispatch(value);
+        this.transport.dispatch(value);
         this.eventsToDispatch.push(value);
     }
 
@@ -150,9 +146,8 @@ export class TransportFabricStub implements ITransportFabricStub {
 
     public destroy(): void {
         this.eventsToDispatch = null;
-
         this._stub = null;
-        this._chaincode = null;
+        this._transport = null;
     }
 
     // --------------------------------------------------------------------------
@@ -161,8 +156,8 @@ export class TransportFabricStub implements ITransportFabricStub {
     //
     // --------------------------------------------------------------------------
 
-    public get chaincode(): TransportFabricChaincode {
-        return this._chaincode;
+    public get transport(): TransportFabricChaincodeTransport {
+        return this._transport;
     }
 
     // --------------------------------------------------------------------------

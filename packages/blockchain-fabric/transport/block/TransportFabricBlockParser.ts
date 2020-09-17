@@ -6,7 +6,6 @@ import { TransportFabric } from '../TransportFabric';
 import { TransformUtil, ObjectUtil } from '@ts-core/common/util';
 import { IFabricBlock, IFabricTransaction } from '../../api';
 import { ITransportFabricEvent } from './ITransportFabricEvent';
-import { ITransportEvent } from '@ts-core/common/transport';
 
 export class TransportFabricBlockParser {
     // --------------------------------------------------------------------------

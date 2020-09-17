@@ -24,7 +24,3 @@ export interface ITransportFabricStub extends IDestroyable {
 
     dispatch<T>(event: ITransportEvent<T>): Promise<void>;
 }
-
-export interface ITransportFabricStubHolder extends IDestroyable {
-    readonly stub: ITransportFabricStub;
-}

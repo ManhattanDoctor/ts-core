@@ -17,14 +17,14 @@ import { DateUtil, ObjectUtil, TransformUtil, ValidateUtil } from '@ts-core/comm
 import { Channel } from 'fabric-client';
 import { ContractEventListener, Contract, Gateway, Network, Wallet } from 'fabric-network';
 import * as _ from 'lodash';
-import { ITransportFabricCommandOptions } from './ITransportFabricCommandOptions';
+import { ITransportFabricCommandOptions } from './ITransportFabricCommand';
 import { ITransportFabricRequestOptions } from './ITransportFabricRequestOptions';
-import { ITransportFabricSettings } from './ITransportFabricSettings';
-import { ITransportFabricStub } from './stub';
 import { TransportFabricRequestPayload } from './TransportFabricRequestPayload';
 import { TransportFabricResponsePayload } from './TransportFabricResponsePayload';
 import { TransportFabricCommandOptions } from './TransportFabricCommandOptions';
-import { FabricApi } from '../api';
+import { FabricApiClient } from '../api';
+import { ITransportSettings } from '@ts-core/common/transport';
+import { IFabricApiSettings } from '../api';
 
 export class TransportFabric extends Transport<ITransportFabricSettings> {
     // --------------------------------------------------------------------------
@@ -403,7 +403,7 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
 
     protected async getWallet(): Promise<Wallet> {
         if (_.isNil(this._wallet)) {
-            this._wallet = await FabricApi.createWallet(this.settings);
+            this._wallet = await FabricApiClient.createWallet(this.settings);
         }
         return this._wallet;
     }
@@ -446,8 +446,8 @@ export class TransportFabric extends Transport<ITransportFabricSettings> {
     }
 }
 
-export interface ITransportCommandFabric<U> extends ITransportCommand<U> {
-    readonly stub: ITransportFabricStub;
+export interface ITransportFabricSettings extends IFabricApiSettings, ITransportSettings {
+    reconnectDelay?: number;
+    reconnectMaxAttempts?: number;
+    isExitApplicationOnDisconnect?: boolean;
 }
-
-export interface ITransportCommandFabricAsync<U, V> extends ITransportCommandFabric<U>, ITransportCommandAsync<U, V> {}

@@ -1,6 +1,5 @@
 import { ILogger } from '@ts-core/common/logger';
-import { AbstractTransportCommandHandler, ITransportCommand } from '@ts-core/common/transport';
-import { TransportFabricChaincode } from '../../chaincode';
+import { AbstractTransportCommandHandler, ITransportCommand, ITransport } from '@ts-core/common/transport';
 
 export abstract class TransportCommandFabricHandler<U, T extends ITransportCommand<U>> extends AbstractTransportCommandHandler<U, T> {
     // --------------------------------------------------------------------------
@@ -9,7 +8,7 @@ export abstract class TransportCommandFabricHandler<U, T extends ITransportComma
     //
     // --------------------------------------------------------------------------
 
-    protected constructor(logger: ILogger, transport: TransportFabricChaincode, name: string) {
+    protected constructor(logger: ILogger, transport: ITransport, name: string) {
         super(logger, transport);
 
         this.transport.listen<T>(name).subscribe(async command => {
