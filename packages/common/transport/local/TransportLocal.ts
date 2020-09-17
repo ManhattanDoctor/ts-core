@@ -7,9 +7,9 @@ import { DateUtil, ObjectUtil } from '../../util';
 import { TransportWaitExceedError } from '../error';
 import { ITransportCommand, ITransportCommandAsync, ITransportCommandOptions, ITransportEvent } from '../ITransport';
 import { ITransportRequestStorage, Transport, TransportLogType } from '../Transport';
-import { ITransportLocalSettings } from './ITransportLocalSettings';
+import { ITransportSettings } from '../ITransportSettings';
 
-export class TransportLocal extends Transport<ITransportLocalSettings> {
+export class TransportLocal extends Transport<ITransportSettings> {
     // --------------------------------------------------------------------------
     //
     //  Public Methods

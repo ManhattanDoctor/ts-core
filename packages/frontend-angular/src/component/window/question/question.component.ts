@@ -37,12 +37,20 @@ export class QuestionComponent extends WindowQuestionBaseComponent {
         super.commitConfigProperties();
 
         if (!_.isNil(this.data.text)) {
-            this.text = this.data.text.replace(/(?:\r\n|\r|\n)/g, '<br/>');
+            this.text = this.data.text.replace(/(?:\r\n|\r|\n)/g, `<br/>`);
         }
 
-        this.data.yesText = this.language.translate(this.data.options.yesTextId);
-        this.data.notText = this.language.translate(this.data.options.notTextId);
-        this.data.checkText = this.language.translate(this.data.options.checkTextId);
-        this.data.closeText = this.language.translate(this.data.options.closeTextId);
+        if (this.language.isHasTranslation(this.data.options.yesTextId)) {
+            this.data.yesText = this.language.translate(this.data.options.yesTextId);
+        }
+        if (this.language.isHasTranslation(this.data.options.notTextId)) {
+            this.data.notText = this.language.translate(this.data.options.notTextId);
+        }
+        if (this.language.isHasTranslation(this.data.options.checkTextId)) {
+            this.data.checkText = this.language.translate(this.data.options.checkTextId);
+        }
+        if (this.language.isHasTranslation(this.data.options.closeTextId)) {
+            this.data.closeText = this.language.translate(this.data.options.closeTextId);
+        }
     }
 }

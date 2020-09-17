@@ -58,13 +58,13 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
     // --------------------------------------------------------------------------
 
     public translate(key: string, params?: any): string {
-        if (_.isNil(this.locale)) {
-            this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_LOCALE, new ExtendedError(`Locale is undefined`, null, key)));
-            return null;
-        }
         if (_.isNil(key)) {
             this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_KEY, new ExtendedError(`Key is undefined`, null, key)));
             return null;
+        }
+        if (_.isNil(this.locale)) {
+            this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_LOCALE, new ExtendedError(`Locale is undefined`, null, key)));
+            return key;
         }
 
         let uniqueKey = this.getUniqueKey(key, params);
@@ -73,7 +73,7 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
             return text;
         }
 
-        if (this.locale.isHasTranslation(key)) {
+        if (this.isHasTranslation(key)) {
             text = this.locale.translate(key, params);
             let link = this.getLink(text);
             if (!_.isNil(link)) {
@@ -102,7 +102,7 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
     }
 
     public isHasTranslation(key: string): boolean {
-        return this.locale.isHasTranslation(key);
+        return !_.isNil(this.locale) ? this.locale.isHasTranslation(key) : false;
     }
 
     // --------------------------------------------------------------------------

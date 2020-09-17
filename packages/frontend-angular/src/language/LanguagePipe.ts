@@ -26,10 +26,8 @@ export class LanguagePipe extends DestroyableContainer implements PipeTransform 
 
     constructor(private language: LanguageService) {
         super();
-        language.events.pipe(takeUntil(this.destroyed)).subscribe(data => {
-            if (data.type === LoadableEvent.COMPLETE) {
-                this.updateValue();
-            }
+        language.completed.pipe(takeUntil(this.destroyed)).subscribe(() => {
+            this.updateValue();
         });
     }
 

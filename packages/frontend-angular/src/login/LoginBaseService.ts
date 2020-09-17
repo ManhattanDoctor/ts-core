@@ -2,6 +2,8 @@ import { LoadableEvent, Loadable, LoadableStatus } from '@ts-core/common';
 import { ExtendedError } from '@ts-core/common/error';
 import { ObservableData } from '@ts-core/common/observer';
 import { TransportNoConnectionError, TransportTimeoutError } from '@ts-core/common/transport';
+import { Observable } from 'rxjs';
+import { map, filter } from 'rxjs/operators';
 
 export abstract class LoginBaseService<E = any, U = any, V = any> extends Loadable<E | LoginBaseServiceEvent, U | V | ExtendedError> {
     // --------------------------------------------------------------------------
@@ -72,6 +74,7 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Loadab
 
             this._isLoggedIn = true;
             this.status = LoadableStatus.LOADED;
+            this.observer.next(new ObservableData(LoadableEvent.COMPLETE, response));
             this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_COMPLETE, response));
         } catch (error) {
             error = ExtendedError.create(error);
@@ -79,6 +82,7 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Loadab
 
             this._isLoggedIn = false;
             this.status = LoadableStatus.ERROR;
+            this.observer.next(new ObservableData(LoadableEvent.ERROR, null, error));
             this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_ERROR, null, error));
         }
 
@@ -173,6 +177,20 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Loadab
     // 	Public Properties
     //
     // --------------------------------------------------------------------------
+
+    public get logined(): Observable<V> {
+        return this.events.pipe(
+            filter(item => item.type === LoginBaseServiceEvent.LOGIN_COMPLETE),
+            map(item => item.data as V)
+        );
+    }
+
+    public get logouted(): Observable<void> {
+        return this.events.pipe(
+            filter(item => item.type === LoginBaseServiceEvent.LOGOUT_FINISHED),
+            map(() => null)
+        );
+    }
 
     public get sid(): string {
         return this._sid;

@@ -1,6 +1,8 @@
 import { Observable, Subject } from 'rxjs';
 import { DestroyableContainer } from './DestroyableContainer';
 import { ObservableData } from './observer';
+import { filter, map } from 'rxjs/operators';
+import { ExtendedError } from './error';
 
 export abstract class Loadable<U = any, V = any> extends DestroyableContainer {
     // --------------------------------------------------------------------------
@@ -73,6 +75,20 @@ export abstract class Loadable<U = any, V = any> extends DestroyableContainer {
 
     public get events(): Observable<ObservableData<U | LoadableEvent, V>> {
         return this.observer.asObservable();
+    }
+
+    public get completed(): Observable<V> {
+        return this.events.pipe(
+            filter(item => item.type === LoadableEvent.COMPLETE),
+            map(item => item.data)
+        );
+    }
+
+    public get errored(): Observable<ExtendedError> {
+        return this.events.pipe(
+            filter(item => item.type === LoadableEvent.ERROR),
+            map(item => item.error)
+        );
     }
 
     public get isLoaded(): boolean {

@@ -9,19 +9,19 @@ import {
     Transport,
     TransportCommand,
     TransportCommandAsync,
-    TransportEvent,
     TransportLogType,
     TransportTimeoutError,
-    TransportWaitError
+    TransportWaitError,
+    ITransportSettings
 } from '@ts-core/common/transport';
 import * as amqp from 'amqplib';
 import { Channel, Message, Options, Replies } from 'amqplib';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 import * as uuid from 'uuid';
-import { ITransportAmqpSettings } from './ITransportAmqpSettings';
 import { TransportInvalidHeadersError } from './TransportInvalidHeadersError';
 import { TransformUtil } from '@ts-core/common/util';
+import { IAmqpSettings } from '../settings';
 
 export class TransportAmqp extends Transport<ITransportAmqpSettings> {
     // --------------------------------------------------------------------------
@@ -654,6 +654,8 @@ export class TransportAmqp extends Transport<ITransportAmqpSettings> {
         return value;
     }
 }
+
+export interface ITransportAmqpSettings extends IAmqpSettings, ITransportSettings {}
 
 interface ICommandOptions {
     headers: ICommandHeaders;

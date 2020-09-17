@@ -35,12 +35,16 @@ export class QuestionManager extends Destroyable implements IQuestion {
         this._closePromise = PromiseHandler.create();
         this._yesNotPromise = PromiseHandler.create();
 
+        this.yesText = 'Yes';
+        this.notText = 'Not';
+        this.closeText = 'Close';
+        this.checkText = 'Check';
         this.options = _.assign(
             {
                 mode: QuestionMode.INFO,
                 isChecked: false,
                 yesTextId: 'general.yes',
-                notTextId: 'general.no',
+                notTextId: 'general.not',
                 closeTextId: 'general.close'
             },
             options

@@ -28,10 +28,8 @@ export abstract class MessageBaseComponent extends DestroyableContainer {
         if (this.language.isLoaded) {
             this.commitLanguageProperties();
         }
-        language.events.pipe(takeUntil(this.destroyed)).subscribe(data => {
-            if (data.type === LoadableEvent.COMPLETE) {
-                this.commitLanguageProperties();
-            }
+        language.completed.pipe(takeUntil(this.destroyed)).subscribe(() => {
+            this.commitLanguageProperties();
         });
     }
 

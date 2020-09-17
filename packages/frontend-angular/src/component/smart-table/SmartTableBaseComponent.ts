@@ -48,10 +48,8 @@ export abstract class SmartTableBaseComponent<U, V extends DataSourceMapCollecti
 
     protected constructor(language: LanguageService) {
         super();
-        language.events.pipe(takeUntil(this.destroyed)).subscribe(data => {
-            if (data.type === LoadableEvent.COMPLETE) {
-                this.commitTableProperties();
-            }
+        language.completed.pipe(takeUntil(this.destroyed)).subscribe(() => {
+            this.commitTableProperties();
         });
     }
 

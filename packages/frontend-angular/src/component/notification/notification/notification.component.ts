@@ -30,10 +30,18 @@ export class NotificationComponent extends NotificationQuestionBaseComponent {
     protected commitConfigProperties(): void {
         super.commitConfigProperties();
 
-        this.data.yesText = this.language.translate(this.data.options.yesTextId);
-        this.data.notText = this.language.translate(this.data.options.notTextId);
-        this.data.checkText = this.language.translate(this.data.options.checkTextId);
-        this.data.closeText = this.language.translate(this.data.options.closeTextId);
+        if (this.language.isHasTranslation(this.data.options.yesTextId)) {
+            this.data.yesText = this.language.translate(this.data.options.yesTextId);
+        }
+        if (this.language.isHasTranslation(this.data.options.notTextId)) {
+            this.data.notText = this.language.translate(this.data.options.notTextId);
+        }
+        if (this.language.isHasTranslation(this.data.options.checkTextId)) {
+            this.data.checkText = this.language.translate(this.data.options.checkTextId);
+        }
+        if (this.language.isHasTranslation(this.data.options.closeTextId)) {
+            this.data.closeText = this.language.translate(this.data.options.closeTextId);
+        }
     }
 
     // --------------------------------------------------------------------------

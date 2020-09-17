@@ -1,6 +1,7 @@
 import { ObservableData } from '@ts-core/common/observer';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
+import { map, filter } from 'rxjs/operators';
 import { LoginBaseService, LoginBaseServiceEvent } from '../login/LoginBaseService';
 import { IUser } from './IUser';
 
@@ -89,6 +90,20 @@ export abstract class UserBaseService<U extends IUser = any, V = void> {
 
     public get events(): Observable<ObservableData<V | UserBaseServiceEvent, U>> {
         return this.observer.asObservable();
+    }
+
+    public get logined(): Observable<U> {
+        return this.events.pipe(
+            filter(item => item.type === UserBaseServiceEvent.LOGINED),
+            map(item => item.data)
+        );
+    }
+
+    public get logouted(): Observable<void> {
+        return this.events.pipe(
+            filter(item => item.type === UserBaseServiceEvent.LOGOUTED),
+            map(() => null)
+        );
     }
 
     public get hasUser(): boolean {

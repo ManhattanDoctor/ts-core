@@ -24,10 +24,11 @@ import * as uuid from 'uuid';
 import { ITransportAmqpEventOptions } from './ITransportAmqpEventOptions';
 import { ITransportAmqpRequestOptions } from './ITransportAmqpRequestOptions';
 import { ITransportAmqpResponseOptions } from './ITransportAmqpResponseOptions';
-import { ITransportAmqpSettings } from './ITransportAmqpSettings';
 import { TransportAmqpEventPayload } from './TransportAmqpEventPayload';
 import { TransportAmqpRequestPayload } from './TransportAmqpRequestPayload';
 import { TransportAmqpResponsePayload } from './TransportAmqpResponsePayload';
+import { ITransportSettings } from '@ts-core/common/transport';
+import { IAmqpSettings } from '../../settings';
 
 export class TransportAmqp2 extends Transport<ITransportAmqpSettings> {
     // --------------------------------------------------------------------------
@@ -662,6 +663,14 @@ export class TransportAmqp2 extends Transport<ITransportAmqpSettings> {
     public get isConnected(): boolean {
         return this._isConnected;
     }
+}
+
+export interface ITransportAmqpSettings extends IAmqpSettings, ITransportSettings {
+    amqpQueuePrefix?: string;
+
+    reconnectDelay?: number;
+    reconnectMaxAttempts?: number;
+    isExitApplicationOnDisconnect?: boolean;
 }
 
 interface ITransportAmqpRequestStorage extends ITransportRequestStorage {

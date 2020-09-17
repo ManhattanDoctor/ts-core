@@ -1,5 +1,4 @@
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
-import { LoadableEvent } from '@ts-core/common';
 import { LanguageService } from '@ts-core/frontend/language';
 
 export class LanguageMomentDateAdapter extends MomentDateAdapter {
@@ -11,10 +10,8 @@ export class LanguageMomentDateAdapter extends MomentDateAdapter {
 
     constructor(language: LanguageService) {
         super(language.locale);
-        language.events.subscribe(data => {
-            if (data.type === LoadableEvent.COMPLETE) {
-                this.setLocale(language.locale);
-            }
+        language.completed.subscribe(item => {
+            this.setLocale(item.locale);
         });
     }
 }
