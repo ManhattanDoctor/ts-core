@@ -1,3 +1,4 @@
+export * from './IUIDable';
 export * from './Filterable';
 export * from './IArrayable';
 export * from './IFilterable';
