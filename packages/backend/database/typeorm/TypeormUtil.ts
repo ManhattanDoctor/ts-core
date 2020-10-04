@@ -135,9 +135,13 @@ export class TypeormUtil {
     //
     // --------------------------------------------------------------------------
 
+    public static async clearEntities(connection: Connection): Promise<void> {
+        for (let item of connection.entityMetadatas) {
+            await connection.getRepository(item.name).query(`DELETE FROM ${item.tableName};`);
+        }
+    }
+
     public static async databaseClear(connection: Connection, name: string): Promise<void> {
-        let queryRunner = connection.createQueryRunner();
-        // await queryRunner.dropDatabase(name, true);
         await connection.synchronize(true);
     }
 

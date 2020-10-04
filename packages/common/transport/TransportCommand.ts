@@ -13,12 +13,12 @@ export class TransportCommand<T> implements ITransportCommand<T> {
     //
     // --------------------------------------------------------------------------
 
-    public static sign<U>(command: ITransportCommand<U>, manager: ITransportCryptoManager, key: IKeyAsymmetric, nonce?: string): ISignature {
+    public static async sign<U>(command: ITransportCommand<U>, manager: ITransportCryptoManager, key: IKeyAsymmetric, nonce?: string): Promise<ISignature> {
         if (_.isNil(nonce)) {
             nonce = Date.now().toString();
         }
         return {
-            value: manager.sign(command, nonce, key.privateKey),
+            value: await manager.sign(command, nonce, key.privateKey),
             publicKey: key.publicKey,
             algorithm: manager.algorithm,
             nonce

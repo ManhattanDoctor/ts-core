@@ -1,16 +1,17 @@
-import { ITransportCommand } from '../ITransport';
-import { Ed25519, ISignature } from '../../crypto';
 import * as _ from 'lodash';
-import { ITransportCryptoManager } from './ITransportCryptoManager';
+import { ITransportCryptoManager } from '@ts-core/common/transport/crypto';
+import { ITransportCommand } from '@ts-core/common/transport/ITransport';
+import { ISignature } from '@ts-core/common/crypto';
+import { GostR3410 } from '../GostR3410';
 
-export class TransportCryptoManagerEd25519 implements ITransportCryptoManager {
+export class TransportCryptoManagerGostR3410 implements ITransportCryptoManager {
     // --------------------------------------------------------------------------
     //
     //  Static Methods
     //
     // --------------------------------------------------------------------------
 
-    public static ALGORITHM = 'Ed25519';
+    public static ALGORITHM = 'GostR3410';
 
     // --------------------------------------------------------------------------
     //
@@ -19,11 +20,11 @@ export class TransportCryptoManagerEd25519 implements ITransportCryptoManager {
     // --------------------------------------------------------------------------
 
     public async sign<U>(command: ITransportCommand<U>, nonce: string, privateKey: string): Promise<string> {
-        return Ed25519.sign(this.toString(command, nonce), privateKey);
+        return GostR3410.sign(this.toString(command, nonce), privateKey);
     }
 
     public async verify<U>(command: ITransportCommand<U>, signature: ISignature): Promise<boolean> {
-        return Ed25519.verify(this.toString(command, signature.nonce), signature.value, signature.publicKey);
+        return GostR3410.verify(this.toString(command, signature.nonce), signature.value, signature.publicKey);
     }
 
     // --------------------------------------------------------------------------
@@ -38,6 +39,6 @@ export class TransportCryptoManagerEd25519 implements ITransportCryptoManager {
     }
 
     public get algorithm(): string {
-        return TransportCryptoManagerEd25519.ALGORITHM;
+        return TransportCryptoManagerGostR3410.ALGORITHM;
     }
 }

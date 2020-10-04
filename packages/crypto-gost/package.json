@@ -1,0 +1,16 @@
+{
+    "name": "@ts-core/crypto-gost",
+    "version": "1.0.3",
+    "description": "GOST cryptography based on WebCrypto GOST by Rudolf Nickolaev",
+    "main": "index.js",
+    "scripts": {},
+    "author": {
+        "name": "Renat Gubaev",
+        "email": "renat.gubaev@gmail.com"
+    },
+    "license": "ISC",
+    "dependencies": {
+        "@ts-core/common": "^1.0.123",
+        "@vostokplatform/crypto-gost-js": "2.0.1"
+    }
+}

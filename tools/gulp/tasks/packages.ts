@@ -16,7 +16,7 @@ const packages = {
     backend: createProject('packages/backend/tsconfig.json'),
     frontend: createProject('packages/frontend/tsconfig.json'),
     blockchain: createProject('packages/blockchain/tsconfig.json'),
-    'blockchain-fabric': createProject('packages/blockchain-fabric/tsconfig.json'),
+    'crypto-gost': createProject('packages/crypto-gost/tsconfig.json'),
     'backend-nestjs': createProject('packages/backend-nestjs/tsconfig.json'),
     'frontend-angular': createProject('packages/frontend-angular/tsconfig.json')
 };
