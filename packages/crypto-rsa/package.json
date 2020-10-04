@@ -1,7 +1,7 @@
 {
-    "name": "@ts-core/crypto-gost",
-    "version": "1.0.4",
-    "description": "GOST cryptography based on WebCrypto GOST by Rudolf Nickolaev",
+    "name": "@ts-core/crypto-rsa",
+    "version": "1.0.2",
+    "description": "RSA cryptography",
     "main": "index.js",
     "scripts": {},
     "author": {
@@ -11,6 +11,6 @@
     "license": "ISC",
     "dependencies": {
         "@ts-core/common": "^1.0.123",
-        "@vostokplatform/crypto-gost-js": "2.0.1"
+        "node-rsa": "1.1.1"
     }
 }

@@ -112,14 +112,6 @@ export abstract class GostBase {
         let data = await gost.subtle.decrypt({ name: 'GOST28147-CFB' }, contentEncryptionKey, gost.coding.Hex.decode(message.data));
         return gost.coding.Chars.encode(data);
     }
-
-    // --------------------------------------------------------------------------
-    //
-    //  Protected Methods
-    //
-    // --------------------------------------------------------------------------
-
-    protected abstract get algorithm(): string;
 }
 
 export interface IGostEncrypted {
