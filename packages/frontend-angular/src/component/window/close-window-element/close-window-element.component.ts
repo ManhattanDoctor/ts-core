@@ -3,7 +3,7 @@ import { ViewUtil } from '../../../util/ViewUtil';
 import { WindowElement } from '../WindowElement';
 
 @Component({
-    selector: 'close-window-element',
+    selector: 'vi-close-window-element',
     styleUrls: ['close-window-element.component.scss'],
     template: ''
 })

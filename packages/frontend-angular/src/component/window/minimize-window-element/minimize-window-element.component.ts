@@ -3,9 +3,10 @@ import { takeUntil } from 'rxjs/operators';
 import { ViewUtil } from '../../../util/ViewUtil';
 import { WindowEvent } from '../../../window/IWindow';
 import { WindowElement } from '../WindowElement';
+import * as _ from 'lodash';
 
 @Component({
-    selector: 'minimize-window-element',
+    selector: 'vi-minimize-window-element',
     styleUrls: ['minimize-window-element.component.scss'],
     template: ''
 })
@@ -84,7 +85,7 @@ export class MinimizeWindowElementComponent extends WindowElement {
 
     private mouseClickHandler = (event: MouseEvent): void => {
         event.stopPropagation();
-        if (this.window) {
+        if (!_.isNil(this.window)) {
             this.window.isMinimized = !this.window.isMinimized;
         }
     };

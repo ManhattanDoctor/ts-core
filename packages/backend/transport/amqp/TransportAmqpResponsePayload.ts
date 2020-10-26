@@ -3,10 +3,11 @@ import { ITransportCommandAsync } from '@ts-core/common/transport';
 import { TransportInvalidDataError } from '@ts-core/common/transport/error/TransportInvalidDataError';
 import { TransformUtil, ValidateUtil } from '@ts-core/common/util';
 import { Message } from 'amqplib';
-import { IsDefined, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
+import { ITransportAmqpResponsePayload } from './ITransportAmqpResponsePayload';
 
-export class TransportAmqpResponsePayload<U = any, V = any> {
+export class TransportAmqpResponsePayload<U = any, V = any> implements ITransportAmqpResponsePayload<V> {
     // --------------------------------------------------------------------------
     //
     //  Static Methods
@@ -37,8 +38,8 @@ export class TransportAmqpResponsePayload<U = any, V = any> {
     @IsString()
     public id: string;
 
-    @IsDefined()
-    public response: ExtendedError | V;
+    @IsOptional()
+    public response?: ExtendedError | V;
 
     // --------------------------------------------------------------------------
     //

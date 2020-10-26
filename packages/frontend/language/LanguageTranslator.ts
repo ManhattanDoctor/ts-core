@@ -6,7 +6,7 @@ import { ObjectUtil } from '@ts-core/common/util';
 import * as _ from 'lodash';
 import * as MessageFormat from 'messageformat';
 import { Observable, Subject } from 'rxjs';
-import { ILanguageTranslator, LanguageTranslatorEvent } from './ILanguageTranslator';
+import { ILanguageTranslator, LanguageTranslatorEvent, ILanguageTranslatorItem } from './ILanguageTranslator';
 
 export class LanguageTranslator extends DestroyableContainer implements ILanguageTranslator {
     // --------------------------------------------------------------------------
@@ -47,8 +47,8 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
         return text.substr(1).trim();
     }
 
-    private getUniqueKey(key: string, params?: any): string {
-        return !_.isNil(params) ? key + '_' + JSON.stringify(ObjectUtil.sortKeys(params)) : key;
+    private getUniqueKey(item: ILanguageTranslatorItem): string {
+        return !_.isNil(item.params) ? `${item.key}_${JSON.stringify(ObjectUtil.sortKeys(item.params))}` : item.key;
     }
 
     // --------------------------------------------------------------------------
@@ -57,7 +57,8 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
     //
     // --------------------------------------------------------------------------
 
-    public translate(key: string, params?: any): string {
+    public translate(item: ILanguageTranslatorItem): string {
+        let { key, params } = item;
         if (_.isNil(key)) {
             this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_KEY, new ExtendedError(`Key is undefined`, null, key)));
             return null;
@@ -67,7 +68,7 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
             return key;
         }
 
-        let uniqueKey = this.getUniqueKey(key, params);
+        let uniqueKey = this.getUniqueKey(item);
         let text = this.locale.translations.get(uniqueKey);
         if (!_.isNil(text)) {
             return text;
@@ -77,7 +78,7 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
             text = this.locale.translate(key, params);
             let link = this.getLink(text);
             if (!_.isNil(link)) {
-                return this.translate(link, params);
+                return this.translate({ key: link, params });
             }
         } else {
             text = key;
@@ -86,12 +87,13 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
         return text;
     }
 
-    public compile(expression: string, params?: any): string {
-        if (_.isNil(expression)) {
-            this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_EXPRESSION, new ExtendedError(`Expression is undefined`, null, expression)));
+    public compile(item: ILanguageTranslatorItem): string {
+        let { key, params } = item;
+        if (_.isNil(key)) {
+            this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_KEY, new ExtendedError(`Key is undefined`, null, key)));
             return null;
         }
-        return this.locale.compile(expression, params);
+        return this.locale.compile(key, params);
     }
 
     public setLocale(locale: string, rawTranslation: any): void {

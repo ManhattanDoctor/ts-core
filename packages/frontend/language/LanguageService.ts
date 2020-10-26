@@ -122,12 +122,12 @@ export class LanguageService extends Loadable<LanguageTranslatorEvent, Language>
         this.load(CookieStorageUtil.get(this.options) || defaultLocale);
     }
 
-    public compile(expression: string, params?: Object): string {
-        return this.translator.compile(expression, params);
+    public compile(key: string, params?: Object): string {
+        return this.translator.compile({ key, params });
     }
 
     public translate(key: string, params?: Object): string {
-        return this.translator.translate(key, params);
+        return this.translator.translate({ key, params });
     }
 
     public isHasTranslation(key: string): boolean {

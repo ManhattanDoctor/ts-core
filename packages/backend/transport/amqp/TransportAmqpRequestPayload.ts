@@ -1,12 +1,14 @@
-import { ITransportCommand, ITransportCommandOptions, TransportCommand, TransportCommandAsync } from '@ts-core/common/transport';
+import { ITransportCommand, ITransportCommandOptions, TransportCommand, TransportCommandAsync, TransportCommandOptions } from '@ts-core/common/transport';
 import { TransportInvalidDataError } from '@ts-core/common/transport/error';
 import { TransformUtil, ValidateUtil } from '@ts-core/common/util';
 import { Message } from 'amqplib';
 import { ClassType } from 'class-transformer/ClassTransformer';
-import { IsBoolean, IsDefined, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDefined, ValidateNested, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
+import { ITransportAmqpRequestPayload } from './ITransportAmqpRequestPayload';
+import { Type } from 'class-transformer';
 
-export class TransportAmqpRequestPayload<U = any> {
+export class TransportAmqpRequestPayload<U = any> implements ITransportAmqpRequestPayload<U> {
     // --------------------------------------------------------------------------
     //
     //  Static Methods
@@ -55,10 +57,12 @@ export class TransportAmqpRequestPayload<U = any> {
     public name: string;
 
     @IsOptional()
-    public request: U;
+    public request?: U;
 
+    @Type(() => TransportCommandOptions)
     @IsDefined()
-    public options: ITransportCommandOptions;
+    @ValidateNested()
+    public options: TransportCommandOptions;
 
     @IsBoolean()
     public isNeedReply: boolean;

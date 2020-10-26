@@ -1,4 +1,4 @@
-import { NavigationCancel, NavigationEnd, NavigationError, NavigationExtras, NavigationStart, Router } from '@angular/router';
+import { NavigationCancel, NavigationEnd, NavigationError, NavigationExtras, NavigationStart, Router, UrlTree } from '@angular/router';
 import { DestroyableContainer } from '@ts-core/common';
 import { ObservableData } from '@ts-core/common/observer';
 import { NativeWindowService } from '@ts-core/frontend/service/NativeWindowService';
@@ -110,11 +110,8 @@ export class RouterBaseService extends DestroyableContainer {
         }
     }
 
-    public isUrlActive(value: string): boolean {
-        if (_.isNil(value) || _.isNil(this.url)) {
-            return false;
-        }
-        return _.includes(this.url.toLowerCase(), value.toLowerCase());
+    public isUrlActive(value: string | UrlTree, isExact: boolean = false): boolean {
+        return !_.isNil(value) ? this.router.isActive(value, isExact) : false;
     }
 
     public reload(): void {
@@ -127,7 +124,7 @@ export class RouterBaseService extends DestroyableContainer {
     //
     // --------------------------------------------------------------------------
 
-    public getParams(): any {
+    public getParams<T = any>(): T {
         let params = {} as any;
         this.map.forEach((value, key) => {
             params[key] = value;
@@ -144,14 +141,14 @@ export class RouterBaseService extends DestroyableContainer {
     }
 
     public setParam(name: string, value: any, extras?: NavigationExtras): void {
-        if (value) {
+        if (!_.isNil(value)) {
             value = value.toString().trim();
             if (value.length === 0) {
                 value = null;
             }
         }
 
-        if (value) {
+        if (!_.isNil(value)) {
             this.map.set(name, value);
         } else {
             this.map.delete(name);

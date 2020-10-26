@@ -2,8 +2,8 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { DestroyableContainer } from '@ts-core/common';
 import * as _ from 'lodash';
 import { filter, takeUntil } from 'rxjs/operators';
-import { MenuItems } from '../menu/MenuItems';
-import { NavigationMenuItem } from '../menu/NavigationMenuItem';
+import { ISelectListItem } from '../list/select/ISelectListItem';
+import { SelectListItems } from '../list/select/SelectListItems';
 import { NotificationConfig } from '../notification/NotificationConfig';
 import { NotificationService, NotificationServiceEvent } from '../notification/NotificationService';
 import { RouterBaseService, RouterBaseServiceEvent } from '../service/RouterBaseService';
@@ -15,8 +15,7 @@ export abstract class ShellBaseComponent extends DestroyableContainer {
     //
     // --------------------------------------------------------------------------
 
-    public menu: MenuItems;
-    public activeItem: NavigationMenuItem;
+    public menu: SelectListItems<ISelectListItem>;
 
     public isNeedSide: boolean = false;
     public isHasNotifications: boolean = false;
@@ -57,7 +56,7 @@ export abstract class ShellBaseComponent extends DestroyableContainer {
                 filter(data => data.type === RouterBaseServiceEvent.LOADING_CHANGED),
                 takeUntil(this.destroyed)
             )
-            .subscribe(this.activeItemCheck);
+            .subscribe(this.routingChanged);
 
         // Menu Size
         this.isNeedSideCheck();
@@ -67,18 +66,12 @@ export abstract class ShellBaseComponent extends DestroyableContainer {
             .subscribe(this.isNeedSideCheck);
 
         this.initializeMenu();
-        this.activeItemCheck();
     }
 
     protected abstract initializeMenu(): void;
 
-    protected activeItemCheck = (): void => {
-        for (let item of this.menu.items) {
-            if (!(item instanceof NavigationMenuItem)) {
-                continue;
-            }
-            item.isActive = this.router.url.includes(item.url);
-        }
+    protected routingChanged = (): void => {
+        this.menu.refresh();
     };
 
     protected isHasNotificationsCheck = (): void => {

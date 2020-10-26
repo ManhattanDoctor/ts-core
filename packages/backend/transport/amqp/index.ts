@@ -5,3 +5,5 @@ export * from './TransportAmqp2';
 export * from './TransportAmqpEventPayload';
 export * from './TransportAmqpRequestPayload';
 export * from './TransportAmqpResponsePayload';
+export * from './ITransportAmqpRequestPayload';
+export * from './ITransportAmqpResponsePayload';

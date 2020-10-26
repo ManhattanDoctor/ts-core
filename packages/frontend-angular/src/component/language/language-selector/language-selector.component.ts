@@ -4,7 +4,7 @@ import { LanguageService } from '@ts-core/frontend/language';
 import { ViewUtil } from '../../../util/ViewUtil';
 
 @Component({
-    selector: 'language-selector',
+    selector: 'vi-language-selector',
     templateUrl: 'language-selector.component.html'
 })
 export class LanguageSelectorComponent extends DestroyableContainer {

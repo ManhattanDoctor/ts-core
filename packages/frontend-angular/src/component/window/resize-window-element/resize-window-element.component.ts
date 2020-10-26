@@ -1,9 +1,10 @@
 import { Component, ElementRef } from '@angular/core';
 import { ViewUtil } from '../../../util/ViewUtil';
 import { WindowElement } from '../WindowElement';
+import * as _ from 'lodash';
 
 @Component({
-    selector: 'resize-window-element',
+    selector: 'vi-resize-window-element',
     styleUrls: ['resize-window-element.component.scss'],
     template: ''
 })
@@ -60,6 +61,8 @@ export class ResizeWindowElementComponent extends WindowElement {
     private mouseClickHandler = (event: MouseEvent) => {
         event.stopPropagation();
 
-        if (this.window) this.window.isMinimized = !this.window.isMinimized;
+        if (!_.isNil(this.window)) {
+            this.window.isMinimized = !this.window.isMinimized;
+        }
     };
 }

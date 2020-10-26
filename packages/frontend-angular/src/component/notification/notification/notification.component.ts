@@ -3,9 +3,10 @@ import { LanguageService } from '@ts-core/frontend/language';
 import { NotificationService } from '../../../notification/NotificationService';
 import { ViewUtil } from '../../../util/ViewUtil';
 import { NotificationQuestionBaseComponent } from '../NotificationQuestionBaseComponent';
+import * as _ from 'lodash';
 
 @Component({
-    selector: 'notification',
+    selector: 'vi-notification',
     templateUrl: 'notification.component.html',
     styleUrls: ['notification.component.scss']
 })
@@ -52,7 +53,7 @@ export class NotificationComponent extends NotificationQuestionBaseComponent {
 
     public remove(): void {
         super.remove();
-        if (!this.notification) {
+        if (_.isNil(this.notification)) {
             this.notifications.remove(this.config);
         }
     }
