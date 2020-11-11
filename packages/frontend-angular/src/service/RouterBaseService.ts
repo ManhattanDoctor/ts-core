@@ -1,12 +1,22 @@
-import { NavigationCancel, NavigationEnd, NavigationError, NavigationExtras, NavigationStart, Router, UrlTree } from '@angular/router';
-import { DestroyableContainer } from '@ts-core/common';
+import {
+    NavigationCancel,
+    DefaultUrlSerializer,
+    NavigationEnd,
+    NavigationError,
+    NavigationExtras,
+    NavigationStart,
+    Router,
+    UrlSerializer,
+    UrlTree
+} from '@angular/router';
+import { DestroyableContainer, Loadable, LoadableStatus } from '@ts-core/common';
 import { ObservableData } from '@ts-core/common/observer';
 import { NativeWindowService } from '@ts-core/frontend/service/NativeWindowService';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-export class RouterBaseService extends DestroyableContainer {
+export class RouterBaseService extends Loadable<void, void> {
     // --------------------------------------------------------------------------
     //
     // 	Properties
@@ -14,11 +24,11 @@ export class RouterBaseService extends DestroyableContainer {
     // --------------------------------------------------------------------------
 
     protected map: Map<string, string>;
-    protected observer: Subject<ObservableData<RouterBaseServiceEvent, void>>;
 
-    protected paramsExtras: any;
-    protected isNeedUpdateParams: boolean = false;
+    protected extrasToApply: any;
+    protected isNeedUpdateExtras: boolean = false;
 
+    protected _lastUrl: string;
     protected _isLoading: boolean = false;
 
     // --------------------------------------------------------------------------
@@ -27,11 +37,12 @@ export class RouterBaseService extends DestroyableContainer {
     //
     // --------------------------------------------------------------------------
 
-    constructor(protected router: Router, protected window: NativeWindowService) {
+    constructor(protected _router: Router, protected window: NativeWindowService) {
         super();
         this.map = new Map();
         this.observer = new Subject();
 
+        this._lastUrl = this.url;
         this.window.getParams().forEach((value, key) => this.map.set(key, value));
         this.initializeObservers();
     }
@@ -45,25 +56,30 @@ export class RouterBaseService extends DestroyableContainer {
     protected initializeObservers(): void {
         this.router.events.pipe(takeUntil(this.destroyed)).subscribe(event => {
             if (event instanceof NavigationStart) {
-                this.setLoading(true);
+                this.status = LoadableStatus.LOADING;
             } else if (event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError) {
-                this.setLoading(false);
+                this.status = LoadableStatus.LOADED;
+                if (event instanceof NavigationEnd) {
+                    this._lastUrl = event.url;
+                }
             }
         });
     }
 
-    protected applyParams(extras?: NavigationExtras): void {
+    protected async applyExtras(extras?: NavigationExtras): Promise<boolean> {
         let params = {} as NavigationExtras;
         params.queryParams = this.getQueryParams();
-        if (extras) {
+
+        if (!_.isNil(extras)) {
             Object.assign(params, extras);
         }
-        if (this.isLoading) {
-            this.isNeedUpdateParams = true;
-            this.paramsExtras = extras;
-        } else {
-            this.router.navigate([], params);
+
+        if (!this.isLoading) {
+            return this.router.navigate([], params);
         }
+        this.extrasToApply = extras;
+        this.isNeedUpdateExtras = true;
+        return false;
     }
 
     protected getQueryParams(): any {
@@ -72,17 +88,45 @@ export class RouterBaseService extends DestroyableContainer {
         return params;
     }
 
-    private setLoading(value: boolean): void {
-        if (value === this._isLoading) {
-            return;
-        }
-        this._isLoading = value;
-        this.observer.next(new ObservableData(RouterBaseServiceEvent.LOADING_CHANGED));
+    protected commitStatusChangedProperties(oldStatus: LoadableStatus, newStatus: LoadableStatus): void {
+        super.commitStatusChangedProperties(oldStatus, newStatus);
 
-        if (!this.isLoading && this.isNeedUpdateParams) {
-            this.isNeedUpdateParams = false;
-            this.applyParams(this.paramsExtras);
+        if (!this.isLoading && this.isNeedUpdateExtras) {
+            this.isNeedUpdateExtras = false;
+            this.applyExtras(this.extrasToApply);
         }
+        //this.observer.next(new ObservableData(RouterBaseServiceEvent.LOADING_CHANGED));
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    // 	Navigate Methods
+    //
+    // --------------------------------------------------------------------------
+
+    public async navigate(url: string, extras?: NavigationExtras): Promise<boolean> {
+        let params = {} as NavigationExtras;
+        params.queryParams = this.getQueryParams();
+        if (!_.isNil(extras)) {
+            Object.assign(params, extras);
+        }
+        return this.router.navigateByUrl(url, params);
+    }
+
+    public navigateToExternalUrl(url: string, target: string = '_blank'): void {
+        this.window.open(url, target);
+    }
+
+    public navigateToLast(extras?: NavigationExtras): Promise<boolean> {
+        return this.navigate(this.lastUrl, extras);
+    }
+
+    public async navigateIfNotLoading(url: string, extras?: NavigationExtras): Promise<boolean> {
+        return !this.isLoading ? this.navigate(url, extras) : false;
+    }
+
+    public reload(): void {
+        location.reload();
     }
 
     // --------------------------------------------------------------------------
@@ -91,31 +135,17 @@ export class RouterBaseService extends DestroyableContainer {
     //
     // --------------------------------------------------------------------------
 
-    public navigate(url: string, extras?: NavigationExtras): void {
-        let params = {} as NavigationExtras;
-        params.queryParams = this.getQueryParams();
-        if (extras) {
-            Object.assign(params, extras);
-        }
-        this.router.navigateByUrl(url, params);
-    }
-
-    public navigateToExternalUrl(url: string, target: string = '_blank'): void {
-        this.window.open(url, target);
-    }
-
-    public navigateIfNotBusy(url: string, extras?: NavigationExtras): void {
-        if (!this.isLoading) {
-            this.navigate(url, extras);
-        }
-    }
-
     public isUrlActive(value: string | UrlTree, isExact: boolean = false): boolean {
-        return !_.isNil(value) ? this.router.isActive(value, isExact) : false;
-    }
+        if (isExact) {
+            return this.router.isActive(value, isExact);
+        }
+        if (_.isString(value)) {
+            value = this.router.parseUrl(value);
+        }
 
-    public reload(): void {
-        location.reload();
+        let item = this.urlTree;
+        value.queryParams = item.queryParams = {};
+        return value.toString() === item.toString();
     }
 
     // --------------------------------------------------------------------------
@@ -143,22 +173,19 @@ export class RouterBaseService extends DestroyableContainer {
     public setParam(name: string, value: any, extras?: NavigationExtras): void {
         if (!_.isNil(value)) {
             value = value.toString().trim();
-            if (value.length === 0) {
+            if (_.isEmpty(value)) {
                 value = null;
             }
         }
-
         if (!_.isNil(value)) {
             this.map.set(name, value);
         } else {
             this.map.delete(name);
         }
-
-        if (!extras) {
+        if (!_.isNil(extras)) {
             extras = { replaceUrl: true };
         }
-
-        this.applyParams(extras);
+        this.applyExtras(extras);
     }
 
     public removeParam(name: string, extras?: NavigationExtras): void {
@@ -181,15 +208,15 @@ export class RouterBaseService extends DestroyableContainer {
         return this.router.url;
     }
 
-    public get events(): Observable<ObservableData<RouterBaseServiceEvent, void>> {
-        return this.observer.asObservable();
+    public get lastUrl(): string {
+        return this._lastUrl;
     }
 
-    public get isLoading(): boolean {
-        return this._isLoading;
+    public get urlTree(): UrlTree {
+        return this.router.parseUrl(this.url);
     }
-}
 
-export enum RouterBaseServiceEvent {
-    LOADING_CHANGED = 'LOADING_CHANGED'
+    public get router(): Router {
+        return this._router;
+    }
 }

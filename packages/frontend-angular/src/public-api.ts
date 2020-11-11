@@ -139,6 +139,8 @@ export * from './question/QuestionManager';
 export * from './service/PipeBaseService';
 /* ======= */
 export * from './service/RouterBaseService';
+export * from './service/route/CanDeactivateGuard';
+export * from './service/route/IRouterDeactivatable';
 /* ======= */
 export * from './theme/ThemeAssetBackgroundDirective';
 export * from './theme/ThemeAssetDirective';

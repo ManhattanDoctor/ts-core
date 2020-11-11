@@ -45,13 +45,20 @@ export abstract class UserBaseService<U extends IUser = any, V = void> {
         });
     }
 
-    protected loginedHandler(): void {
+    protected initializeUser(): void {
         this._user = this.createUser(this.login.loginData);
+    }
+    protected deinitializeUser(): void {
+        this._user = null;
+    }
+
+    protected loginedHandler(): void {
+        this.initializeUser();
         this.observer.next(new ObservableData(UserBaseServiceEvent.LOGINED, this.user));
     }
 
     protected logoutedHandler(): void {
-        this._user = null;
+        this.deinitializeUser();
         this.observer.next(new ObservableData(UserBaseServiceEvent.LOGOUTED));
     }
 

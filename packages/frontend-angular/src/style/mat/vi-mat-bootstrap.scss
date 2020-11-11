@@ -51,6 +51,9 @@
 
     .border {
         border-color: $divider-color !important;
+        &.solid {
+            border: 1px solid $divider-color !important;
+        }
         &.dashed {
             border: 1px dashed $divider-color !important;
         }

@@ -1,12 +1,12 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { DestroyableContainer } from '@ts-core/common';
+import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
 import * as _ from 'lodash';
 import { filter, takeUntil } from 'rxjs/operators';
 import { ISelectListItem } from '../list/select/ISelectListItem';
 import { SelectListItems } from '../list/select/SelectListItems';
 import { NotificationConfig } from '../notification/NotificationConfig';
 import { NotificationService, NotificationServiceEvent } from '../notification/NotificationService';
-import { RouterBaseService, RouterBaseServiceEvent } from '../service/RouterBaseService';
+import { RouterBaseService } from '../service/RouterBaseService';
 
 export abstract class ShellBaseComponent extends DestroyableContainer {
     // --------------------------------------------------------------------------
@@ -48,43 +48,38 @@ export abstract class ShellBaseComponent extends DestroyableContainer {
                 filter(data => data.type === NotificationServiceEvent.CLOSED || data.type === NotificationServiceEvent.REMOVED),
                 takeUntil(this.destroyed)
             )
-            .subscribe(this.isHasNotificationsCheck);
+            .subscribe(() => this.isHasNotificationsCheck());
 
         // Routing
-        this.router.events
-            .pipe(
-                filter(data => data.type === RouterBaseServiceEvent.LOADING_CHANGED),
-                takeUntil(this.destroyed)
-            )
-            .subscribe(this.routingChanged);
+        this.router.completed.pipe(takeUntil(this.destroyed)).subscribe(() => this.routingChanged());
 
         // Menu Size
         this.isNeedSideCheck();
         this.breakpointObserver
             .observe(this.sideMediaQueryToCheck)
             .pipe(takeUntil(this.destroyed))
-            .subscribe(this.isNeedSideCheck);
+            .subscribe(() => this.isNeedSideCheck());
 
         this.initializeMenu();
     }
 
     protected abstract initializeMenu(): void;
 
-    protected routingChanged = (): void => {
+    protected routingChanged(): void {
         this.menu.refresh();
-    };
+    }
 
-    protected isHasNotificationsCheck = (): void => {
+    protected isHasNotificationsCheck(): void {
         this.isHasNotifications = !_.isEmpty(this.notificationItems);
         if (!this.isHasNotifications) {
             this.isShowNotifications = false;
         }
-    };
+    }
 
-    protected isNeedSideCheck = (): void => {
+    protected isNeedSideCheck(): void {
         this.isNeedSide = this.breakpointObserver.isMatched(this.sideMediaQueryToCheck);
         this.isShowMenu = this.isNeedSide;
-    };
+    }
 
     // --------------------------------------------------------------------------
     //

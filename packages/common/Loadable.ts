@@ -44,6 +44,7 @@ export abstract class Loadable<U = any, V = any> extends DestroyableContainer {
 
     public destroy(): void {
         super.destroy();
+        
         if (this.observer) {
             this.observer.complete();
             this.observer = null;

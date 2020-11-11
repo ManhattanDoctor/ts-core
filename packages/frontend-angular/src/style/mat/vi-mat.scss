@@ -246,8 +246,8 @@
     .text-one-line {
         @include text-one-line();
     }
-    .word-wrap-break {
-        @include word-wrap-break();
+    .text-word-wrap-break {
+        @include text-word-wrap-break();
     }
     .scroll-no {
         @include scroll-no();
@@ -255,9 +255,12 @@
     .scroll-auto {
         @include scroll-auto();
     }
+
+    .scroll-vertical,
     .vertical-scroll-only {
         @include vertical-scroll-only();
     }
+    .scroll-horizontal,
     .horizontal-scroll-only {
         @include horizontal-scroll-only();
     }

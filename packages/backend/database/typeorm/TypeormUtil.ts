@@ -31,7 +31,53 @@ export class TypeormUtil {
     //
     // --------------------------------------------------------------------------
 
-    private static applyConditions<U, T>(query: SelectQueryBuilder<U>, conditions: FilterableConditions<T>): SelectQueryBuilder<U> {
+    private static getConditionByType(item: FilterableConditionType): string {
+        switch (item) {
+            case FilterableConditionType.EQUAL:
+                return '=';
+            case FilterableConditionType.MORE:
+                return '>';
+            case FilterableConditionType.MORE_OR_EQUAL:
+                return '>=';
+            case FilterableConditionType.LESS:
+                return '<';
+            case FilterableConditionType.LESS_OR_EQUAL:
+                return '<=';
+            case FilterableConditionType.CONTAINS:
+            case FilterableConditionType.CONTAINS_SENSITIVE:
+                return 'like';
+            default:
+                throw new ExtendedError(`Invalid condition type ${item}`);
+        }
+    }
+
+    // --------------------------------------------------------------------------
+    //
+    //  Query Static Methods
+    //
+    // --------------------------------------------------------------------------
+
+    public static applyFilters<U, T>(query: SelectQueryBuilder<U>, filters: IFilterable<T>): SelectQueryBuilder<U> {
+        if (ObjectUtil.instanceOf(filters, ['conditions'])) {
+            TypeormUtil.applyConditions(query, filters.conditions);
+        }
+        if (ObjectUtil.instanceOf(filters, ['sort'])) {
+            TypeormUtil.applySort(query, filters.sort);
+        }
+        return query;
+    }
+
+    public static applySort<U, T>(query: SelectQueryBuilder<U>, sort: FilterableSort<T>): SelectQueryBuilder<U> {
+        if (_.isNil(sort)) {
+            return query;
+        }
+        for (let key of Object.keys(sort)) {
+            query.addOrderBy(`${query.alias}.${key}`, sort[key] ? 'ASC' : 'DESC', 'NULLS LAST');
+        }
+        return query;
+    }
+
+    public static applyConditions<U, T>(query: SelectQueryBuilder<U>, conditions: FilterableConditions<T>): SelectQueryBuilder<U> {
         if (_.isNil(conditions)) {
             return query;
         }
@@ -63,51 +109,6 @@ export class TypeormUtil {
         return query;
     }
 
-    private static getConditionByType(item: FilterableConditionType): string {
-        switch (item) {
-            case FilterableConditionType.EQUAL:
-                return '=';
-            case FilterableConditionType.MORE:
-                return '>';
-            case FilterableConditionType.MORE_OR_EQUAL:
-                return '>=';
-            case FilterableConditionType.LESS:
-                return '<';
-            case FilterableConditionType.LESS_OR_EQUAL:
-                return '<=';
-            case FilterableConditionType.CONTAINS:
-            case FilterableConditionType.CONTAINS_SENSITIVE:
-                return 'like';
-            default:
-                throw new ExtendedError(`Invalid condition type ${item}`);
-        }
-    }
-
-    private static applySort<U, T>(query: SelectQueryBuilder<U>, sort: FilterableSort<T>): SelectQueryBuilder<U> {
-        if (_.isNil(sort)) {
-            return query;
-        }
-        for (let key of Object.keys(sort)) {
-            query.addOrderBy(`${query.alias}.${key}`, sort[key] ? 'ASC' : 'DESC', 'NULLS LAST');
-        }
-        return query;
-    }
-
-    // --------------------------------------------------------------------------
-    //
-    //  Query Static Methods
-    //
-    // --------------------------------------------------------------------------
-
-    public static applyFilters<U, T>(query: SelectQueryBuilder<U>, params: IFilterable<T>): SelectQueryBuilder<U> {
-        if (ObjectUtil.instanceOf(params, ['conditions'])) {
-            TypeormUtil.applyConditions(query, params.conditions);
-        }
-        if (ObjectUtil.instanceOf(params, ['sort'])) {
-            TypeormUtil.applySort(query, params.sort);
-        }
-        return query;
-    }
 
     public static async toPagination<U, V, T>(
         query: SelectQueryBuilder<U>,
