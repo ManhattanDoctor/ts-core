@@ -246,6 +246,9 @@
     .text-one-line {
         @include text-one-line();
     }
+    .text-multi-line {
+        @include text-word-wrap-break();
+    }
     .text-word-wrap-break {
         @include text-word-wrap-break();
     }

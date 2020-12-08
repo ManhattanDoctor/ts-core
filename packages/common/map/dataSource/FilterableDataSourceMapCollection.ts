@@ -36,7 +36,7 @@ export abstract class FilterableDataSourceMapCollection<U, V = any> extends Data
     // --------------------------------------------------------------------------
 
     public async reload(): Promise<void> {
-        this._length = 0;
+        this.setLength(0);
         return super.reload();
     }
 

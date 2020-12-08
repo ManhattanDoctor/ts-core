@@ -1,19 +1,9 @@
-import {
-    NavigationCancel,
-    DefaultUrlSerializer,
-    NavigationEnd,
-    NavigationError,
-    NavigationExtras,
-    NavigationStart,
-    Router,
-    UrlSerializer,
-    UrlTree
-} from '@angular/router';
-import { DestroyableContainer, Loadable, LoadableStatus } from '@ts-core/common';
+import { NavigationCancel, NavigationEnd, NavigationError, NavigationExtras, NavigationStart, Router, UrlTree } from '@angular/router';
+import { Loadable, LoadableEvent, LoadableStatus } from '@ts-core/common';
 import { ObservableData } from '@ts-core/common/observer';
 import { NativeWindowService } from '@ts-core/frontend/service/NativeWindowService';
 import * as _ from 'lodash';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 export class RouterBaseService extends Loadable<void, void> {
@@ -29,7 +19,6 @@ export class RouterBaseService extends Loadable<void, void> {
     protected isNeedUpdateExtras: boolean = false;
 
     protected _lastUrl: string;
-    protected _isLoading: boolean = false;
 
     // --------------------------------------------------------------------------
     //
@@ -91,11 +80,22 @@ export class RouterBaseService extends Loadable<void, void> {
     protected commitStatusChangedProperties(oldStatus: LoadableStatus, newStatus: LoadableStatus): void {
         super.commitStatusChangedProperties(oldStatus, newStatus);
 
-        if (!this.isLoading && this.isNeedUpdateExtras) {
-            this.isNeedUpdateExtras = false;
-            this.applyExtras(this.extrasToApply);
+        switch (newStatus) {
+            case LoadableStatus.LOADING:
+                this.observer.next(new ObservableData(LoadableEvent.STARTED));
+                break;
+            case LoadableStatus.LOADED:
+                if (this.isNeedUpdateExtras) {
+                    this.isNeedUpdateExtras = false;
+                    this.applyExtras(this.extrasToApply);
+                }
+                this.observer.next(new ObservableData(LoadableEvent.COMPLETE));
+                break;
         }
-        //this.observer.next(new ObservableData(RouterBaseServiceEvent.LOADING_CHANGED));
+
+        if (newStatus === LoadableStatus.LOADED || newStatus === LoadableStatus.ERROR) {
+            this.observer.next(new ObservableData(LoadableEvent.FINISHED));
+        }
     }
 
     // --------------------------------------------------------------------------

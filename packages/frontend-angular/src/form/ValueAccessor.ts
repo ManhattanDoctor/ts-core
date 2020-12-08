@@ -56,7 +56,14 @@ export class ValueAccessor<T> extends Destroyable implements ControlValueAccesso
         this.touched.push(fn);
     }
 
-    public destroy(): void {}
+    public destroy(): void {
+        super.destroy();
+        if (this.isDestroyed) {
+            return;
+        }
+        this.changed = null;
+        this.touched = null;
+    }
 
     // --------------------------------------------------------------------------
     //

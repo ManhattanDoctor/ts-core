@@ -15,18 +15,7 @@ export class ClickToCopyDirective extends Destroyable {
 
     @Input('vi-click-to-copy')
     public element: HTMLElement;
-
     private selectionClearTimer: any;
-
-    // --------------------------------------------------------------------------
-    //
-    //  Constructor
-    //
-    // --------------------------------------------------------------------------
-
-    constructor() {
-        super();
-    }
 
     // --------------------------------------------------------------------------
     //
@@ -53,6 +42,11 @@ export class ClickToCopyDirective extends Destroyable {
     // --------------------------------------------------------------------------
 
     public destroy(): void {
+        super.destroy();
+        if (this.isDestroyed) {
+            return;
+        }
+
         this.element = null;
         clearTimeout(this.selectionClearTimer);
     }

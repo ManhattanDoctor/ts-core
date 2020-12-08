@@ -50,6 +50,10 @@ export class ThemeToggleDirective extends Destroyable {
     // --------------------------------------------------------------------------
 
     public destroy(): void {
+        super.destroy();
+        if (this.isDestroyed) {
+            return;
+        }
         this.theme = null;
     }
 }

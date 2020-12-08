@@ -4,6 +4,7 @@ import * as interact from 'interactjs';
 import { Destroyable } from '@ts-core/common';
 import { IWindow } from '../../window/IWindow';
 import { WindowDragable } from './WindowDragable';
+import * as _ from 'lodash';
 
 @Directive({
     selector: '[vi-window-drag-area]'
@@ -35,7 +36,11 @@ export class WindowDragAreaDirective extends Destroyable {
     // --------------------------------------------------------------------------
 
     public destroy(): void {
-        if (this._interactable) {
+        super.destroy();
+        if (this.isDestroyed) {
+            return;
+        }
+        if (!_.isNil(this._interactable)) {
             this._interactable.unset();
             this._interactable = null;
         }

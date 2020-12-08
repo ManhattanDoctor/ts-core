@@ -29,7 +29,6 @@ export class CdkTableDataSource<U> extends DestroyableContainer {
                 case LoadableEvent.COMPLETE:
                     this.parseResponse();
                     break;
-
                 case DataSourceMapCollectionEvent.DATA_LOADED_AND_PARSED:
                     this.parseParsedResponse();
                     break;

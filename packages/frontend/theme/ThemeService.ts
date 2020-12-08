@@ -67,15 +67,19 @@ export class ThemeService extends Destroyable {
     }
 
     public destroy(): void {
-        this._theme = null;
-        if (this.observer) {
+        super.destroy();
+        if (this.isDestroyed) {
+            return;
+        }
+        if (!_.isNil(this.observer)) {
             this.observer.complete();
             this.observer = null;
         }
-        if (this._themes) {
+        if (!_.isNil(this._themes)) {
             this._themes.destroy();
             this._themes = null;
         }
+        this._theme = null;
     }
 
     public getStyle<T>(name: string): T {

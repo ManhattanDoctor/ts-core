@@ -48,7 +48,7 @@ export class ThemeAssetDirective extends Destroyable implements OnInit {
     // --------------------------------------------------------------------------
 
     protected getSource(id: string): string {
-        if (!id) {
+        if (_.isNil(id)) {
             return null;
         }
         if (this.isImage) {
@@ -123,6 +123,11 @@ export class ThemeAssetDirective extends Destroyable implements OnInit {
     }
 
     public destroy(): void {
+        super.destroy();
+        if (this.isDestroyed) {
+            return;
+        }
+
         this.theme = null;
         this.element = null;
         if (this.subscription) {

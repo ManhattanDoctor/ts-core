@@ -57,7 +57,7 @@ export class LanguageService extends Loadable<LanguageTranslatorEvent, Language>
         }
 
         let language = this.languages.get(locale);
-        if (!language) {
+        if (_.isNil(language)) {
             throw new ExtendedError(`Can't find locale ${locale}`);
         }
 
@@ -73,7 +73,7 @@ export class LanguageService extends Loadable<LanguageTranslatorEvent, Language>
         items = items.filter(item => item.isComplete);
         if (_.isEmpty(items)) {
             this.status = LoadableStatus.ERROR;
-            this.observer.next(new ObservableData(LoadableEvent.ERROR, language, new ExtendedError(`Can't to load language: ${language.name}`)));
+            this.observer.next(new ObservableData(LoadableEvent.ERROR, language, new ExtendedError(`Unable to load language "${language.name}"`)));
             this.observer.next(new ObservableData(LoadableEvent.FINISHED, language));
             return;
         }

@@ -49,10 +49,16 @@ export class FocusManager extends Destroyable {
     }
 
     public destroy(): void {
-        this.element = null;
+        super.destroy();
+        if (this.isDestroyed) {
+            return;
+        }
+
         if (this.timer) {
             clearTimeout(this.timer);
             this.timer = null;
         }
+
+        this.element = null;
     }
 }

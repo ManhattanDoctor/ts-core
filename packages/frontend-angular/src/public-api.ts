@@ -70,6 +70,17 @@ export * from './component/window/WindowDragAreaDirective';
 export * from './component/window/WindowElement';
 export * from './component/window/WindowQuestionBaseComponent';
 export * from './component/window/WindowResizeable';
+export * from './component/cdk-table/CdkTableBaseComponent';
+export * from './component/cdk-table/CdkTableDataSource';
+export * from './component/cdk-table/CdkTablePaginableBookmarkMapCollection';
+export * from './component/cdk-table/CdkTablePaginableMapCollection';
+export * from './component/cdk-table/column/ICdkTableColumn';
+export * from './component/cdk-table/column/CdkTableColumnManager';
+export * from './component/cdk-table/column/cache/CdkTableColumnCache';
+export * from './component/cdk-table/column/cache/CdkTableColumnValueCache';
+export * from './component/cdk-table/column/cache/CdkTableColumnClassNameCache';
+export * from './component/cdk-table/column/cache/CdkTableColumnStyleNameCache';
+export * from './component/cdk-table/cdk-table-paginable/cdk-table-paginable.component';
 /* ======= */
 export * from './cookie/CookieModule';
 export * from './cookie/CookieOptions';

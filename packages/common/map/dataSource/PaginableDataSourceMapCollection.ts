@@ -23,6 +23,7 @@ export abstract class PaginableDataSourceMapCollection<U, V = any> extends Filte
     // --------------------------------------------------------------------------
 
     public reload(): Promise<void> {
+        this._pages = 0;
         this._pageIndex = 0;
         return super.reload();
     }
@@ -59,7 +60,7 @@ export abstract class PaginableDataSourceMapCollection<U, V = any> extends Filte
     }
 
     protected isAbleToLoad(): boolean {
-        if (this.pageIndex > this.pages - 1) {
+        if (this.pages > 0 && this.pageIndex > this.pages - 1) {
             return false;
         }
         return !this.isLoading;
@@ -67,10 +68,6 @@ export abstract class PaginableDataSourceMapCollection<U, V = any> extends Filte
 
     protected checkIsAllLoaded(response: IPagination<V>, items: Array<any>): void {
         this._isAllLoaded = this.pageIndex >= this.pages - 1 || this.pageSize > items.length;
-    }
-
-    protected isNeedClearAfterLoad(response: IPagination<V>): boolean {
-        return true;
     }
 
     // --------------------------------------------------------------------------

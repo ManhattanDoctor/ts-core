@@ -11,7 +11,6 @@ export abstract class IWindow<T = any> extends Destroyable {
     // --------------------------------------------------------------------------
 
     abstract close(): void;
-    abstract destroy(): void;
 
     abstract blink(): void;
     abstract shake(): void;

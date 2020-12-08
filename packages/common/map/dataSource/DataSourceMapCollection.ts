@@ -183,6 +183,10 @@ export abstract class DataSourceMapCollection<U, V = any> extends DestroyableMap
         return this._isDirty;
     }
 
+    public get isClear(): boolean {
+        return !this.isDirty;
+    }
+
     public get isAllLoaded(): boolean {
         return this._isAllLoaded;
     }

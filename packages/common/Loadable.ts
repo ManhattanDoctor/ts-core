@@ -3,6 +3,7 @@ import { DestroyableContainer } from './DestroyableContainer';
 import { ObservableData } from './observer';
 import { filter, map } from 'rxjs/operators';
 import { ExtendedError } from './error';
+import * as _ from 'lodash';
 
 export abstract class Loadable<U = any, V = any> extends DestroyableContainer {
     // --------------------------------------------------------------------------
@@ -33,7 +34,7 @@ export abstract class Loadable<U = any, V = any> extends DestroyableContainer {
     // --------------------------------------------------------------------------
 
     protected commitStatusChangedProperties(oldStatus: LoadableStatus, newStatus: LoadableStatus): void {
-        this.observer.next(new ObservableData(LoadableEvent.STATUS_CHANGED));
+        this.observer.next(new ObservableData(LoadableEvent.STATUS_CHANGED, { oldStatus, newStatus } as any));
     }
 
     // --------------------------------------------------------------------------
@@ -44,8 +45,8 @@ export abstract class Loadable<U = any, V = any> extends DestroyableContainer {
 
     public destroy(): void {
         super.destroy();
-        
-        if (this.observer) {
+
+        if (!_.isNil(this.observer)) {
             this.observer.complete();
             this.observer = null;
         }
@@ -60,6 +61,7 @@ export abstract class Loadable<U = any, V = any> extends DestroyableContainer {
     protected get status(): LoadableStatus {
         return this._status;
     }
+
     protected set status(value: LoadableStatus) {
         if (value === this._status) {
             return;
@@ -78,10 +80,17 @@ export abstract class Loadable<U = any, V = any> extends DestroyableContainer {
         return this.observer.asObservable();
     }
 
+    public get started(): Observable<V> {
+        return this.events.pipe(
+            filter(item => item.type === LoadableEvent.STARTED),
+            map(item => item.data as V)
+        );
+    }
+
     public get completed(): Observable<V> {
         return this.events.pipe(
             filter(item => item.type === LoadableEvent.COMPLETE),
-            map(item => item.data)
+            map(item => item.data as V)
         );
     }
 
@@ -89,6 +98,20 @@ export abstract class Loadable<U = any, V = any> extends DestroyableContainer {
         return this.events.pipe(
             filter(item => item.type === LoadableEvent.ERROR),
             map(item => item.error)
+        );
+    }
+
+    public get finished(): Observable<V> {
+        return this.events.pipe(
+            filter(item => item.type === LoadableEvent.FINISHED),
+            map(item => item.data as V)
+        );
+    }
+
+    public get statusChanged(): Observable<ILoadableStatusChangeData> {
+        return this.events.pipe(
+            filter(item => item.type === LoadableEvent.STATUS_CHANGED),
+            map(item => item.data as any)
         );
     }
 
@@ -107,6 +130,11 @@ export abstract class Loadable<U = any, V = any> extends DestroyableContainer {
 }
 
 export interface ILoadable {}
+
+export interface ILoadableStatusChangeData {
+    oldStatus: LoadableStatus;
+    newStatus: LoadableStatus;
+}
 
 export enum LoadableEvent {
     ERROR = 'ERROR',

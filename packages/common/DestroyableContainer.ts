@@ -1,30 +1,18 @@
 import * as _ from 'lodash';
 import { Observable, Subject, Subscription } from 'rxjs';
+import { Destroyable } from './Destroyable';
 import { IDestroyable } from './IDestroyable';
 import { ArrayUtil } from './util';
 
-export class DestroyableContainer extends IDestroyable {
+export class DestroyableContainer extends Destroyable {
     // --------------------------------------------------------------------------
     //
     //  Properties
     //
     // --------------------------------------------------------------------------
 
-    private _destroyed: Subject<void>;
-
     private destroyables: Array<IDestroyable>;
     private subscriptions: Array<Subscription>;
-
-    // --------------------------------------------------------------------------
-    //
-    //  Constructor
-    //
-    // --------------------------------------------------------------------------
-
-    constructor() {
-        super();
-        this._destroyed = new Subject();
-    }
 
     // --------------------------------------------------------------------------
     //
@@ -76,6 +64,7 @@ export class DestroyableContainer extends IDestroyable {
     }
 
     public destroy(): void {
+        super.destroy();
         if (this.isDestroyed) {
             return;
         }
@@ -88,25 +77,7 @@ export class DestroyableContainer extends IDestroyable {
             _.forEach(this.destroyables, item => item.destroy());
         }
 
-        this._destroyed.next();
-        this._destroyed.complete();
-        this._destroyed = null;
-
         this.destroyables = null;
         this.subscriptions = null;
-    }
-
-    // --------------------------------------------------------------------------
-    //
-    //  Public Properties
-    //
-    // --------------------------------------------------------------------------
-
-    public get destroyed(): Observable<void> {
-        return !_.isNil(this._destroyed) ? this._destroyed.asObservable() : null;
-    }
-
-    public get isDestroyed(): boolean {
-        return !_.isNil(this._destroyed) ? this._destroyed.closed : true;
     }
 }

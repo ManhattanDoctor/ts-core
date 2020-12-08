@@ -80,6 +80,11 @@ export class QuestionManager extends Destroyable implements IQuestion {
     // --------------------------------------------------------------------------
 
     public destroy(): void {
+        super.destroy();
+        if (this.isDestroyed) {
+            return;
+        }
+
         this.notClickHandler();
         this._yesNotPromise = null;
         this._closePromise = null;

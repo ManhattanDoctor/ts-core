@@ -93,6 +93,7 @@ body {
     mat-accordion {
         .mat-expansion-panel {
             background: transparent;
+            border-radius: 0;
             border-bottom: 1px solid map-get($foreground, divider);
             &:last-child {
                 border-bottom: none;

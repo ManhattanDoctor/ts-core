@@ -1,9 +1,10 @@
 import { MatPaginatorIntl } from '@angular/material';
-import { LoadableEvent } from '@ts-core/common';
 import { LanguageService } from '@ts-core/frontend/language';
 import { Subscription } from 'rxjs';
+import { OnDestroy } from '@angular/core';
+import * as _ from 'lodash';
 
-export class LanguageMatPaginatorIntl extends MatPaginatorIntl {
+export class LanguageMatPaginatorIntl extends MatPaginatorIntl implements OnDestroy {
     // --------------------------------------------------------------------------
     //
     //	Properties
@@ -16,7 +17,7 @@ export class LanguageMatPaginatorIntl extends MatPaginatorIntl {
     public previousPageLabel: string;
     public itemsPerPageLabel: string;
 
-    private subscription: Subscription;
+    protected subscription: Subscription;
 
     // --------------------------------------------------------------------------
     //
@@ -24,13 +25,11 @@ export class LanguageMatPaginatorIntl extends MatPaginatorIntl {
     //
     // --------------------------------------------------------------------------
 
-    constructor(private language: LanguageService) {
+    constructor(protected language: LanguageService) {
         super();
 
         this.commitLanguageProperties();
-        this.subscription = this.language.completed.subscribe(() => {
-            this.commitLanguageProperties();
-        });
+        this.subscription = this.language.completed.subscribe(() => this.commitLanguageProperties());
     }
 
     // --------------------------------------------------------------------------
@@ -39,18 +38,18 @@ export class LanguageMatPaginatorIntl extends MatPaginatorIntl {
     //
     // --------------------------------------------------------------------------
 
-    private commitLanguageProperties(): void {
-        this.lastPageLabel = this.language.translate('general.lastPage');
-        this.nextPageLabel = this.language.translate('general.nextPage');
-        this.firstPageLabel = this.language.translate('general.firstPage');
-        this.previousPageLabel = this.language.translate('general.previousPage');
-        this.itemsPerPageLabel = this.language.translate('general.itemsPerPage');
+    protected commitLanguageProperties(): void {
+        this.lastPageLabel = this.language.translate('paginator.lastPage');
+        this.nextPageLabel = this.language.translate('paginator.nextPage');
+        this.firstPageLabel = this.language.translate('paginator.firstPage');
+        this.previousPageLabel = this.language.translate('paginator.previousPage');
+        this.itemsPerPageLabel = this.language.translate('paginator.itemsPerPage');
         this.getRangeLabel = this.languageRangeLabel;
     }
 
-    private languageRangeLabel = (page: number, pageSize: number, length: number): string => {
+    protected languageRangeLabel = (page: number, pageSize: number, length: number): string => {
         let translation = { current: '0', total: '0' };
-        if (length == 0 || pageSize == 0) {
+        if (length === 0 || pageSize === 0) {
             translation.total = length.toString();
         } else {
             length = Math.max(length, 0);
@@ -59,7 +58,7 @@ export class LanguageMatPaginatorIntl extends MatPaginatorIntl {
             translation.current = `${startIndex + 1} – ${endIndex}`;
             translation.total = length.toString();
         }
-        return this.language.translate('general.pageRange', translation);
+        return this.language.translate('paginator.pageRange', translation);
     };
 
     // --------------------------------------------------------------------------
@@ -69,7 +68,7 @@ export class LanguageMatPaginatorIntl extends MatPaginatorIntl {
     // --------------------------------------------------------------------------
 
     public ngOnDestroy(): void {
-        if (this.subscription) {
+        if (!_.isNil(this.subscription)) {
             this.subscription.unsubscribe();
             this.subscription = null;
         }

@@ -1,6 +1,5 @@
 {
-    "general":
-    {
+    "general": {
         "footer": "<a href='https://coin.monitor' target='_blank' tabindex='-1'>Coin Monitor</a> © 2018"
     },
     "tab": {
@@ -20,22 +19,20 @@
         "test": "Тесты"
     },
     "user": {
-        "createdDate":"Создан",
-        "account":
-        {
-            "FREE":"Бесплатный",
-            "PROTOTYPE":"Простой",
-            "PRODUCTION":"Профессиональный",
-            "VIP":"Особый",
-            "ADMINISTRATOR":"Администратор"
+        "createdDate": "Создан",
+        "account": {
+            "FREE": "Бесплатный",
+            "PROTOTYPE": "Простой",
+            "PRODUCTION": "Профессиональный",
+            "VIP": "Особый",
+            "ADMINISTRATOR": "Администратор"
         },
-        "limit":
-        {
-            "limit":"Лимиты аккаунта",
-            "webhookAddresses":"{current} из {max} адресов на прослушке",
-            "webhookTransactions":"{current} из {max} транзакций на прослушке",
-            "requestsDay":"{current} из {max} запросов в сутках ",
-            "requestsHour":"{current} из {max} запросов в час"
+        "limit": {
+            "limit": "Лимиты аккаунта",
+            "webhookAddresses": "{current} из {max} адресов на прослушке",
+            "webhookTransactions": "{current} из {max} транзакций на прослушке",
+            "requestsDay": "{current} из {max} запросов в сутках ",
+            "requestsHour": "{current} из {max} запросов в час"
         },
         "status": {
             "status": "Статус",
@@ -50,13 +47,13 @@
         }
     },
     "extra": {
-        "balance":"Баланс",
-        "nonce":"Нонс",
-        "transaction":"Транзакция",
-        "rawTransaction":"Сырая транзакция",
-        "address":"Адрес",
-        "blockParse":"Парсинг блоков",
-        "blockParseNotification":"Блок успешно отправлен на парсинг"
+        "balance": "Баланс",
+        "nonce": "Нонс",
+        "transaction": "Транзакция",
+        "rawTransaction": "Сырая транзакция",
+        "address": "Адрес",
+        "blockParse": "Парсинг блоков",
+        "blockParseNotification": "Блок успешно отправлен на парсинг"
     },
     "coin": {
         "name": "Название",
@@ -77,29 +74,28 @@
         },
 
         "coin": {
-            "ETH":"Ethereum",
-            "ETC":"Ethereum Classic",
-            "BTC":"Bitcoin",
-            "LTC":"Litecoin",
-            "XRP":"Ripple",
-            "USDC":"USD Coin",
-            "TETHER_USD":"Tether USD",
-            "TRUE_USD":"True USD"
+            "ETH": "Ethereum",
+            "ETC": "Ethereum Classic",
+            "BTC": "Bitcoin",
+            "LTC": "Litecoin",
+            "XRP": "Ripple",
+            "USDC": "USD Coin",
+            "TETHER_USD": "Tether USD",
+            "TRUE_USD": "True USD"
         },
         "block": {
-            "block":"Блок",
-            "last":"Последний блок",
-            "createdDate":"Создан",
-            "parsedDate":"Разобран",
-            "addresses":"Адресов",
-            "transactions":"Транзакций",
-            "description":"В <b>списке поддерживаемых валют</b> вы можете видеть синхронизацию наших мониторов с различными блокчейнами и время обработки последних блоков"
+            "block": "Блок",
+            "last": "Последний блок",
+            "createdDate": "Создан",
+            "parsedDate": "Разобран",
+            "addresses": "Адресов",
+            "transactions": "Транзакций",
+            "description": "В <b>списке поддерживаемых валют</b> вы можете видеть синхронизацию наших мониторов с различными блокчейнами и время обработки последних блоков"
         },
-        "status":
-        {
+        "status": {
             "status": "Статус",
-            "ACTIVE":"Активен",
-            "NON_ACTIVE":"Не активна"
+            "ACTIVE": "Активен",
+            "NON_ACTIVE": "Не активна"
         }
     },
     "webhook": {
@@ -113,13 +109,12 @@
         "isRemoveIfExist": "Перезаписать если уже существует?",
         "address": "Адрес",
         "transaction": "Транзакция",
-        "requiredConfirmations":"Необходимо подтверждений",
+        "requiredConfirmations": "Необходимо подтверждений",
         "callbackUrl": "Колбек",
         "addedNotification": "Колбек успешно добавлен",
         "removeConfirmation": "Вы уверены что хотите удалить колбек?",
         "removedNotification": "Колбек успешно удален",
-        "notification":
-        {
+        "notification": {
             "try": "Вызвать вручную",
             "tryConfirmation": "Вы уверены что хотите вручную вызывать колбек?",
             "triedNotification": "Колбек был успешно вызван",
@@ -131,13 +126,12 @@
             "blockHeight": "Высота блока",
             "details": "Детализация",
             "notificatedDate": "Уведомление",
-            "status":
-            {
+            "status": {
                 "status": "Статус",
-                "ACTIVE":"Активен",
-                "PENDING":"В процессе",
-                "ERROR":"Ошибка",
-                "COMPLETE":"Завершен"
+                "ACTIVE": "Активен",
+                "PENDING": "В процессе",
+                "ERROR": "Ошибка",
+                "COMPLETE": "Завершен"
             }
         }
     },

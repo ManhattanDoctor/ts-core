@@ -17,7 +17,5 @@ export interface ILanguageTranslatorItem<T = any> {
 }
 
 export enum LanguageTranslatorEvent {
-    INVALID_KEY = 'INVALID_KEY',
-    INVALID_LOCALE = 'INVALID_LOCALE',
-    COMPILE_ERROR = 'COMPILE_ERROR'
+    INVALID_DATA = 'INVALID_DATA'
 }

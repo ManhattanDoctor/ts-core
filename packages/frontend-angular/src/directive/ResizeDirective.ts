@@ -68,6 +68,11 @@ export class ResizeDirective extends Destroyable {
     // --------------------------------------------------------------------------
 
     public destroy(): void {
+        super.destroy();
+        if (this.isDestroyed) {
+            return;
+        }
+
         if (this.interactable) {
             this.interactable.unset();
             this.interactable = null;

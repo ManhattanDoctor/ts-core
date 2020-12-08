@@ -86,7 +86,7 @@ export abstract class UserBaseService<U extends IUser = any, V = void> {
             return;
         }
         this.user.update(data);
-        this.observer.next(new ObservableData(UserBaseServiceEvent.CHANGED));
+        this.observer.next(new ObservableData(UserBaseServiceEvent.CHANGED, data));
     }
 
     // --------------------------------------------------------------------------
@@ -102,6 +102,13 @@ export abstract class UserBaseService<U extends IUser = any, V = void> {
     public get logined(): Observable<U> {
         return this.events.pipe(
             filter(item => item.type === UserBaseServiceEvent.LOGINED),
+            map(item => item.data)
+        );
+    }
+
+    public get changed(): Observable<any> {
+        return this.events.pipe(
+            filter(item => item.type === UserBaseServiceEvent.CHANGED),
             map(item => item.data)
         );
     }

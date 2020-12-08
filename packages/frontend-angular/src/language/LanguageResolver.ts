@@ -1,7 +1,6 @@
 import { Resolve } from '@angular/router';
 import { LoadableEvent } from '@ts-core/common';
 import { LanguageService } from '@ts-core/frontend/language';
-import { Subscription } from 'rxjs';
 import { PromiseHandler } from '@ts-core/common/promise';
 
 export class LanguageResolver implements Resolve<void> {

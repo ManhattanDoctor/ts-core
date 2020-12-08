@@ -51,6 +51,25 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
         return !_.isNil(item.params) ? `${item.key}_${JSON.stringify(ObjectUtil.sortKeys(item.params))}` : item.key;
     }
 
+    private validate(item: ILanguageTranslatorItem): string {
+        let text = null;
+        try {
+            if (_.isNil(this.locale)) {
+                throw `Locale is undefined`;
+            }
+            if (_.isNil(item.key)) {
+                throw `Key is undefined`;
+            }
+            if (!_.isString(item.key)) {
+                throw `Key must be string`;
+            }
+        } catch (message) {
+            text = message;
+            this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_DATA, null, new ExtendedError(message, null, item)));
+        }
+        return text;
+    }
+
     // --------------------------------------------------------------------------
     //
     // 	Public Methods
@@ -58,22 +77,18 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
     // --------------------------------------------------------------------------
 
     public translate(item: ILanguageTranslatorItem): string {
-        let { key, params } = item;
-        if (_.isNil(key)) {
-            this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_KEY, new ExtendedError(`Key is undefined`, null, key)));
-            return null;
-        }
-        if (_.isNil(this.locale)) {
-            this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_LOCALE, new ExtendedError(`Locale is undefined`, null, key)));
-            return key;
-        }
-
-        let uniqueKey = this.getUniqueKey(item);
-        let text = this.locale.translations.get(uniqueKey);
+        let text = this.validate(item);
         if (!_.isNil(text)) {
             return text;
         }
 
+        let uniqueKey = this.getUniqueKey(item);
+        text = this.locale.translations.get(uniqueKey);
+        if (!_.isNil(text)) {
+            return text;
+        }
+
+        let { key, params } = item;
         if (this.isHasTranslation(key)) {
             text = this.locale.translate(key, params);
             let link = this.getLink(text);
@@ -88,12 +103,8 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
     }
 
     public compile(item: ILanguageTranslatorItem): string {
-        let { key, params } = item;
-        if (_.isNil(key)) {
-            this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_KEY, new ExtendedError(`Key is undefined`, null, key)));
-            return null;
-        }
-        return this.locale.compile(key, params);
+        let text = this.validate(item);
+        return !_.isNil(text) ? text : this.locale.compile(item.key, item.params);
     }
 
     public setLocale(locale: string, rawTranslation: any): void {
@@ -155,13 +166,13 @@ export class LocaleContainer extends IDestroyable {
     }
 
     public isHasTranslation(key: string): boolean {
-        return _.hasIn(this.rawTranslation, key);
+        return _.isString(_.get(this.rawTranslation, key));
     }
 
     public destroy(): void {
         this.locale = null;
         this.formatter = null;
-        if (this.translations) {
+        if (!_.isNil(this.translations)) {
             this.translations.clear();
             this.translations = null;
         }

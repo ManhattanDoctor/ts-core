@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
+import { DestroyableContainer } from '@ts-core/common';
 import { LanguageService } from '@ts-core/frontend/language';
 import { takeUntil } from 'rxjs/operators';
+import * as _ from 'lodash';
 
 @Pipe({
     name: 'viTranslate',
@@ -26,9 +27,7 @@ export class LanguagePipe extends DestroyableContainer implements PipeTransform 
 
     constructor(private language: LanguageService) {
         super();
-        language.completed.pipe(takeUntil(this.destroyed)).subscribe(() => {
-            this.updateValue();
-        });
+        language.completed.pipe(takeUntil(this.destroyed)).subscribe(this.valueUpdate);
     }
 
     // --------------------------------------------------------------------------
@@ -37,9 +36,9 @@ export class LanguagePipe extends DestroyableContainer implements PipeTransform 
     //
     // --------------------------------------------------------------------------
 
-    private updateValue(): void {
+    private valueUpdate = (): void => {
         this._value = this.language.translate(this.key, this.params);
-    }
+    };
 
     // --------------------------------------------------------------------------
     //
@@ -50,9 +49,18 @@ export class LanguagePipe extends DestroyableContainer implements PipeTransform 
     public transform(key: string, params?: any): string {
         this.key = key;
         this.params = params;
-        if (!this._value) {
-            this.updateValue();
+        if (_.isNil(this._value)) {
+            this.valueUpdate();
         }
         return this._value;
+    }
+
+    public destroy(): void {
+        super.destroy();
+        if (this.isDestroyed) {
+            return;
+        }
+        this.key = null;
+        this.params = null;
     }
 }

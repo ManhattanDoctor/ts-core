@@ -1,6 +1,6 @@
 {
     "name": "@ts-core/frontend-angular",
-    "version": "8.0.63",
+    "version": "8.0.75",
     "description": "Classes and utils for frontend based on angular",
     "main": "public-api.js",
     "author": {
@@ -22,8 +22,8 @@
         "@angular/platform-browser-dynamic": "8.2.14",
         "@angular/platform-server": "8.2.14",
         "@angular/router": "8.2.14",
-        "@ts-core/common": "^1.0.67",
-        "@ts-core/frontend": "^1.0.22",
+        "@ts-core/common": "^1.0.127",
+        "@ts-core/frontend": "^1.0.29",
         "@types/numeral": "0.0.25",
         "bootstrap": "4.3.1",
         "css-element-queries": "1.2.0",

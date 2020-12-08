@@ -107,6 +107,11 @@ export class ScrollDirective extends Destroyable {
     // --------------------------------------------------------------------------
 
     public destroy(): void {
+        super.destroy();
+        if (this.isDestroyed) {
+            return;
+        }
+
         this.element = null;
         this.isInitialized = false;
 

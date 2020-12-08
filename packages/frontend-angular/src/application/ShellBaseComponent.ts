@@ -1,21 +1,16 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { DestroyableContainer, LoadableEvent } from '@ts-core/common';
+import { DestroyableContainer } from '@ts-core/common';
 import * as _ from 'lodash';
 import { filter, takeUntil } from 'rxjs/operators';
-import { ISelectListItem } from '../list/select/ISelectListItem';
-import { SelectListItems } from '../list/select/SelectListItems';
 import { NotificationConfig } from '../notification/NotificationConfig';
 import { NotificationService, NotificationServiceEvent } from '../notification/NotificationService';
-import { RouterBaseService } from '../service/RouterBaseService';
 
-export abstract class ShellBaseComponent extends DestroyableContainer {
+export class ShellBaseComponent extends DestroyableContainer {
     // --------------------------------------------------------------------------
     //
     // 	Properties
     //
     // --------------------------------------------------------------------------
-
-    public menu: SelectListItems<ISelectListItem>;
 
     public isNeedSide: boolean = false;
     public isHasNotifications: boolean = false;
@@ -29,7 +24,7 @@ export abstract class ShellBaseComponent extends DestroyableContainer {
     //
     // --------------------------------------------------------------------------
 
-    constructor(public router: RouterBaseService, public notifications: NotificationService, public breakpointObserver: BreakpointObserver) {
+    constructor(public notifications: NotificationService, public breakpointObserver: BreakpointObserver) {
         super();
     }
 
@@ -42,7 +37,6 @@ export abstract class ShellBaseComponent extends DestroyableContainer {
     protected initialize(): void {
         // Notifications
         this.isHasNotificationsCheck();
-
         this.notifications.events
             .pipe(
                 filter(data => data.type === NotificationServiceEvent.CLOSED || data.type === NotificationServiceEvent.REMOVED),
@@ -50,23 +44,12 @@ export abstract class ShellBaseComponent extends DestroyableContainer {
             )
             .subscribe(() => this.isHasNotificationsCheck());
 
-        // Routing
-        this.router.completed.pipe(takeUntil(this.destroyed)).subscribe(() => this.routingChanged());
-
         // Menu Size
         this.isNeedSideCheck();
         this.breakpointObserver
             .observe(this.sideMediaQueryToCheck)
             .pipe(takeUntil(this.destroyed))
             .subscribe(() => this.isNeedSideCheck());
-
-        this.initializeMenu();
-    }
-
-    protected abstract initializeMenu(): void;
-
-    protected routingChanged(): void {
-        this.menu.refresh();
     }
 
     protected isHasNotificationsCheck(): void {
@@ -95,10 +78,6 @@ export abstract class ShellBaseComponent extends DestroyableContainer {
 
     public toggleNotifications(): void {
         this.isShowNotifications = !this.isShowNotifications;
-    }
-
-    public destroy(): void {
-        super.destroy();
     }
 
     // --------------------------------------------------------------------------

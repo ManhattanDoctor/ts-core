@@ -56,16 +56,8 @@ export abstract class PaginableBookmarkDataSourceMapCollection<U, V> extends Fil
         return !_.isNil(response) ? response.items : null;
     }
 
-    protected isAbleToLoad(): boolean {
-        return !this.isLoading && !this.isAllLoaded;
-    }
-
     protected checkIsAllLoaded(response: IPaginationBookmark<V>, items: Array<any>): void {
         this._isAllLoaded = this.isAllLoaded || this.pageSize > items.length;
-    }
-
-    protected isNeedClearAfterLoad(response: IPaginationBookmark<V>): boolean {
-        return this.isReloadRequest;
     }
 
     protected commitDetailsProperties(): void {}
