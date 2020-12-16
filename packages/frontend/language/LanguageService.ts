@@ -40,8 +40,8 @@ export class LanguageService extends Loadable<LanguageTranslatorEvent, Language>
         this._translator = new LanguageTranslator();
 
         this.addDestroyable(this.translator);
-        this.translator.events.pipe(takeUntil(this.destroyed)).subscribe(data => {
-            this.observer.next(new ObservableData(data.type, this.language, data.error));
+        this.translator.events.pipe(takeUntil(this.destroyed)).subscribe(event => {
+            this.observer.next(new ObservableData(event.type, this.language, event.error));
         });
     }
 

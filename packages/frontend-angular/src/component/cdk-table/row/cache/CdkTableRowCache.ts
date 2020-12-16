@@ -1,7 +1,7 @@
 import { IDestroyable } from '@ts-core/common';
 import * as _ from 'lodash';
 
-export abstract class CdkTableCache<U, V> extends Map<string, V> implements IDestroyable {
+export abstract class CdkTableRowCache<U, V> extends Map<string, V> implements IDestroyable {
     // --------------------------------------------------------------------------
     //
     // 	Properties

@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
-import { FilterableConditions, FilterableSort, IFilterable } from '../../dto/IFilterable';
+import { Filterable } from '../../dto/Filterable';
+import { FilterableConditions, FilterableSort, IFilterable, IsFilterableCondition } from '../../dto/IFilterable';
 import { DataSourceMapCollection } from './DataSourceMapCollection';
 
 export abstract class FilterableDataSourceMapCollection<U, V = any> extends DataSourceMapCollection<U, V> {
@@ -20,13 +21,45 @@ export abstract class FilterableDataSourceMapCollection<U, V = any> extends Data
 
     protected createRequestData(): IFilterable<U> {
         let data: IFilterable<U> = {};
-        if (!_.isEmpty(this.sort)) {
-            data.sort = this.sort;
+        let sort = this.createSortForRequest(this.sort);
+        let conditions = this.createConditionsForRequest(this.conditions);
+        if (!_.isEmpty(sort)) {
+            data.sort = sort;
         }
-        if (!_.isEmpty(this.conditions)) {
-            data.conditions = this.conditions;
+        if (!_.isEmpty(conditions)) {
+            data.conditions = conditions;
         }
         return data;
+    }
+
+    protected createSortForRequest(sort: FilterableSort<U>): FilterableSort<U> {
+        if (_.isEmpty(sort)) {
+            return null;
+        }
+        let item = _.cloneDeep(sort);
+        for (let pair of Object.entries(item)) {
+            if (Filterable.isValueInvalid(pair[1])) {
+                delete item[pair[0]];
+            }
+        }
+        return item;
+    }
+
+    protected createConditionsForRequest(conditions: FilterableConditions<U>): FilterableConditions<U> {
+        if (_.isEmpty(conditions)) {
+            return null;
+        }
+        let item = _.cloneDeep(conditions);
+        for (let pair of Object.entries(item)) {
+            let value = pair[1];
+            if (IsFilterableCondition(value)) {
+                value = value.value;
+            }
+            if (Filterable.isValueInvalid(value)) {
+                delete item[pair[0]];
+            }
+        }
+        return item;
     }
 
     // --------------------------------------------------------------------------
@@ -42,7 +75,6 @@ export abstract class FilterableDataSourceMapCollection<U, V = any> extends Data
 
     public destroy(): void {
         super.destroy();
-
         this._sort = null;
         this._conditions = null;
     }

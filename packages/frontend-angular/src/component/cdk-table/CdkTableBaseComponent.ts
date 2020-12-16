@@ -3,8 +3,14 @@ import { DestroyableContainer } from '@ts-core/common';
 import * as _ from 'lodash';
 import { ICdkTableColumn } from './column/ICdkTableColumn';
 import { CdkTablePaginableMapCollection } from './CdkTablePaginableMapCollection';
+import { CdkTableFilterableMapCollection } from './CdkTableFilterableMapCollection';
 
-export abstract class CdkTableBaseComponent<T extends CdkTablePaginableMapCollection<U, V>, U, V, S = ICdkTableSettings> extends DestroyableContainer {
+export abstract class CdkTableBaseComponent<
+    T extends CdkTablePaginableMapCollection<U, V> | CdkTableFilterableMapCollection<U, V>,
+    U,
+    V,
+    S = ICdkTableSettings
+> extends DestroyableContainer {
     // --------------------------------------------------------------------------
     //
     // 	Properties

@@ -1,6 +1,6 @@
 {
     "name": "@ts-core/common",
-    "version": "1.0.127",
+    "version": "1.0.140",
     "description": "Common classes and utils",
     "main": "index.js",
     "scripts": {},

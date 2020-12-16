@@ -23,6 +23,7 @@ import { SelectListComponent } from './select-list/select-list.component';
 import { TabGroupComponent } from './tab-group/tab-group.component';
 import { ResizeWindowElementComponent } from './window/resize-window-element/resize-window-element.component';
 import { CdkTablePaginableComponent } from './cdk-table/cdk-table-paginable/cdk-table-paginable.component';
+import { CdkTableFilterableComponent } from './cdk-table/cdk-table-filterable/cdk-table-filterable.component';
 
 const IMPORTS = [
     CommonModule,
@@ -39,7 +40,15 @@ const IMPORTS = [
     VICommonModule
 ];
 const ENTRY_COMPONENTS = [QuestionComponent, NotificationComponent, CloseWindowElementComponent, ResizeWindowElementComponent, MinimizeWindowElementComponent];
-const DECLARATIONS = [LanguageSelectorComponent, TabGroupComponent, MenuListComponent, SelectListComponent, CdkTablePaginableComponent, ...ENTRY_COMPONENTS];
+const DECLARATIONS = [
+    LanguageSelectorComponent,
+    TabGroupComponent,
+    MenuListComponent,
+    SelectListComponent,
+    CdkTablePaginableComponent,
+    CdkTableFilterableComponent,
+    ...ENTRY_COMPONENTS
+];
 const EXPORTS = [...DECLARATIONS];
 
 @NgModule({

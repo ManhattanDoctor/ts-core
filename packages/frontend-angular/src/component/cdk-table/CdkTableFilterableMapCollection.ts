@@ -1,34 +1,10 @@
 import { CdkTableDataSource } from './CdkTableDataSource';
-import { FilterableDataSourceMapCollection, PaginableDataSourceMapCollection } from '@ts-core/common/map/dataSource';
-import { PageEvent, SortDirection } from '@angular/material';
+import { FilterableDataSourceMapCollection } from '@ts-core/common/map/dataSource';
 import { CdkTableColumnManager } from './column/CdkTableColumnManager';
 import * as _ from 'lodash';
+import { CdkTablePaginableMapCollection, SortEvent } from './CdkTablePaginableMapCollection';
 
-export abstract class CdkTablePaginableMapCollection<U, V> extends PaginableDataSourceMapCollection<U, V> {
-    // --------------------------------------------------------------------------
-    //
-    // 	Static Methods
-    //
-    // --------------------------------------------------------------------------
-
-    public static sortEventHandler<U, V = any>(collection: FilterableDataSourceMapCollection<U, V>, event: SortEvent<U>): void {
-        for (let key of Object.keys(collection.sort)) {
-            delete collection.sort[key];
-        }
-
-        let value = undefined;
-        if (event.direction === 'asc') {
-            value = true;
-        } else if (event.direction === 'desc') {
-            value = false;
-        }
-
-        if (value === collection.sort[event.active]) {
-            return;
-        }
-        collection.sort[event.active] = value;
-        collection.load();
-    }
+export abstract class CdkTableFilterableMapCollection<U, V> extends FilterableDataSourceMapCollection<U, V> {
     // --------------------------------------------------------------------------
     //
     // 	Properties
@@ -68,12 +44,6 @@ export abstract class CdkTablePaginableMapCollection<U, V> extends PaginableData
         CdkTablePaginableMapCollection.sortEventHandler(this, event);
     }
 
-    public pageEventHandler(event: PageEvent): void {
-        this.pageIndex = event.pageIndex;
-        this.pageSize = event.pageSize;
-        this.load();
-    }
-
     // --------------------------------------------------------------------------
     //
     // 	Public Methods
@@ -110,9 +80,4 @@ export abstract class CdkTablePaginableMapCollection<U, V> extends PaginableData
     public get columns(): CdkTableColumnManager<U> {
         return this._columns;
     }
-}
-
-export interface SortEvent<U> {
-    active: keyof U;
-    direction: SortDirection;
 }

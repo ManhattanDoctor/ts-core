@@ -16,6 +16,7 @@ export class ListItems<U extends IListItem<V>, V = any> extends FilterableMapCol
     protected languageSubscription: Subscription;
 
     protected _isAllEnabled: boolean;
+    protected _isLeastOneEnabled: boolean;
 
     // --------------------------------------------------------------------------
     //
@@ -76,12 +77,14 @@ export class ListItems<U extends IListItem<V>, V = any> extends FilterableMapCol
         }
 
         this._isAllEnabled = true;
+        this._isLeastOneEnabled = false;
         for (let item of this._collection) {
             item.isEnabled = !_.isNil(item.checkEnabled) ? item.checkEnabled(item, ...params) : true;
             if (!item.isEnabled) {
                 this._isAllEnabled = false;
             } else if (this.filter(item)) {
                 this._filtered.push(item);
+                this._isLeastOneEnabled = true;
             }
         }
     }
@@ -112,5 +115,9 @@ export class ListItems<U extends IListItem<V>, V = any> extends FilterableMapCol
 
     public get isAllEnabled(): boolean {
         return this._isAllEnabled;
+    }
+
+    public get isLeastOneEnabled(): boolean {
+        return this._isLeastOneEnabled;
     }
 }

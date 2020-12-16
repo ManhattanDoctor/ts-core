@@ -17,5 +17,8 @@ export interface ILanguageTranslatorItem<T = any> {
 }
 
 export enum LanguageTranslatorEvent {
-    INVALID_DATA = 'INVALID_DATA'
+    KEY_INVALID = 'KEY_INVALID',
+    KEY_UNDEFINED = 'KEY_UNDEFINED',
+    KEY_NOT_FOUND = 'KEY_NOT_FOUND',
+    LOCALE_UNDEFINED = 'LOCALE_UNDEFINED'
 }

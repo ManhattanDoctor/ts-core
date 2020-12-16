@@ -4,7 +4,7 @@ import { CdkTablePaginableMapCollection } from '../CdkTablePaginableMapCollectio
 import { Component, Input } from '@angular/core';
 
 @Component({
-    selector: 'cdk-table-paginable',
+    selector: 'vi-cdk-table-paginable',
     templateUrl: 'cdk-table-paginable.component.html'
 })
 export class CdkTablePaginableComponent<U = any, V = any> extends CdkTableBaseComponent<CdkTablePaginableMapCollection<U, V>, U, V> {

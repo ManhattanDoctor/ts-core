@@ -5,7 +5,7 @@ import {
     IFilterable,
     IPaginable,
     IPagination,
-    isIFilterableCondition
+    IsFilterableCondition
 } from '@ts-core/common/dto';
 import { ExtendedError } from '@ts-core/common/error';
 import { PromiseHandler } from '@ts-core/common/promise';
@@ -90,7 +90,7 @@ export class TypeormUtil {
                 continue;
             }
 
-            if (!isIFilterableCondition(value)) {
+            if (!IsFilterableCondition(value)) {
                 query.andWhere(`${property} = :${key}`, { [key]: value });
                 continue;
             }
@@ -108,7 +108,6 @@ export class TypeormUtil {
         }
         return query;
     }
-
 
     public static async toPagination<U, V, T>(
         query: SelectQueryBuilder<U>,

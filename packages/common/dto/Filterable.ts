@@ -2,7 +2,7 @@ import { IsOptional } from 'class-validator';
 import * as _ from 'lodash';
 import { TraceUtil } from '../trace';
 import { DateUtil } from '../util';
-import { FilterableConditions, FilterableDataType, FilterableSort, IFilterable, IFilterableCondition, isIFilterableCondition } from './IFilterable';
+import { FilterableConditions, FilterableDataType, FilterableSort, IFilterable, IFilterableCondition, IsFilterableCondition } from './IFilterable';
 
 export class Filterable<U> implements IFilterable<U> {
     // --------------------------------------------------------------------------
@@ -25,6 +25,16 @@ export class Filterable<U> implements IFilterable<U> {
         return item;
     }
 
+    public static isValueInvalid(value: any): boolean {
+        if (_.isBoolean(value) || _.isNull(value)) {
+            return false;
+        }
+        if (_.isNumber(value)) {
+            return _.isNaN(value);
+        }
+        return _.isEmpty(value) || _.isUndefined(value);
+    }
+
     // --------------------------------------------------------------------------
     //
     //  Transform Methods
@@ -43,7 +53,7 @@ export class Filterable<U> implements IFilterable<U> {
 
     private static parse(value: any, transform: (item: any, key: string, value: any) => void): any {
         value = Filterable.check(value);
-        if (!value) {
+        if (_.isNil(value)) {
             return value;
         }
         for (let pair of Object.entries(value)) {
@@ -52,39 +62,29 @@ export class Filterable<U> implements IFilterable<U> {
         return value;
     }
 
-    private static transformCondition(item: any, key: string, value: any): void {
-        if (isIFilterableCondition(value)) {
+    public static transformCondition(item: any, key: string, value: any): void {
+        if (IsFilterableCondition(value)) {
             Filterable.transformFilterableCondition(item, key, value);
             return;
         }
-        if (Filterable.isConditionValueInvalid(value)) {
+        if (Filterable.isValueInvalid(value)) {
             delete item[key];
             return;
         }
     }
 
-    private static transformSort(item: any, key: string, value: any): void {
+    public static transformSort(item: any, key: string, value: any): void {
         return Filterable.transformCondition(item, key, value);
     }
 
     private static transformFilterableCondition(item: any, key: string, condition: IFilterableCondition): void {
-        if (Filterable.isConditionValueInvalid(condition.value)) {
+        if (Filterable.isValueInvalid(condition.value)) {
             delete item[key];
             return;
         }
         if (condition.type === FilterableDataType.DATE) {
             condition.value = DateUtil.getDate(condition.value);
         }
-    }
-
-    private static isConditionValueInvalid(value: any): boolean {
-        if (_.isBoolean(value)) {
-            return false;
-        }
-        if (_.isNumber(value)) {
-            return _.isNaN(value);
-        }
-        return _.isEmpty(value) || _.isNil(value);
     }
 
     // --------------------------------------------------------------------------

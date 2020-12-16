@@ -53,20 +53,22 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
 
     private validate(item: ILanguageTranslatorItem): string {
         let text = null;
-        try {
-            if (_.isNil(this.locale)) {
-                throw `Locale is undefined`;
-            }
-            if (_.isNil(item.key)) {
-                throw `Key is undefined`;
-            }
-            if (!_.isString(item.key)) {
-                throw `Key must be string`;
-            }
-        } catch (message) {
-            text = message;
-            this.observer.next(new ObservableData(LanguageTranslatorEvent.INVALID_DATA, null, new ExtendedError(message, null, item)));
+        let type = null;
+        if (_.isNil(this.locale)) {
+            text = `Locale is undefined`;
+            type = LanguageTranslatorEvent.LOCALE_UNDEFINED;
+        } else if (_.isNil(item.key)) {
+            text = `Key is undefined`;
+            type = LanguageTranslatorEvent.KEY_UNDEFINED;
+        } else if (!_.isString(item.key)) {
+            text = `Key must be string`;
+            type = LanguageTranslatorEvent.KEY_INVALID;
         }
+
+        if (!_.isNil(text)) {
+            this.observer.next(new ObservableData(type, null, new ExtendedError(text, null, item)));
+        }
+
         return text;
     }
 
@@ -97,6 +99,7 @@ export class LanguageTranslator extends DestroyableContainer implements ILanguag
             }
         } else {
             text = key;
+            this.observer.next(new ObservableData(LanguageTranslatorEvent.KEY_NOT_FOUND, null, new ExtendedError(text, null, item)));
         }
         this.locale.translations.set(uniqueKey, text);
         return text;

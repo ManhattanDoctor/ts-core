@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
-import { CdkTableCache } from './CdkTableCache';
+import { CdkTableRowCache } from './CdkTableRowCache';
 
-export class CdkTableRowClassNameCache<U> extends CdkTableCache<U, string> {
+export class CdkTableRowClassNameCache<U> extends CdkTableRowCache<U, string> {
     // --------------------------------------------------------------------------
     //
     // 	Protected Methods
@@ -9,6 +9,6 @@ export class CdkTableRowClassNameCache<U> extends CdkTableCache<U, string> {
     // --------------------------------------------------------------------------
 
     protected parseValue(item: U): string {
-        return !_.isNil(column.className) ? (_.isString(column.className) ? column.className : column.className(item, column)) : null;
+        return null;
     }
 }

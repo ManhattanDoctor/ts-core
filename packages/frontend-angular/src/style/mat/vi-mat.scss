@@ -95,7 +95,7 @@
 
         &.transparent {
             .mat-progress-bar-buffer {
-                background-color: transparent;
+                background-color: transparent !important;
             }
             svg {
                 display: none;

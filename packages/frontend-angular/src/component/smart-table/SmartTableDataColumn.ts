@@ -1,55 +1,8 @@
-import { FilterableConditionType, FilterableDataType, IFilterableCondition } from '@ts-core/common/dto';
-import { DateUtil, ObjectUtil } from '@ts-core/common/util';
+import { IFilterableCondition } from '@ts-core/common/dto';
+import { ObjectUtil } from '@ts-core/common/util';
 import * as _ from 'lodash';
 
 export class SmartTableDataColumn<U> {
-    // --------------------------------------------------------------------------
-    //
-    // 	Static Methods
-    //
-    // --------------------------------------------------------------------------
-
-    public static filterFunction(
-        value: string,
-        type: FilterableDataType = FilterableDataType.STRING,
-        condition: FilterableConditionType = FilterableConditionType.CONTAINS
-    ): IFilterableCondition {
-        if (_.isEmpty(value)) {
-            return { condition, value };
-        }
-
-        if (type === FilterableDataType.STRING) {
-            switch (condition) {
-                case FilterableConditionType.CONTAINS:
-                case FilterableConditionType.CONTAINS_SENSITIVE:
-                    value = `%${value}%`;
-                    break;
-            }
-            return { value, type, condition };
-        }
-
-        if (value.includes('=')) {
-            condition = FilterableConditionType.EQUAL;
-        } else if (value.includes('>')) {
-            condition = FilterableConditionType.MORE;
-        } else if (value.includes('<')) {
-            condition = FilterableConditionType.LESS;
-        }
-        value = value.replace(/[<=>]/g, '').trim();
-
-        switch (type) {
-            case FilterableDataType.NUMBER:
-                value = parseFloat(value) as any;
-                break;
-            case FilterableDataType.DATE:
-                let date = DateUtil.parseDate(value, '/');
-                value = !_.isNil(date) ? date.getTime().toString() : null;
-                break;
-        }
-
-        return { value, type, condition };
-    }
-
     //--------------------------------------------------------------------------
     //
     // 	Properties

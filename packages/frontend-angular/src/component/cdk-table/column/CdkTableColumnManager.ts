@@ -5,7 +5,6 @@ import { CdkTableColumnValueCache } from './cache/CdkTableColumnValueCache';
 import { CdkTableColumnStyleNameCache } from './cache/CdkTableColumnStyleNameCache';
 import { CdkTableColumnClassNameCache } from './cache/CdkTableColumnClassNameCache';
 
-
 export class CdkTableColumnManager<U> extends DestroyableContainer {
     // --------------------------------------------------------------------------
     //
@@ -18,6 +17,7 @@ export class CdkTableColumnManager<U> extends DestroyableContainer {
     protected _valueCache: CdkTableColumnValueCache<U>;
     protected _classNameCache: CdkTableColumnClassNameCache<U>;
     protected _styleNameCache: CdkTableColumnStyleNameCache<U>;
+    protected _headerStyleNameCache: CdkTableColumnStyleNameCache<U>;
 
     // --------------------------------------------------------------------------
     //
@@ -30,6 +30,7 @@ export class CdkTableColumnManager<U> extends DestroyableContainer {
         this._valueCache = new CdkTableColumnValueCache(uidPropertyName);
         this._classNameCache = new CdkTableColumnClassNameCache(uidPropertyName);
         this._styleNameCache = new CdkTableColumnStyleNameCache(uidPropertyName);
+        this._headerStyleNameCache = new CdkTableColumnStyleNameCache(uidPropertyName);
     }
 
     // --------------------------------------------------------------------------
@@ -58,8 +59,18 @@ export class CdkTableColumnManager<U> extends DestroyableContainer {
         return this.styleNameCache.getValue(item, column);
     }
 
+    public getHeaderStyle(item: U, column: ICdkTableColumn<U>): { [key: string]: string } {
+        return this.headerStyleNameCache.getValue(item, column);
+    }
+
     public trackBy(index: number, item: ICdkTableColumn<U>): keyof U {
         return item.name;
+    }
+
+    public clear(): void {
+        this.valueCache.clear();
+        this.classNameCache.clear();
+        this.styleNameCache.clear();
     }
 
     public destroy(): void {
@@ -76,6 +87,10 @@ export class CdkTableColumnManager<U> extends DestroyableContainer {
             this._styleNameCache.destroy();
             this._styleNameCache = null;
         }
+        if (!_.isNil(this._headerStyleNameCache)) {
+            this._headerStyleNameCache.destroy();
+            this._headerStyleNameCache = null;
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -90,6 +105,10 @@ export class CdkTableColumnManager<U> extends DestroyableContainer {
 
     public get styleNameCache(): CdkTableColumnStyleNameCache<U> {
         return this._styleNameCache;
+    }
+
+    public get headerStyleNameCache(): CdkTableColumnStyleNameCache<U> {
+        return this._headerStyleNameCache;
     }
 
     public get classNameCache(): CdkTableColumnClassNameCache<U> {

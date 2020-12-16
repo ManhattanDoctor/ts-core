@@ -52,9 +52,7 @@ export abstract class CdkTablePaginableBookmarkMapCollection<U, V> extends Pagin
 
     public clear(): void {
         super.clear();
-        this.columns.valueCache.clear();
-        this.columns.classNameCache.clear();
-        this.columns.styleNameCache.clear();
+        this.columns.clear();
     }
 
     public destroy(): void {

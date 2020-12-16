@@ -24,8 +24,3 @@
 
 <mat-progress-bar class="flex-shrink-0 border transparent" mode="indeterminate" *ngIf="table?.isLoading"
     style="margin-bottom: -1px;"></mat-progress-bar>
-
-<mat-paginator class="justify-content-center border-top" [pageSize]="table?.pageSize" [pageIndex]="table?.pageIndex" [length]="table?.total"
-    (page)="table?.pageEventHandler($event)"
-    [pageSizeOptions]="paginator?.pageSizes" [showFirstLastButtons]="paginator?.showFirstLastButtons" 
-    [hidePageSize]="paginator?.hidePageSize" *ngIf="paginator && table?.length > 0"></mat-paginator>
