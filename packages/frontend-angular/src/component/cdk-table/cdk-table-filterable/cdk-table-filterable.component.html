@@ -20,7 +20,7 @@
 
 </mat-table>
 
-<p class="p-3 text-center mouse-inactive" *ngIf="table?.length === 0" [innerHTML]="settings?.noDataId | viTranslate"></p>
+<p class="p-3 text-center mouse-inactive" *ngIf="!table?.isLoading && table?.length === 0" [innerHTML]="settings?.noDataId | viTranslate"></p>
 
 <mat-progress-bar class="flex-shrink-0 border transparent" mode="indeterminate" *ngIf="table?.isLoading"
     style="margin-bottom: -1px;"></mat-progress-bar>

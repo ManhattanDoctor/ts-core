@@ -43,7 +43,7 @@ export class DateUtil {
             return DateUtil.parseDate(value.split(splitter));
         }
         if (_.isArray(value)) {
-            if (value.length != 3) {
+            if (value.length !== 3) {
                 return null;
             }
             value = value.map(item => Number(item));

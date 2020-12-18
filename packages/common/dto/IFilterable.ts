@@ -42,7 +42,7 @@ export interface IFilterable<U> extends ITraceable {
 export interface IFilterableCondition<T = any, P extends keyof T = any> {
     condition: FilterableConditionType;
     type?: FilterableDataType;
-    value: T[P] | string;
+    value: T[P] | number | string;
 }
 
 // --------------------------------------------------------------------------
@@ -84,19 +84,17 @@ export const ToFilterableCondition = <T, P extends keyof T>(
         return { value, type, condition };
     }
 
-    condition = GetFilterableConditionType(value, defaultCondition);
-    value = RemoveFilterableCondition(value);
+    let item: string | number = RemoveFilterableCondition(value);
     switch (type) {
         case FilterableDataType.NUMBER:
-            value = parseFloat(value) as any;
+            item = Number(value);
             break;
         case FilterableDataType.DATE:
-            let date = DateUtil.parseDate(value, '/');
-            value = !_.isNil(date) ? date.getTime().toString() : null;
+            item = Date.parse(value);
             break;
     }
 
-    return { value, type, condition };
+    return { value: item, type, condition: GetFilterableConditionType(value, defaultCondition) };
 };
 
 export const GetFilterableCondition = (value: string): string => {

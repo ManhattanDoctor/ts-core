@@ -78,12 +78,18 @@ export class Filterable<U> implements IFilterable<U> {
     }
 
     private static transformFilterableCondition(item: any, key: string, condition: IFilterableCondition): void {
-        if (Filterable.isValueInvalid(condition.value)) {
+        let value = condition.value;
+        if (Filterable.isValueInvalid(value)) {
             delete item[key];
             return;
         }
         if (condition.type === FilterableDataType.DATE) {
-            condition.value = DateUtil.getDate(condition.value);
+            if (!_.isNumber(value)) {
+                value = parseInt(value, 10);
+            }
+            if (!_.isNaN(value)) {
+                condition.value = DateUtil.getDate(value);
+            }
         }
     }
 
