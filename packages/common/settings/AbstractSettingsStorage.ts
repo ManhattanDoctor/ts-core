@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { ILogger } from '../logger';
 import { ObjectUtil } from '../util';
 
 export abstract class AbstractSettingsStorage {
@@ -14,13 +15,6 @@ export abstract class AbstractSettingsStorage {
 
     public static parsePEM(value: string): string {
         return _.isString(value) ? value.replace(/\\n/gm, '\n') : value;
-    }
-
-    private static parseValue<T>(value: any, defaultValue: T): T {
-        if (!_.isNil(value) && _.isNumber(defaultValue)) {
-            return parseFloat(value.toString()) as any;
-        }
-        return value;
     }
 
     // --------------------------------------------------------------------------
@@ -52,12 +46,21 @@ export abstract class AbstractSettingsStorage {
         if (_.isNil(value) && ObjectUtil.hasOwnProperty(this.data, name)) {
             value = this.data[name];
         }
-
         if (_.isNil(value)) {
             value = defaultValue;
         }
+        return this.parseValue(value, defaultValue);
+    }
 
-        return AbstractSettingsStorage.parseValue(value, defaultValue);
+    protected getPrefferedValue<T>(name: string): T {
+        return null;
+    }
+
+    protected parseValue<T>(value: any, defaultValue: T): T {
+        if (!_.isNil(value) && _.isNumber(defaultValue)) {
+            return parseFloat(value.toString()) as any;
+        }
+        return value;
     }
 
     // --------------------------------------------------------------------------
@@ -70,11 +73,11 @@ export abstract class AbstractSettingsStorage {
 
     // --------------------------------------------------------------------------
     //
-    //  Protected Properties
+    //  Public Methods
     //
     // --------------------------------------------------------------------------
 
-    protected getPrefferedValue<T>(name: string): T {
-        return null;
+    public async validate(logger: ILogger): Promise<boolean> {
+        return true;
     }
 }

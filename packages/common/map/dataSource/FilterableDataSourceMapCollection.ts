@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { Filterable } from '../../dto/Filterable';
 import { FilterableConditions, FilterableSort, IFilterable, IsFilterableCondition } from '../../dto/IFilterable';
+import { ObjectUtil } from '../../util';
 import { DataSourceMapCollection } from './DataSourceMapCollection';
 
 export abstract class FilterableDataSourceMapCollection<U, V = any> extends DataSourceMapCollection<U, V> {
@@ -67,6 +68,20 @@ export abstract class FilterableDataSourceMapCollection<U, V = any> extends Data
     // 	Public Methods
     //
     // --------------------------------------------------------------------------
+
+    public conditionsSort(isLoadAfter: boolean = true): void {
+        ObjectUtil.clear(this.sort);
+        if (isLoadAfter) {
+            this.load();
+        }
+    }
+
+    public conditionsClear(isReloadAfter: boolean = true): void {
+        ObjectUtil.clear(this.conditions);
+        if (isReloadAfter) {
+            this.reload();
+        }
+    }
 
     public async reload(): Promise<void> {
         this.setLength(0);

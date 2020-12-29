@@ -1,6 +1,6 @@
 import { PaginableBookmarkDataSourceMapCollection } from '@ts-core/common/map/dataSource';
 import { CdkTableDataSource } from './CdkTableDataSource';
-import { CdkTablePaginableMapCollection, SortEvent } from './CdkTablePaginableMapCollection';
+import { CdkTablePaginableMapCollection, SortData } from './CdkTablePaginableMapCollection';
 import { CdkTableColumnManager } from './column/CdkTableColumnManager';
 import * as _ from 'lodash';
 
@@ -40,7 +40,7 @@ export abstract class CdkTablePaginableBookmarkMapCollection<U, V> extends Pagin
     //
     // --------------------------------------------------------------------------
 
-    public sortEventHandler(event: SortEvent<U>): void {
+    public sortEventHandler(event: SortData<U>): void {
         CdkTablePaginableMapCollection.sortEventHandler(this, event);
     }
 

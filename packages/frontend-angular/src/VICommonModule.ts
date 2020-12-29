@@ -77,6 +77,8 @@ export class VICommonModule {
                 { provide: VI_ANGULAR_OPTIONS, useValue: options || {} },
                 { provide: Logger, deps: [VI_ANGULAR_OPTIONS], useFactory: loggerServiceFactory },
 
+                ...WindowModule.forRoot().providers,
+                ...NotificationModule.forRoot().providers,
                 ...CookieModule.forRoot(options).providers,
                 ...ThemeModule.forRoot(options ? options.themeOptions : null).providers,
                 ...LanguageModule.forRoot(options ? options.languageOptions : null).providers

@@ -35,6 +35,7 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Loadab
     //
     // --------------------------------------------------------------------------
 
+    /*
     protected async loginByParam(param?: any): Promise<void> {
         if (this.isLoggedIn || this.isLoading) {
             return;
@@ -62,6 +63,44 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Loadab
             this.observer.next(new ObservableData(LoadableEvent.FINISHED));
             this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_FINISHED));
         }
+    }
+    */
+
+    protected async loginByParam(param?: any): Promise<U> {
+        return this.loginByFunction(() => this.loginRequest(param));
+    }
+
+    protected async loginByFunction(sidReturnFunction: (...params) => Promise<U>): Promise<U> {
+        if (this.isLoggedIn || this.isLoading) {
+            return null;
+        }
+
+        let response: U;
+        this.status = LoadableStatus.LOADING;
+        this.observer.next(new ObservableData(LoadableEvent.STARTED));
+        this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_STARTED));
+
+        try {
+            response = await sidReturnFunction();
+            this.parseLoginResponse(response);
+            if (!this.isCanLoginWithSid()) {
+                this.status = LoadableStatus.LOADED;
+            } else {
+                this.loginBySid();
+            }
+        } catch (error) {
+            error = ExtendedError.create(error);
+
+            this.status = LoadableStatus.ERROR;
+            this.parseLoginErrorResponse(error);
+            this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_ERROR, null, error));
+        }
+
+        if (!this.isLoading) {
+            this.observer.next(new ObservableData(LoadableEvent.FINISHED));
+            this.observer.next(new ObservableData(LoginBaseServiceEvent.LOGIN_FINISHED));
+        }
+        return response;
     }
 
     protected async loginBySid(): Promise<void> {
@@ -97,7 +136,7 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Loadab
         this._loginData = null;
     }
 
-    protected abstract loginRequest(param: any): Promise<U>;
+    protected abstract loginRequest(...params): Promise<U>;
     protected abstract loginSidRequest(): Promise<V>;
 
     protected abstract logoutRequest(): Promise<void>;
@@ -209,6 +248,7 @@ export abstract class LoginBaseService<E = any, U = any, V = any> extends Loadab
         return this._isLoggedIn;
     }
 }
+
 export enum LoginBaseServiceEvent {
     LOGIN_ERROR = 'LOGIN_ERROR',
     LOGIN_STARTED = 'LOGIN_STARTED',

@@ -247,10 +247,13 @@
         @include text-one-line();
     }
     .text-multi-line {
-        @include text-word-wrap-break();
+        @include text-word-wrap-break-all();
     }
-    .text-word-wrap-break {
-        @include text-word-wrap-break();
+    .text-word-wrap-break-all {
+        @include text-word-wrap-break-all();
+    }
+    .text-word-wrap-break-word {
+        @include text-word-wrap-break-word();
     }
     .scroll-no {
         @include scroll-no();
@@ -258,7 +261,6 @@
     .scroll-auto {
         @include scroll-auto();
     }
-
     .scroll-vertical,
     .vertical-scroll-only {
         @include vertical-scroll-only();

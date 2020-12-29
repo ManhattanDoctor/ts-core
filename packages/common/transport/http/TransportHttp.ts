@@ -7,11 +7,10 @@ import { ILogger } from '../../../common/logger';
 import { ObservableData } from '../../../common/observer';
 import { PromiseHandler } from '../../../common/promise';
 import { ITransportCommand, ITransportCommandAsync, ITransportCommandOptions, ITransportEvent, Transport, TransportLogType } from '../../../common/transport';
-import { TransformUtil } from '../../util';
 import { TransportNoConnectionError, TransportTimeoutError } from '../error';
 import { ITransportHttpRequest } from './ITransportHttpRequest';
 import { ITransportHttpSettings } from './ITransportHttpSettings';
-import { ITransportResponse } from '../ITransportResponse';
+import { TransportHttpCommandAsync } from './TransportHttpCommandAsync';
 
 export class TransportHttp extends Transport<ITransportHttpSettings> {
     // --------------------------------------------------------------------------
@@ -81,6 +80,10 @@ export class TransportHttp extends Transport<ITransportHttpSettings> {
         this.responseSend(command);
     }
 
+    public call<V = any, U = any>(path: string, request?: ITransportHttpRequest<U>, options?: ITransportCommandOptions): Promise<V> {
+        return this.sendListen(new TransportHttpCommandAsync(path, request), options);
+    }
+
     public wait<U>(command: ITransportCommand<U>): void {
         throw new ExtendedError(`Method doesn't implemented`);
     }
@@ -120,7 +123,7 @@ export class TransportHttp extends Transport<ITransportHttpSettings> {
         return new ExtendedError(`Unknown error`, ExtendedError.DEFAULT_ERROR_CODE, data);
     }
 
-    protected parseAxiosError<U, V>(data: AxiosError, command: ITransportCommand<U>): ExtendedError {
+    protected parseAxiosError<U>(data: AxiosError, command: ITransportCommand<U>): ExtendedError {
         let message = !_.isNil(data.message) ? data.message.toLocaleLowerCase() : ``;
         if (message.includes(`network error`)) {
             return new TransportNoConnectionError(command);

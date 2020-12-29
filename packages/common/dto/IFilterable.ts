@@ -87,10 +87,10 @@ export const ToFilterableCondition = <T, P extends keyof T>(
     let item: string | number = RemoveFilterableCondition(value);
     switch (type) {
         case FilterableDataType.NUMBER:
-            item = Number(value);
+            item = Number(item);
             break;
         case FilterableDataType.DATE:
-            item = Date.parse(value);
+            item = Date.parse(item);
             break;
     }
 

@@ -8,4 +8,6 @@ export interface ICookieService {
     putObject(key: string, value: Object, options?: ICookieOptions): void;
     remove(key: string, options?: ICookieOptions): void;
     removeAll(options?: ICookieOptions): void;
+    update(key: string, value: string, options?: ICookieOptions): void;
+    updateObject(key: string, value: Object, options?: ICookieOptions): void;
 }

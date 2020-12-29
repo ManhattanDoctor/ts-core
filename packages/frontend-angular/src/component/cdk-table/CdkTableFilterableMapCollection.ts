@@ -2,7 +2,7 @@ import { CdkTableDataSource } from './CdkTableDataSource';
 import { FilterableDataSourceMapCollection } from '@ts-core/common/map/dataSource';
 import { CdkTableColumnManager } from './column/CdkTableColumnManager';
 import * as _ from 'lodash';
-import { CdkTablePaginableMapCollection, SortEvent } from './CdkTablePaginableMapCollection';
+import { CdkTablePaginableMapCollection, SortData } from './CdkTablePaginableMapCollection';
 
 export abstract class CdkTableFilterableMapCollection<U, V> extends FilterableDataSourceMapCollection<U, V> {
     // --------------------------------------------------------------------------
@@ -40,7 +40,7 @@ export abstract class CdkTableFilterableMapCollection<U, V> extends FilterableDa
     //
     // --------------------------------------------------------------------------
 
-    public sortEventHandler(event: SortEvent<U>): void {
+    public sortEventHandler(event: SortData<U>): void {
         CdkTablePaginableMapCollection.sortEventHandler(this, event);
     }
 

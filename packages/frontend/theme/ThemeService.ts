@@ -3,6 +3,7 @@ import { ExtendedError } from '@ts-core/common/error';
 import { MapCollection } from '@ts-core/common/map';
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
+import { map, filter } from 'rxjs/operators';
 import { CookieStorageUtil, ICookieStorageOptions } from '../cookie';
 import { Theme } from './Theme';
 
@@ -94,6 +95,10 @@ export class ThemeService extends Destroyable {
 
     public get events(): Observable<string> {
         return this.observer.asObservable();
+    }
+
+    public get changed(): Observable<string> {
+        return this.events.pipe(filter(item => item === ThemeServiceEvent.CHANGED));
     }
 
     public get themes(): MapCollection<Theme> {

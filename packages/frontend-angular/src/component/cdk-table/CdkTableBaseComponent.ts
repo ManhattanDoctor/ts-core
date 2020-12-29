@@ -4,6 +4,8 @@ import * as _ from 'lodash';
 import { ICdkTableColumn } from './column/ICdkTableColumn';
 import { CdkTablePaginableMapCollection } from './CdkTablePaginableMapCollection';
 import { CdkTableFilterableMapCollection } from './CdkTableFilterableMapCollection';
+import { SortDirection } from '@angular/material';
+import { FilterableDataSourceMapCollection } from '@ts-core/common/map/dataSource';
 
 export abstract class CdkTableBaseComponent<
     T extends CdkTablePaginableMapCollection<U, V> | CdkTableFilterableMapCollection<U, V>,
@@ -27,6 +29,9 @@ export abstract class CdkTableBaseComponent<
     @Output()
     public cellClicked: EventEmitter<ICdkTableCellEvent<U>>;
 
+    public sortActive: keyof U;
+    public sortDirection: SortDirection;
+
     // --------------------------------------------------------------------------
     //
     // 	Constructor
@@ -49,11 +54,18 @@ export abstract class CdkTableBaseComponent<
     // --------------------------------------------------------------------------
 
     protected commitTableProperties(): void {
-        if (!this.table.isDirty) {
-            this.table.reload();
+        let sort = CdkTablePaginableMapCollection.getSort(this.table as FilterableDataSourceMapCollection<U, V>);
+        if (!_.isNil(sort)) {
+            this.sortActive = sort.active;
+            this.sortDirection = sort.direction;
         }
+
         if (!_.isEmpty(this.table.columns.items)) {
             this.columns = this.table.columns.items;
+        }
+
+        if (!this.table.isDirty) {
+            this.table.reload();
         }
     }
 

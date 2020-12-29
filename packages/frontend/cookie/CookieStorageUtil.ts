@@ -11,28 +11,20 @@ export class CookieStorageUtil {
     public static get(item: ICookieStorageOptions): string {
         return CookieStorageUtil.isValid(item) ? item.service.get(item.name) : null;
     }
+    
     public static getObject<T = any>(item: ICookieStorageOptions): T {
         return CookieStorageUtil.isValid(item) ? (item.service.getObject(item.name) as T) : null;
     }
 
     public static put(item: ICookieStorageOptions, value?: string): void {
-        if (!CookieStorageUtil.isValid(item)) {
-            return;
-        }
-        if (!_.isNil(value)) {
-            item.service.put(item.name, value, item.options);
-        } else {
-            item.service.remove(item.name);
+        if (CookieStorageUtil.isValid(item)) {
+            item.service.update(item.name, value, item.options);
         }
     }
+
     public static putObject<T = any>(item: ICookieStorageOptions, value?: T): void {
-        if (!CookieStorageUtil.isValid(item)) {
-            return;
-        }
-        if (!_.isNil(value)) {
-            item.service.putObject(item.name, value, item.options);
-        } else {
-            item.service.remove(item.name);
+        if (CookieStorageUtil.isValid(item)) {
+            item.service.updateObject(item.name, value, item.options);
         }
     }
 

@@ -1,4 +1,5 @@
-<mat-table matSort [ngClass]="{'mat-nav-list':settings?.isInteractive}" [dataSource]="table?.table.dataSource" (matSortChange)="table.sortEventHandler($event)">
+<mat-table matSort [ngClass]="{'mat-nav-list':settings?.isInteractive}" [dataSource]="table?.table.dataSource" 
+    [matSortActive]="sortActive" [matSortDirection]="sortDirection" (matSortChange)="table.sortEventHandler($event)">
   
     <ng-container *ngFor="let item of columns;trackBy:table?.columns.trackBy">
         <ng-container [matColumnDef]="item.name">
