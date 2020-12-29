@@ -1,8 +1,0 @@
-<ng-container *ngFor="let item of list?.collection">
-
-    <mat-list-item [ngClass]="item.isSelected? item.selectedClassName : item.className" *ngIf="item.isEnabled" (click)="list.actionItem(item)" >
-        <span [ngClass]="item.iconId" *ngIf="item.iconId" matListIcon></span>
-        <span [innerHTML]="item.label" [title]="item.label" matLine></span>
-    </mat-list-item>
-
-</ng-container>

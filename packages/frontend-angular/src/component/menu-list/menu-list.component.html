@@ -1,6 +1,0 @@
-<ng-container *ngFor="let item of list?.filtered">
-    <button mat-menu-item [ngClass]="item.className" (click)="list?.actionItem(item)">
-        <span [ngClass]="item.iconId" *ngIf="item.iconId"></span>
-        <span [innerHTML]="item.label" [title]="item.label"></span>
-    </button>
-</ng-container>

@@ -1,6 +1,0 @@
-<mat-tab-group [ngClass]="className" (selectedIndexChange)="list.selectedIndex = $event" [selectedIndex]="list?.selectedIndex"
-    (selectedTabChange)="selectedTabChange($event)">
-    <ng-container *ngFor="let item of list?.collection">
-        <mat-tab [ngClass]="item.className" [label]="item.label" [disabled]="!item.isEnabled" (click)="list?.actionItem(item)"></mat-tab>
-    </ng-container>
-</mat-tab-group>

@@ -10,7 +10,6 @@ import { PipeBaseService, RouterBaseService, VICommonModule, VIComponentModule }
 import { SettingsBaseService } from '@ts-core/frontend/service';
 import { Ng2SmartTableModule } from 'ng2-smart-table';
 import { CoinBlockTableComponent } from './component/coin-block-table.component';
-import { CoinTableComponent } from './component/coin-table.component';
 import { RootComponent } from './component/root/root.component';
 import { ApiService } from './service/ApiService';
 import { PipeService } from './service/PipeService';
@@ -43,7 +42,7 @@ export const providers: any[] = [
     { provide: SettingsBaseService, useClass: SettingsService }
 ];
 
-export const declarations: Array<any> = [RootComponent, CoinTableComponent, CoinBlockTableComponent];
+export const declarations: Array<any> = [RootComponent, CoinBlockTableComponent];
 
 export const entryComponents: any[] = [RootComponent];
 

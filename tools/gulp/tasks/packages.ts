@@ -18,8 +18,7 @@ const packages = {
     blockchain: createProject('packages/blockchain/tsconfig.json'),
     'crypto-gost': createProject('packages/crypto-gost/tsconfig.json'),
     'crypto-rsa': createProject('packages/crypto-rsa/tsconfig.json'),
-    'backend-nestjs': createProject('packages/backend-nestjs/tsconfig.json'),
-    'frontend-angular': createProject('packages/frontend-angular/tsconfig.json')
+    'backend-nestjs': createProject('packages/backend-nestjs/tsconfig.json')
 };
 
 const modules = Object.keys(packages);
@@ -49,10 +48,6 @@ const filesCopy = async (files: Array<string>, destination: string, options?: an
 
 const isFileExist = async (file: string): Promise<boolean> => {
     return new Promise(resolve => fs.exists(file, value => resolve(value)));
-};
-
-const isAngularPackage = (packageName: string): boolean => {
-    return packageName === 'frontend-angular';
 };
 
 // --------------------------------------------------------------------------
@@ -133,20 +128,16 @@ const packageBuild = async (packageName: string): Promise<void> => {
     await packageCompile(packageName);
 
     // Copy files
-    if (!isAngularPackage(packageName)) {
-        await filesCopy([`${projectDirectory}/.npmrc`, `${projectDirectory}/package.json`, `!${projectDirectory}/node_modules/**/*`], outputDirectory);
-    } else {
-        await run(`npm --prefix ${projectDirectory} run build`)();
-        await filesCopy([`${projectDirectory}/src/style/**/*.scss`], `${outputDirectory}/style`);
-    }
+    await filesCopy([`${projectDirectory}/.npmrc`, `${projectDirectory}/package.json`, `!${projectDirectory}/node_modules/**/*`], outputDirectory);
+
     await packageCopyToExamples(packageName);
 };
 
-const packageCopyToExamples = async (packageName:string): Promise<void> => {
+const packageCopyToExamples = async (packageName: string): Promise<void> => {
     const outputDirectory = `${output}/${packageName}`;
     await filesCopy([`${outputDirectory}/**/*`], `examples/frontend/node_modules/@ts-core/${packageName}`);
     await filesCopy([`${outputDirectory}/**/*`], `examples/backend/node_modules/@ts-core/${packageName}`);
-}
+};
 
 const packagePublish = async (packageName: string, type: 'patch' | 'minor' | 'major'): Promise<void> => {
     const projectDirectory = packages[packageName].projectDirectory;
@@ -158,12 +149,8 @@ const packagePublish = async (packageName: string, type: 'patch' | 'minor' | 'ma
     // Update version of package.js
 
     // Copy package.js
-    if (!isAngularPackage(packageName)) {
-        await run(`npm --prefix ${projectDirectory} version ${type}`)();
-        await filesCopy([`${projectDirectory}/package.json`], outputDirectory);
-    } else {
-        await run(`npm --prefix ${projectDirectory}/src version ${type}`)();
-    }
+    await run(`npm --prefix ${projectDirectory} version ${type}`)();
+    await filesCopy([`${projectDirectory}/package.json`], outputDirectory);
 
     // Publish to npm
     await run(`npm --prefix ${outputDirectory} --access public publish ${outputDirectory}`)();
