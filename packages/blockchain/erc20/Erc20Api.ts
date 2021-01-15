@@ -35,6 +35,15 @@ export class Erc20Api {
         return this.client.contractCall<string>(this.contract, 'balanceOf', [address]);
     }
 
+    public async getGasLimit(recipient: string, amount: string, spender: string): Promise<string> {
+        return this.contract.methods.transfer(recipient, amount).estimateGas({ spender });
+    }
+
+    public async getTransferData(recipient: string, amount: string): Promise<string> {
+        return this.contract.methods.transfer(recipient, amount).encodeABI();
+    }
+
+
     // --------------------------------------------------------------------------
     //
     // 	Public Properties
