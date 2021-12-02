@@ -10,7 +10,7 @@
     },
     "license": "ISC",
     "dependencies": {
-        "@ts-core/common": "^1.0.123",
+        "@ts-core/common": "^1.0.128",
         "node-rsa": "1.1.1"
     }
 }

@@ -13,8 +13,6 @@ import { createProject } from 'gulp-typescript';
 
 const packages = {
     common: createProject('packages/common/tsconfig.json'),
-    backend: createProject('packages/backend/tsconfig.json'),
-    frontend: createProject('packages/frontend/tsconfig.json'),
     blockchain: createProject('packages/blockchain/tsconfig.json'),
     'crypto-gost': createProject('packages/crypto-gost/tsconfig.json'),
     'crypto-rsa': createProject('packages/crypto-rsa/tsconfig.json'),
